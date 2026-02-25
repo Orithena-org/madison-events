@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor {{ site_title }}</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="/">{{ site_title }}</a></h1>
+            <p class="tagline">Sponsorship Opportunities</p>
+            <nav class="main-nav">
+                <a href="/">All Events</a>
+                <a href="/newsletter.html">Newsletter</a>
+                <a href="/sponsors.html" class="active">Sponsors</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <section class="sponsor-hero">
+            <h2>Reach Madison's Event-Goers</h2>
+            <p>{{ site_title }} aggregates events from across Madison, attracting engaged locals looking for things to do. Partner with us to reach this audience.</p>
+        </section>
+
+        <section class="sponsor-tiers">
+            <h2>Sponsorship Tiers</h2>
+            <div class="tier-grid">
+                {% for tier_id, tier in sponsor_tiers.items() %}
+                <div class="tier-card tier-{{ tier_id }}">
+                    <h3>{{ tier_id|title }} Sponsor</h3>
+                    <div class="tier-price">${{ tier.price }}/month</div>
+                    <ul class="tier-perks">
+                        {% for perk in tier.perks %}
+                        <li>{{ perk }}</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="mailto:sponsors@madison-events.example.com?subject={{ tier_id|title }}%20Sponsorship" class="tier-cta">Get Started</a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="sponsor-stats">
+            <h2>Why Sponsor?</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_events }}+</div>
+                    <div class="stat-label">Events Listed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Local Sources</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Weekly</div>
+                    <div class="stat-label">Newsletter</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Daily</div>
+                    <div class="stat-label">Social Posts</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sponsor-ad-info">
+            <h2>Advertising Options</h2>
+            <div class="ad-options-grid">
+                {% for slot_id, slot in ad_slots.items() %}
+                <div class="ad-option-card">
+                    <h3>{{ slot.label }}</h3>
+                    <p>{{ slot.width }}x{{ slot.height }} pixels</p>
+                    <p>Placement: {{ slot_id|replace('_', ' ')|title }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Built by Orithena.</p>
+        </div>
+    </footer>
+</body>
+</html>

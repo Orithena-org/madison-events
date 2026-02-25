@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site_title }} - {{ site_tagline }}</title>
+    <meta name="description" content="{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <!-- Header with Ad Slot -->
+    <header class="site-header">
+        <div class="ad-slot ad-header" id="ad-header-banner">
+            <span class="ad-label">Advertisement</span>
+            <div class="ad-placeholder">Your Ad Here - 728x90 Header Banner</div>
+        </div>
+        <div class="header-content">
+            <h1><a href="/">{{ site_title }}</a></h1>
+            <p class="tagline">{{ site_tagline }}</p>
+            <nav class="main-nav">
+                <a href="/" class="active">All Events</a>
+                <a href="#this-week">This Week</a>
+                <a href="#weekend">Weekend</a>
+                <a href="/newsletter.html">Newsletter</a>
+                <a href="/sponsors.html">Sponsors</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-layout">
+        <!-- Main Content -->
+        <main class="events-main">
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Source:</label>
+                    <button class="filter-btn active" data-source="all">All</button>
+                    {% for source_id, source_name in sources.items() %}
+                    <button class="filter-btn" data-source="{{ source_id }}">{{ source_name }}</button>
+                    {% endfor %}
+                </div>
+                <div class="filter-group">
+                    <label>View:</label>
+                    <button class="view-btn active" data-view="list">List</button>
+                    <button class="view-btn" data-view="calendar">Calendar</button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <span>{{ total_events }} events</span>
+                <span>from {{ sources|length }} sources</span>
+                <span>Updated: {{ last_updated }}</span>
+            </div>
+
+            <!-- Events List View -->
+            <div id="events-list" class="events-list">
+                {% for date_group, events in events_by_date.items() %}
+                <div class="date-section" id="{{ date_group }}">
+                    <h2 class="date-header">{{ events[0].date_display }}</h2>
+
+                    {% for event in events %}
+                    <article class="event-card" data-source="{{ event.source }}">
+                        {% if event.is_featured %}
+                        <div class="featured-badge">Featured</div>
+                        {% endif %}
+                        <div class="event-content">
+                            <div class="event-info">
+                                <h3 class="event-title">
+                                    {% if event.url %}
+                                    <a href="{{ event.url }}" target="_blank" rel="noopener">{{ event.title }}</a>
+                                    {% else %}
+                                    {{ event.title }}
+                                    {% endif %}
+                                </h3>
+                                <div class="event-meta">
+                                    <span class="event-time">{{ event.time_display }}</span>
+                                    {% if event.venue %}
+                                    <span class="event-venue">{{ event.venue }}</span>
+                                    {% endif %}
+                                    <span class="event-source badge-{{ event.source }}">{{ event.source_display }}</span>
+                                </div>
+                                {% if event.description %}
+                                <p class="event-description">{{ event.description[:200] }}{% if event.description|length > 200 %}...{% endif %}</p>
+                                {% endif %}
+                                {% if event.price %}
+                                <span class="event-price">{{ event.price }}</span>
+                                {% endif %}
+                            </div>
+                            {% if event.image_url %}
+                            <div class="event-image">
+                                <img src="{{ event.image_url }}" alt="{{ event.title }}" loading="lazy">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </article>
+
+                    {% if loop.index == 3 %}
+                    <!-- In-feed sponsored content -->
+                    <div class="ad-slot ad-in-feed">
+                        <span class="ad-label">Sponsored</span>
+                        <div class="ad-placeholder">Sponsored Event or Ad - Support Local Madison!</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Calendar View (hidden by default) -->
+            <div id="events-calendar" class="events-calendar" style="display:none;">
+                <div class="calendar-grid">
+                    {% for date_str, events in events_by_date.items() %}
+                    <div class="calendar-day">
+                        <div class="calendar-day-header">{{ events[0].date.strftime('%b %-d') }}</div>
+                        <div class="calendar-day-name">{{ events[0].date.strftime('%A') }}</div>
+                        {% for event in events[:4] %}
+                        <div class="calendar-event" data-source="{{ event.source }}">
+                            <span class="dot dot-{{ event.source }}"></span>
+                            {{ event.title[:40] }}{% if event.title|length > 40 %}...{% endif %}
+                        </div>
+                        {% endfor %}
+                        {% if events|length > 4 %}
+                        <div class="calendar-more">+{{ events|length - 4 }} more</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Sidebar Ad -->
+            <div class="ad-slot ad-sidebar">
+                <span class="ad-label">Advertisement</span>
+                <div class="ad-placeholder">Sidebar Ad 300x250</div>
+            </div>
+
+            <!-- Newsletter Signup -->
+            <div class="sidebar-widget newsletter-signup">
+                <h3>Weekly Newsletter</h3>
+                <p>Get Madison's best events delivered to your inbox every Monday.</p>
+                <form class="newsletter-form" action="#" method="post">
+                    <input type="email" placeholder="your@email.com" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+
+            <!-- Sponsor Section -->
+            <div class="sidebar-widget sponsors-widget">
+                <h3>Our Sponsors</h3>
+                <p class="sponsor-cta">Want to reach Madison's event-goers? <a href="/sponsors.html">Become a sponsor</a></p>
+                <div class="sponsor-logos">
+                    <div class="sponsor-placeholder">Your Logo Here</div>
+                </div>
+            </div>
+
+            <!-- Source Legend -->
+            <div class="sidebar-widget source-legend">
+                <h3>Event Sources</h3>
+                {% for source_id, source_name in sources.items() %}
+                <div class="source-item">
+                    <span class="dot dot-{{ source_id }}"></span>
+                    {{ source_name }}
+                </div>
+                {% endfor %}
+            </div>
+        </aside>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>{{ site_title }}</h4>
+                <p>A community events aggregator for Madison, Wisconsin. We pull together events from multiple local sources so you never miss what's happening.</p>
+            </div>
+            <div class="footer-col">
+                <h4>For Venues & Organizers</h4>
+                <p>Want your events featured? <a href="/sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <p>
+                    <a href="#">Twitter/X</a> |
+                    <a href="#">Instagram</a> |
+                    <a href="#">Facebook</a>
+                </p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Events data sourced from public listings. Built by Orithena.</p>
+        </div>
+    </footer>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>

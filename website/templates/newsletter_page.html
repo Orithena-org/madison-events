@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter - {{ site_title }}</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="/">{{ site_title }}</a></h1>
+            <p class="tagline">Weekly Newsletter</p>
+            <nav class="main-nav">
+                <a href="/">All Events</a>
+                <a href="/newsletter.html" class="active">Newsletter</a>
+                <a href="/sponsors.html">Sponsors</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-content">
+        <section class="newsletter-hero">
+            <h2>Never Miss What's Happening in Madison</h2>
+            <p>Every Monday morning, get a curated roundup of the best events happening in Madison this week. Concerts, shows, community events, and more - all in one email.</p>
+            <form class="newsletter-form-large" action="#" method="post">
+                <input type="email" placeholder="your@email.com" required>
+                <button type="submit">Subscribe Free</button>
+            </form>
+        </section>
+
+        <section class="newsletter-preview">
+            <h2>Latest Newsletter Preview</h2>
+            <div class="newsletter-preview-content">
+                {{ newsletter_preview }}
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Built by Orithena.</p>
+        </div>
+    </footer>
+</body>
+</html>
