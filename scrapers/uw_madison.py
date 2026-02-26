@@ -26,18 +26,14 @@ class UWMadisonScraper(BaseScraper):
         if not soup:
             return events
 
-        # today.wisc.edu uses event listing cards
-        event_elements = soup.select(
-            ".event-listing, .event-card, .event-item, "
-            "article[class*='event'], div[class*='event-row'], "
-            ".uw-event, .views-row, li[class*='event']"
-        )
+        # today.wisc.edu uses li.event-row for each event listing
+        event_elements = soup.select("li.event-row")
 
         # Fallback: broader search
         if not event_elements:
             event_elements = soup.select(
-                "a[href*='/events/'], a[href*='/event/'], "
-                ".view-content .views-row, article"
+                ".event-listing, .event-card, .event-item, "
+                "article[class*='event'], div[class*='event-row']"
             )
 
         for el in event_elements[:30]:
@@ -87,22 +83,20 @@ class UWMadisonScraper(BaseScraper):
             except (ValueError, TypeError):
                 pass
 
-        # Time
-        time_el = el.select_one(
-            ".time, .event-time, span[class*='time'], .field-time"
-        )
-        time_start = time_el.get_text(strip=True) if time_el else None
+        # Time — today.wisc.edu uses p.event-time with span.time-hm children
+        time_el = el.select_one(".event-time")
+        time_start = None
+        if time_el:
+            time_start = time_el.get_text(strip=True)
 
-        # Venue
-        venue_el = el.select_one(
-            ".venue, .location, .field-location, "
-            "span[class*='venue'], span[class*='location']"
-        )
+        # Venue — today.wisc.edu uses p.event-location
+        venue_el = el.select_one(".event-location")
         venue = venue_el.get_text(strip=True) if venue_el else None
 
-        # Description
+        # Description — UW event rows don't have description text in the listing,
+        # so avoid the generic p fallback which grabs time/sponsor text
         desc_el = el.select_one(
-            ".description, .excerpt, .summary, .field-body, p"
+            ".description, .excerpt, .summary, .field-body"
         )
         description = desc_el.get_text(strip=True) if desc_el else None
 
