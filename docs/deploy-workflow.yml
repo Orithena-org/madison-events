@@ -1,3 +1,7 @@
+# GitHub Actions workflow for automated scrape + deploy
+# To enable: copy this file to .github/workflows/publish.yml
+# Requires: GitHub Pages enabled, PAT with workflow scope
+
 name: Scrape and Publish
 
 on:
