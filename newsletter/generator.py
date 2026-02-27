@@ -1,7 +1,10 @@
-"""Newsletter content generator for Madison Events."""
+"""Newsletter content generator for Madison Events.
+
+Generates curated weekly newsletters with Editor's Picks,
+weekend highlights, and categorized event listings.
+"""
 from __future__ import annotations
 
-import json
 import logging
 from collections import OrderedDict
 from datetime import date, timedelta
@@ -9,12 +12,13 @@ from pathlib import Path
 
 from config import OUTPUT_DIR, SITE_URL, SITE_TITLE, SPONSOR_TIERS
 from models import Event
+from curator import select_editors_picks, select_weekend_picks
 
 logger = logging.getLogger(__name__)
 
 
 def generate_newsletter_html(events: list[Event]) -> str:
-    """Generate a weekly newsletter email in HTML format."""
+    """Generate a weekly newsletter email in HTML format with curated picks."""
     today = date.today()
     week_start = today
     week_end = today + timedelta(days=6)
@@ -26,9 +30,16 @@ def generate_newsletter_html(events: list[Event]) -> str:
     ]
     week_events.sort(key=lambda e: (e.date, e.time_start or ""))
 
-    # Group by category
+    # Get curated picks
+    editors_picks = select_editors_picks(events, count=5)
+    weekend_picks = select_weekend_picks(events, count=3)
+
+    # Group remaining by category
     by_category = {}
+    pick_titles = {p["event"].title for p in editors_picks}
     for event in week_events:
+        if event.title in pick_titles:
+            continue  # Don't repeat picks in category listings
         cat = event.category or "Other Events"
         if cat not in by_category:
             by_category[cat] = []
@@ -42,7 +53,7 @@ def generate_newsletter_html(events: list[Event]) -> str:
     <!-- Header -->
     <div style="background:#1a1a2e;color:white;padding:24px;text-align:center;border-radius:8px 8px 0 0;">
         <h1 style="margin:0;font-size:24px;">{SITE_TITLE}</h1>
-        <p style="margin:8px 0 0;color:#aaa;font-size:14px;">Weekly Events Digest</p>
+        <p style="margin:8px 0 0;color:#aaa;font-size:14px;">Your Weekly Guide to Madison</p>
         <p style="margin:4px 0 0;color:#ccc;font-size:16px;">{week_start_str} - {week_end_str}</p>
     </div>
 
@@ -57,45 +68,72 @@ def generate_newsletter_html(events: list[Event]) -> str:
     <!-- Intro -->
     <div style="padding:20px 24px;border:1px solid #e0e0e0;border-top:none;">
         <p style="font-size:15px;line-height:1.6;color:#333;">
-            Happy {today.strftime('%A')}! Here's your weekly roundup of <strong>{len(week_events)} events</strong>
-            happening in Madison this week. From arts and entertainment to community gatherings,
-            there's something for everyone.
+            Happy {today.strftime('%A')}! We dug through <strong>{len(week_events)} events</strong>
+            happening in Madison this week and picked the ones actually worth your time.
+            Here's what made the cut.
         </p>
     </div>
-
-    <!-- Featured Events -->
-    <div style="padding:20px 24px;border:1px solid #e0e0e0;border-top:none;">
-        <h2 style="font-size:18px;color:#c41e3a;border-bottom:2px solid #c41e3a;padding-bottom:8px;">
-            This Week's Highlights
-        </h2>
 """
 
-    # Show top 5 events as highlights
-    highlights = week_events[:5]
-    for event in highlights:
-        html += f"""
-        <div style="padding:12px 0;border-bottom:1px solid #f0f0f0;">
+    # Editor's Picks section
+    if editors_picks:
+        html += """
+    <!-- Editor's Picks -->
+    <div style="padding:20px 24px;border:1px solid #e0e0e0;border-top:none;">
+        <h2 style="font-size:18px;color:#c41e3a;border-bottom:2px solid #c41e3a;padding-bottom:8px;margin-bottom:16px;">
+            Editor's Picks
+        </h2>
+"""
+        for i, pick in enumerate(editors_picks):
+            event = pick["event"]
+            commentary = pick["commentary"]
+            html += f"""
+        <div style="padding:14px 0;border-bottom:1px solid #f0f0f0;">
             <h3 style="margin:0;font-size:16px;">
                 <a href="{event.url}" style="color:#1a1a2e;text-decoration:none;">{event.title}</a>
             </h3>
             <p style="margin:4px 0 0;font-size:13px;color:#666;">
                 {event.date_display} {('at ' + event.time_start) if event.time_start else ''}
                 {(' | ' + event.venue) if event.venue else ''}
+                {(' | ' + event.price) if event.price else ''}
             </p>
-            {('<p style="margin:4px 0 0;font-size:13px;color:#888;">' + event.description[:150] + '...</p>') if event.description and len(event.description) > 10 else ''}
+            <p style="margin:6px 0 0;font-size:14px;color:#444;font-style:italic;">
+                {commentary}
+            </p>
+            {('<p style="margin:6px 0 0;font-size:13px;color:#888;">' + event.description[:120] + '...</p>') if event.description and len(event.description) > 10 else ''}
         </div>
 """
+        html += "    </div>\n"
 
-    html += """
-    </div>
-
+    # Mid-newsletter sponsor slot
+    html += f"""
     <!-- Mid-newsletter sponsor slot -->
     <div style="background:#fff8f8;padding:16px 24px;text-align:center;border:1px solid #e0e0e0;border-top:none;">
         <p style="margin:0;font-size:11px;color:#999;text-transform:uppercase;">Sponsored</p>
         <p style="margin:8px 0;font-size:15px;color:#333;">Your business could be here!</p>
-        <a href="{url}/sponsors.html" style="color:#c41e3a;font-size:13px;">Learn about newsletter sponsorship</a>
+        <a href="{SITE_URL}/sponsors.html" style="color:#c41e3a;font-size:13px;">Learn about newsletter sponsorship</a>
     </div>
-""".format(url=SITE_URL)
+"""
+
+    # Weekend picks
+    if weekend_picks:
+        html += """
+    <!-- Weekend Picks -->
+    <div style="padding:20px 24px;border:1px solid #e0e0e0;border-top:none;">
+        <h2 style="font-size:18px;color:#333;margin-bottom:12px;">Weekend Picks</h2>
+"""
+        for pick in weekend_picks:
+            event = pick["event"]
+            commentary = pick["commentary"]
+            html += f"""
+        <div style="padding:10px 0;border-bottom:1px solid #f5f5f5;">
+            <strong style="font-size:14px;">{event.title}</strong>
+            <span style="font-size:12px;color:#888;"> - {event.date.strftime('%A')}</span>
+            {('<span style="font-size:12px;color:#888;"> @ ' + event.venue + '</span>') if event.venue else ''}
+            <p style="margin:4px 0 0;font-size:13px;color:#666;font-style:italic;">{commentary}</p>
+        </div>
+"""
+        html += "    </div>\n"
 
     # Events by category
     for category, cat_events in by_category.items():
@@ -106,7 +144,7 @@ def generate_newsletter_html(events: list[Event]) -> str:
         for event in cat_events[:6]:
             source_colors = {
                 "isthmus": "#e74c3c",
-                "overture": "#3498db",
+                "eventbrite": "#3498db",
                 "uw_madison": "#c5050c",
             }
             dot_color = source_colors.get(event.source, "#999")
@@ -144,7 +182,7 @@ def generate_newsletter_html(events: list[Event]) -> str:
             <a href="{SITE_URL}/sponsors.html" style="color:#aaa;">Advertise</a>
         </p>
         <p style="margin:8px 0 0;color:#666;">
-            Events sourced from Isthmus, Overture Center, and UW-Madison
+            Events sourced from Isthmus, Eventbrite, and UW-Madison
         </p>
     </div>
 </div>
@@ -163,29 +201,50 @@ def generate_newsletter_plain(events: list[Event]) -> str:
     ]
     week_events.sort(key=lambda e: (e.date, e.time_start or ""))
 
+    editors_picks = select_editors_picks(events, count=5)
+
     lines = [
-        f"{SITE_TITLE} - Weekly Events Digest",
+        f"{SITE_TITLE} - Your Weekly Guide to Madison",
         f"{today.strftime('%B %-d')} - {week_end.strftime('%B %-d, %Y')}",
         "=" * 50,
         "",
-        f"{len(week_events)} events happening this week in Madison.",
+        f"We dug through {len(week_events)} events this week. Here's what made the cut.",
         "",
-        "THIS WEEK'S HIGHLIGHTS",
-        "-" * 30,
     ]
 
-    for event in week_events[:10]:
+    if editors_picks:
+        lines.append("EDITOR'S PICKS")
+        lines.append("-" * 30)
+        for pick in editors_picks:
+            event = pick["event"]
+            commentary = pick["commentary"]
+            lines.append(f"\n* {event.title}")
+            lines.append(f"  {event.date_display} {event.time_display}")
+            if event.venue:
+                lines.append(f"  @ {event.venue}")
+            if event.price:
+                lines.append(f"  {event.price}")
+            lines.append(f"  >> {commentary}")
+            if event.url:
+                lines.append(f"  {event.url}")
+
+    lines.append("")
+    lines.append("MORE THIS WEEK")
+    lines.append("-" * 30)
+
+    pick_titles = {p["event"].title for p in editors_picks}
+    remaining = [e for e in week_events if e.title not in pick_titles]
+
+    for event in remaining[:10]:
         lines.append(f"\n* {event.title}")
         lines.append(f"  {event.date_display} {event.time_display}")
         if event.venue:
             lines.append(f"  @ {event.venue}")
-        if event.description:
-            lines.append(f"  {event.description[:100]}...")
         if event.url:
             lines.append(f"  {event.url}")
 
-    if len(week_events) > 10:
-        lines.append(f"\n...and {len(week_events) - 10} more events!")
+    if len(remaining) > 10:
+        lines.append(f"\n...and {len(remaining) - 10} more events!")
 
     lines.extend([
         "",
