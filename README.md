@@ -81,3 +81,29 @@ madison-events/
 - **Ad slots**: Header banner (728x90), sidebar (300x250), in-feed sponsored
 - **Sponsor tiers**: Presenting ($500/mo), Supporting ($200/mo), Community ($50/mo)
 - **Featured events**: Premium placement for paying venues/organizers
+
+## Deployment
+
+The site is deployed to GitHub Pages automatically via GitHub Actions.
+
+**Live site:** https://orithena-org.github.io/madison-events
+
+### How it works
+
+1. Every push to `main` triggers a build via `.github/workflows/deploy.yml`
+2. The workflow installs Python dependencies, runs `python run.py --demo`, and deploys `output/site/` to GitHub Pages
+3. A daily scheduled build (6 AM Central) keeps the demo dates current
+
+### Setup (one-time)
+
+1. Go to the repo's **Settings > Pages**
+2. Set **Source** to "GitHub Actions"
+3. Push to `main` — the workflow handles the rest
+
+### Custom domain (optional)
+
+To use a custom domain, add a `CNAME` file to `website/static/` containing your domain (it gets copied to `output/site/` during build), and update the `SITE_URL` env var in the workflow.
+
+## Feedback
+
+Found an issue or want to suggest a new event source? Use our [feedback form](https://github.com/Orithena-org/madison-events/issues/new/choose) on GitHub.

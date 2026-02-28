@@ -1,0 +1,31 @@
+name: General Feedback
+description: Share feedback about the site, report incorrect event info, or suggest improvements
+labels: ["feedback"]
+body:
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: Feedback Type
+      options:
+        - Incorrect event information
+        - Missing event
+        - Website bug or display issue
+        - Feature suggestion
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Tell us what's going on
+      placeholder: Describe the issue or suggestion...
+    validations:
+      required: true
+
+  - type: input
+    id: event-name
+    attributes:
+      label: Related Event (if applicable)
+      placeholder: e.g., Madison Symphony Orchestra concert on Feb 28
