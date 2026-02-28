@@ -35,6 +35,17 @@ class Event:
         return cls(**d)
 
     @property
+    def display_url(self) -> str:
+        """URL with affiliate tracking appended where applicable."""
+        from config import EVENTBRITE_AFFILIATE_ID
+        if not self.url:
+            return ""
+        if EVENTBRITE_AFFILIATE_ID and "eventbrite.com" in self.url:
+            sep = "&" if "?" in self.url else "?"
+            return f"{self.url}{sep}aff={EVENTBRITE_AFFILIATE_ID}"
+        return self.url
+
+    @property
     def date_display(self) -> str:
         return self.date.strftime("%A, %B %-d, %Y")
 

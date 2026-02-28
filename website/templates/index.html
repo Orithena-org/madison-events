@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ site_title }} - {{ site_tagline }}</title>
     <meta name="description" content="{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.">
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ site_title }} - {{ site_tagline }}">
+    <meta property="og:description" content="Find concerts, shows, festivals, and community events in Madison, Wisconsin. Updated daily.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}/">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ site_title }}">
+    <meta name="twitter:description" content="{{ site_tagline }}. Updated daily.">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
@@ -72,7 +83,7 @@
                             <div class="event-info">
                                 <h3 class="event-title">
                                     {% if event.url %}
-                                    <a href="{{ event.url }}" target="_blank" rel="noopener">{{ event.title }}</a>
+                                    <a href="{{ event.display_url }}" target="_blank" rel="noopener">{{ event.title }}</a>
                                     {% else %}
                                     {{ event.title }}
                                     {% endif %}
@@ -194,6 +205,34 @@
         </div>
     </footer>
 
+    <!-- JSON-LD Structured Data for Events -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "{{ site_title }}",
+        "url": "{{ site_url }}/",
+        "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin."
+    }
+    </script>
+    {% for date_group, events in events_by_date.items() %}
+    {% for event in events %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": "{{ event.title | e }}",
+        "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
+        {% if event.description %}"description": "{{ event.description[:200] | e }}",{% endif %}
+        {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
+        {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
+        {% if event.price %}"offers": { "@type": "Offer", "price": "{{ event.price }}", "priceCurrency": "USD", "url": "{{ event.display_url }}" },{% endif %}
+        "url": "{{ event.display_url }}",
+        "eventStatus": "https://schema.org/EventScheduled"
+    }
+    </script>
+    {% endfor %}
+    {% endfor %}
     <script src="static/js/app.js"></script>
 </body>
 </html>
