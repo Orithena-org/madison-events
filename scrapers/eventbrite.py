@@ -1,9 +1,9 @@
-"""Scraper for Isthmus (isthmus.com) using JSON-LD structured data."""
+"""Scraper for Eventbrite Madison events using JSON-LD structured data."""
 from __future__ import annotations
 
 import json
 import logging
-from datetime import date, datetime
+from datetime import date
 from dateutil import parser as dateparser
 
 from config import SOURCES
@@ -13,33 +13,39 @@ from .base import BaseScraper
 logger = logging.getLogger(__name__)
 
 
-class IsthmusScraper(BaseScraper):
-    source_id = "isthmus"
-    source_name = "Isthmus"
+class EventbriteScraper(BaseScraper):
+    source_id = "eventbrite"
+    source_name = "Eventbrite"
 
     def scrape(self) -> list[Event]:
         events = []
-        conf = SOURCES["isthmus"]
+        conf = SOURCES["eventbrite"]
         soup = self.fetch_page(conf["events_url"])
         if not soup:
             return events
 
-        # Isthmus embeds event data as JSON-LD <script type="application/ld+json">
+        # Eventbrite embeds an ItemList JSON-LD with all events
         for script in soup.select('script[type="application/ld+json"]'):
             try:
                 data = json.loads(script.string)
             except (json.JSONDecodeError, TypeError):
                 continue
 
-            if not isinstance(data, dict) or data.get("@type") != "Event":
+            if not isinstance(data, dict):
                 continue
 
-            try:
-                event = self._parse_jsonld(data)
-                if event:
-                    events.append(event)
-            except Exception as e:
-                logger.debug(f"Failed to parse Isthmus JSON-LD event: {e}")
+            # The ItemList contains ListItem entries wrapping Event objects
+            if data.get("@type") == "ItemList":
+                for list_item in data.get("itemListElement", []):
+                    item = list_item.get("item", {})
+                    if item.get("@type") != "Event":
+                        continue
+                    try:
+                        event = self._parse_jsonld(item)
+                        if event:
+                            events.append(event)
+                    except Exception as e:
+                        logger.debug(f"Failed to parse Eventbrite event: {e}")
 
         return events[:30]
 
@@ -52,25 +58,14 @@ class IsthmusScraper(BaseScraper):
 
         # Parse date
         event_date = date.today()
-        time_start = None
-        time_end = None
         start_str = data.get("startDate", "")
         if start_str:
             try:
-                dt = dateparser.parse(start_str)
-                event_date = dt.date()
-                time_start = dt.strftime("%-I:%M %p")
-            except (ValueError, TypeError):
-                pass
-        end_str = data.get("endDate", "")
-        if end_str:
-            try:
-                dt = dateparser.parse(end_str)
-                time_end = dt.strftime("%-I:%M %p")
+                event_date = dateparser.parse(start_str).date()
             except (ValueError, TypeError):
                 pass
 
-        # Location
+        # Location / venue
         venue = None
         location = data.get("location")
         if isinstance(location, dict):
@@ -87,8 +82,6 @@ class IsthmusScraper(BaseScraper):
             date=event_date,
             source=self.source_id,
             url=url,
-            time_start=time_start,
-            time_end=time_end,
             venue=venue,
             description=description,
             image_url=image_url,

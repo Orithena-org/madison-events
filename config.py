@@ -27,12 +27,12 @@ SOURCES = {
     "isthmus": {
         "name": "Isthmus",
         "base_url": "https://isthmus.com",
-        "events_url": "https://isthmus.com/events/",
+        "events_url": "https://isthmus.com/search/event/calendar-of-events/",
     },
-    "overture": {
-        "name": "Overture Center",
-        "base_url": "https://www.overture.org",
-        "events_url": "https://www.overture.org/events",
+    "eventbrite": {
+        "name": "Eventbrite",
+        "base_url": "https://www.eventbrite.com",
+        "events_url": "https://www.eventbrite.com/d/wi--madison/events/",
     },
     "uw_madison": {
         "name": "UW-Madison",
