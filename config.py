@@ -44,7 +44,7 @@ SOURCES = {
 # Website settings
 SITE_TITLE = "Madison Events"
 SITE_TAGLINE = "Your guide to everything happening in Madison, WI"
-SITE_URL = os.getenv("SITE_URL", "https://madison-events.example.com")
+SITE_URL = os.getenv("SITE_URL", "https://orithena-org.github.io/madison-events")
 
 # Monetization
 AD_SLOTS = {
