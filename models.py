@@ -11,7 +11,7 @@ import json
 class Event:
     title: str
     date: date
-    source: str  # isthmus, overture, uw_madison
+    source: str  # isthmus, overture, uw_madison, city_madison, patch
     url: str
     time_start: Optional[str] = None
     time_end: Optional[str] = None
@@ -63,6 +63,8 @@ class Event:
             "isthmus": "Isthmus",
             "eventbrite": "Eventbrite",
             "uw_madison": "UW-Madison",
+            "city_madison": "City of Madison",
+            "patch": "Patch.com",
         }
         return names.get(self.source, self.source)
 
