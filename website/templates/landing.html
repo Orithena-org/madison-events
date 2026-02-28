@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site_title }} - {{ site_tagline }}</title>
+    <meta name="description" content="Get the best Madison, WI events delivered to your inbox every week. Free newsletter curated from Isthmus, Eventbrite, UW-Madison, and more.">
+    <meta property="og:title" content="{{ site_title }}">
+    <meta property="og:description" content="{{ site_tagline }}">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        .landing-hero {
+            background: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 60px 20px 50px;
+        }
+        .landing-hero h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 0 0 16px;
+            line-height: 1.2;
+        }
+        .landing-hero h1 span { color: var(--primary); }
+        .landing-hero .subtitle {
+            font-size: 18px;
+            color: #bbb;
+            max-width: 540px;
+            margin: 0 auto 32px;
+            line-height: 1.5;
+        }
+        .landing-hero .signup-form {
+            display: flex;
+            gap: 10px;
+            max-width: 460px;
+            margin: 0 auto;
+            justify-content: center;
+        }
+        .landing-hero .signup-form input[type="email"] {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #2a2a3e;
+            color: white;
+        }
+        .landing-hero .signup-form input[type="email"]::placeholder { color: #888; }
+        .landing-hero .signup-form input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .landing-hero .signup-form button {
+            padding: 14px 28px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .landing-hero .signup-form button:hover { background: var(--primary-dark); }
+        .landing-trust {
+            font-size: 13px;
+            color: #666;
+            margin-top: 14px;
+        }
+
+        .landing-value {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+        .landing-value h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 40px;
+        }
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .value-card {
+            text-align: center;
+            padding: 24px;
+        }
+        .value-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .value-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .value-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .landing-preview {
+            background: #f5f5f5;
+            padding: 50px 20px;
+        }
+        .landing-preview h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .landing-preview .preview-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .picks-preview {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .picks-header {
+            background: var(--secondary);
+            color: white;
+            padding: 16px 24px;
+            text-align: center;
+        }
+        .picks-header h3 { font-size: 18px; margin: 0; }
+        .picks-header p { font-size: 13px; color: #aaa; margin: 4px 0 0; }
+        .pick-item {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .pick-item:last-child { border-bottom: none; }
+        .pick-item h4 { font-size: 15px; margin: 0 0 4px; }
+        .pick-item .pick-meta { font-size: 13px; color: var(--text-muted); }
+        .pick-item .pick-comment {
+            font-size: 13px;
+            color: #555;
+            font-style: italic;
+            margin-top: 6px;
+        }
+
+        .landing-cta {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .landing-cta h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .landing-cta p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 16px;
+        }
+
+        .landing-also {
+            background: var(--secondary);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .landing-also h2 { font-size: 22px; margin-bottom: 20px; }
+        .landing-also .also-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .landing-also .also-links a {
+            color: #ccc;
+            font-size: 15px;
+            padding: 8px 16px;
+            border: 1px solid #444;
+            border-radius: 6px;
+        }
+        .landing-also .also-links a:hover {
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .landing-hero h1 { font-size: 28px; }
+            .landing-hero .signup-form { flex-direction: column; }
+            .value-grid { grid-template-columns: 1fr; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="landing-hero">
+        <h1>Madison's best events.<br><span>Every week. Free.</span></h1>
+        <p class="subtitle">
+            We scour Isthmus, Eventbrite, UW-Madison, and more so you don't have to.
+            Get a curated list of the week's best events — delivered every Monday.
+        </p>
+        <form class="signup-form newsletter-form-large" action="#" method="post">
+            <input type="email" placeholder="your@email.com" required>
+            <button type="submit">Get the Newsletter</button>
+        </form>
+        <p class="landing-trust">Free forever. One email per week. Unsubscribe anytime.</p>
+    </section>
+
+    <!-- Value Props -->
+    <section class="landing-value">
+        <h2>Why subscribers love it</h2>
+        <div class="value-grid">
+            <div class="value-card">
+                <div class="value-icon">&#127912;</div>
+                <h3>Curated, Not Dumped</h3>
+                <p>We don't just list every event. We pick the ones worth your time and tell you why they're worth going to.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">&#128197;</div>
+                <h3>Every Source, One Place</h3>
+                <p>Events from Isthmus, Eventbrite, UW-Madison, Overture Center, and more — all in one weekly email.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">&#9201;</div>
+                <h3>2-Minute Read</h3>
+                <p>Editor's picks up top, full listings below. Scan it over coffee Monday morning and plan your week.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Preview -->
+    <section class="landing-preview">
+        <h2>See what you'll get</h2>
+        <p class="preview-subtitle">A sample of this week's Editor's Picks</p>
+        <div class="picks-preview">
+            <div class="picks-header">
+                <h3>{{ site_title }}</h3>
+                <p>Editor's Picks — This Week</p>
+            </div>
+            {% for pick in editors_picks[:4] %}
+            <div class="pick-item">
+                <h4>{{ pick.event.title }}</h4>
+                <div class="pick-meta">
+                    {{ pick.event.date_display }}
+                    {% if pick.event.time_start %} at {{ pick.event.time_start }}{% endif %}
+                    {% if pick.event.venue %} | {{ pick.event.venue }}{% endif %}
+                </div>
+                <div class="pick-comment">{{ pick.commentary }}</div>
+            </div>
+            {% endfor %}
+            {% if not editors_picks %}
+            <div class="pick-item">
+                <h4>Madison Symphony Orchestra: Winter Concert</h4>
+                <div class="pick-meta">Saturday at 7:30 PM | Overture Hall</div>
+                <div class="pick-comment">Worth clearing your calendar for.</div>
+            </div>
+            <div class="pick-item">
+                <h4>Isthmus Beer & Cheese Fest</h4>
+                <div class="pick-meta">Saturday 12-5 PM | Alliant Energy Center</div>
+                <div class="pick-comment">Wisconsin knows food. This proves it.</div>
+            </div>
+            <div class="pick-item">
+                <h4>Gallery Night: MMoCA New Exhibits</h4>
+                <div class="pick-meta">Friday 6-9 PM | Madison Museum of Contemporary Art</div>
+                <div class="pick-comment">This is the kind of thing that makes Madison special.</div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="landing-cta">
+        <h2>Don't miss what's happening in Madison</h2>
+        <p>Join other Madisonians who start their week knowing what's worth doing.</p>
+        <form class="signup-form newsletter-form-large" action="#" method="post" style="max-width:460px;margin:0 auto;display:flex;gap:10px;">
+            <input type="email" placeholder="your@email.com" required style="flex:1;padding:14px 18px;border:1px solid #ddd;border-radius:8px;font-size:16px;">
+            <button type="submit" style="padding:14px 28px;background:#c41e3a;color:white;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap;">Subscribe Free</button>
+        </form>
+    </section>
+
+    <!-- Also available -->
+    <section class="landing-also">
+        <h2>Also available</h2>
+        <div class="also-links">
+            <a href="/index.html">Browse All Events</a>
+            <a href="/newsletter.html">Newsletter Archive</a>
+            <a href="/sponsors.html">Advertise With Us</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer" style="margin-top:0;">
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Events data sourced from public listings. Built by <a href="https://orithena.org" style="color:var(--primary);">Orithena</a>.</p>
+        </div>
+    </footer>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>

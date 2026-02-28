@@ -14,6 +14,7 @@ from config import (
     AD_SLOTS, SPONSOR_TIERS,
 )
 from models import Event
+from curator import select_editors_picks
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ def build_site(events: list[Event], newsletter_html: str = "") -> Path:
     events_by_date = group_events_by_date(events)
     sources = {sid: s["name"] for sid, s in SOURCES.items()}
     current_year = datetime.now().year
+    editors_picks = select_editors_picks(events, count=5)
 
     common_context = {
         "site_title": SITE_TITLE,
@@ -52,7 +54,16 @@ def build_site(events: list[Event], newsletter_html: str = "") -> Path:
         "last_updated": datetime.now().strftime("%B %-d, %Y at %-I:%M %p"),
     }
 
-    # Build index page
+    # Build landing page (main entry point)
+    landing_tmpl = env.get_template("landing.html")
+    landing_html = landing_tmpl.render(
+        editors_picks=editors_picks,
+        **common_context,
+    )
+    (SITE_OUTPUT / "landing.html").write_text(landing_html)
+    logger.info("Built landing.html")
+
+    # Build index page (full events listing)
     index_tmpl = env.get_template("index.html")
     index_html = index_tmpl.render(
         events_by_date=events_by_date,
