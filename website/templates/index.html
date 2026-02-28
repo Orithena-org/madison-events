@@ -23,6 +23,7 @@
                 <a href="#weekend">Weekend</a>
                 <a href="/newsletter.html">Newsletter</a>
                 <a href="/sponsors.html">Sponsors</a>
+                <a href="https://github.com/Orithena-org/madison-events/issues/new/choose" target="_blank" rel="noopener">Feedback</a>
             </nav>
         </div>
     </header>
@@ -44,6 +45,9 @@
                     <button class="view-btn active" data-view="list">List</button>
                     <button class="view-btn" data-view="calendar">Calendar</button>
                 </div>
+                <div class="filter-group">
+                    <button class="filter-btn" id="show-past-btn">Show Past Events</button>
+                </div>
             </div>
 
             <!-- Stats Bar -->
@@ -56,7 +60,7 @@
             <!-- Events List View -->
             <div id="events-list" class="events-list">
                 {% for date_group, events in events_by_date.items() %}
-                <div class="date-section" id="{{ date_group }}">
+                <div class="date-section" id="{{ date_group }}" data-date="{{ date_group }}">
                     <h2 class="date-header">{{ events[0].date_display }}</h2>
 
                     {% for event in events %}
@@ -111,7 +115,7 @@
             <div id="events-calendar" class="events-calendar" style="display:none;">
                 <div class="calendar-grid">
                     {% for date_str, events in events_by_date.items() %}
-                    <div class="calendar-day">
+                    <div class="calendar-day" data-date="{{ date_str }}">
                         <div class="calendar-day-header">{{ events[0].date.strftime('%b %-d') }}</div>
                         <div class="calendar-day-name">{{ events[0].date.strftime('%A') }}</div>
                         {% for event in events[:4] %}
@@ -181,12 +185,8 @@
                 <p>Want your events featured? <a href="/sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
             </div>
             <div class="footer-col">
-                <h4>Follow Us</h4>
-                <p>
-                    <a href="#">Twitter/X</a> |
-                    <a href="#">Instagram</a> |
-                    <a href="#">Facebook</a>
-                </p>
+                <h4>Feedback</h4>
+                <p>Know an event source we're missing? Found incorrect info? <a href="https://github.com/Orithena-org/madison-events/issues/new/choose" target="_blank" rel="noopener">Let us know</a>.</p>
             </div>
         </div>
         <div class="footer-bottom">

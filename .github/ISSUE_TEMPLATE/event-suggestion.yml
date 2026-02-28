@@ -1,0 +1,38 @@
+name: Suggest an Event Source
+description: Suggest a new event source or venue we should include
+labels: ["event-source"]
+body:
+  - type: input
+    id: source-name
+    attributes:
+      label: Source / Venue Name
+      placeholder: e.g., High Noon Saloon, Dane County Fair
+    validations:
+      required: true
+
+  - type: input
+    id: source-url
+    attributes:
+      label: Website URL
+      placeholder: https://example.com/events
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source-type
+    attributes:
+      label: Type of Source
+      options:
+        - Venue (single location)
+        - Calendar / Listing site
+        - Organization / Community group
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Additional Details
+      description: Anything else we should know (event types, frequency, etc.)
+      placeholder: They host live music events 3-4 nights per week...

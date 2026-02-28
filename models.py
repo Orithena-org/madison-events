@@ -50,7 +50,7 @@ class Event:
     def source_display(self) -> str:
         names = {
             "isthmus": "Isthmus",
-            "overture": "Overture Center",
+            "eventbrite": "Eventbrite",
             "uw_madison": "UW-Madison",
             "city_madison": "City of Madison",
             "patch": "Patch.com",

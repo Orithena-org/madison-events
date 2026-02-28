@@ -44,7 +44,7 @@ def create_sample_events() -> list[Event]:
         Event(
             title="Madison Symphony Orchestra: Winter Concert",
             date=today,
-            source="overture",
+            source="eventbrite",
             url="https://www.overture.org/events",
             time_start="7:30 PM",
             venue="Overture Hall",
@@ -90,7 +90,7 @@ def create_sample_events() -> list[Event]:
         Event(
             title="Children's Theater: The Wizard of Oz",
             date=today + timedelta(days=1),
-            source="overture",
+            source="eventbrite",
             url="https://www.overture.org/events",
             time_start="2:00 PM",
             time_end="4:30 PM",
@@ -158,7 +158,7 @@ def create_sample_events() -> list[Event]:
         Event(
             title="Gallery Night: MMoCA New Exhibits",
             date=today + timedelta(days=4),
-            source="overture",
+            source="eventbrite",
             url="https://www.overture.org/events",
             time_start="6:00 PM",
             time_end="9:00 PM",
@@ -202,7 +202,7 @@ def create_sample_events() -> list[Event]:
         Event(
             title="Forward Theater: New Play Reading",
             date=today + timedelta(days=6),
-            source="overture",
+            source="eventbrite",
             url="https://www.overture.org/events",
             time_start="7:30 PM",
             venue="Overture Center - Playhouse",

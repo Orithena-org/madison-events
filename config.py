@@ -27,12 +27,12 @@ SOURCES = {
     "isthmus": {
         "name": "Isthmus",
         "base_url": "https://isthmus.com",
-        "events_url": "https://isthmus.com/events/",
+        "events_url": "https://isthmus.com/search/event/calendar-of-events/",
     },
-    "overture": {
-        "name": "Overture Center",
-        "base_url": "https://www.overture.org",
-        "events_url": "https://www.overture.org/events",
+    "eventbrite": {
+        "name": "Eventbrite",
+        "base_url": "https://www.eventbrite.com",
+        "events_url": "https://www.eventbrite.com/d/wi--madison/events/",
     },
     "uw_madison": {
         "name": "UW-Madison",
@@ -54,7 +54,7 @@ SOURCES = {
 # Website settings
 SITE_TITLE = "Madison Events"
 SITE_TAGLINE = "Your guide to everything happening in Madison, WI"
-SITE_URL = os.getenv("SITE_URL", "https://madison-events.example.com")
+SITE_URL = os.getenv("SITE_URL", "https://orithena-org.github.io/madison-events")
 
 # Monetization
 AD_SLOTS = {
