@@ -1,5 +1,5 @@
 from .isthmus import IsthmusScraper
-from .overture import OvertureScraper
+from .eventbrite import EventbriteScraper
 from .uw_madison import UWMadisonScraper
 
-ALL_SCRAPERS = [IsthmusScraper, OvertureScraper, UWMadisonScraper]
+ALL_SCRAPERS = [IsthmusScraper, EventbriteScraper, UWMadisonScraper]

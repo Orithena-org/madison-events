@@ -61,7 +61,7 @@ class Event:
     def source_display(self) -> str:
         names = {
             "isthmus": "Isthmus",
-            "overture": "Overture Center",
+            "eventbrite": "Eventbrite",
             "uw_madison": "UW-Madison",
         }
         return names.get(self.source, self.source)
