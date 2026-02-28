@@ -32,7 +32,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build site with demo data
-        run: python run.py --demo
+        run: |
+          python run.py --demo
+          touch output/site/.nojekyll
         env:
           SITE_URL: https://orithena-org.github.io/madison-events
 
