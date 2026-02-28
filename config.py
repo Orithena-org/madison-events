@@ -39,6 +39,16 @@ SOURCES = {
         "base_url": "https://today.wisc.edu",
         "events_url": "https://today.wisc.edu/events",
     },
+    "city_madison": {
+        "name": "City of Madison",
+        "base_url": "https://www.cityofmadison.com",
+        "events_url": "https://www.cityofmadison.com/events",
+    },
+    "patch": {
+        "name": "Patch.com",
+        "base_url": "https://patch.com",
+        "events_url": "https://patch.com/wisconsin/madison-wi/calendar",
+    },
 }
 
 # Website settings
