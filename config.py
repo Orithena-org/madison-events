@@ -46,6 +46,9 @@ SITE_TITLE = "Madison Events"
 SITE_TAGLINE = "Your guide to everything happening in Madison, WI"
 SITE_URL = os.getenv("SITE_URL", "https://orithena-org.github.io/madison-events")
 
+# Affiliate settings
+EVENTBRITE_AFFILIATE_ID = os.getenv("EVENTBRITE_AFFILIATE_ID", "")
+
 # Monetization
 AD_SLOTS = {
     "header_banner": {"width": 728, "height": 90, "label": "Header Banner"},

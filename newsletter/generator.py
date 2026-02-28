@@ -90,7 +90,7 @@ def generate_newsletter_html(events: list[Event]) -> str:
             html += f"""
         <div style="padding:14px 0;border-bottom:1px solid #f0f0f0;">
             <h3 style="margin:0;font-size:16px;">
-                <a href="{event.url}" style="color:#1a1a2e;text-decoration:none;">{event.title}</a>
+                <a href="{event.display_url}" style="color:#1a1a2e;text-decoration:none;">{event.title}</a>
             </h3>
             <p style="margin:4px 0 0;font-size:13px;color:#666;">
                 {event.date_display} {('at ' + event.time_start) if event.time_start else ''}
@@ -241,7 +241,7 @@ def generate_newsletter_plain(events: list[Event]) -> str:
         if event.venue:
             lines.append(f"  @ {event.venue}")
         if event.url:
-            lines.append(f"  {event.url}")
+            lines.append(f"  {event.display_url}")
 
     if len(remaining) > 10:
         lines.append(f"\n...and {len(remaining) - 10} more events!")
