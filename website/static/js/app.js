@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     // Source filtering
-    const filterBtns = document.querySelectorAll(".filter-btn");
+    const filterBtns = document.querySelectorAll(".filter-btn[data-source]");
     const eventCards = document.querySelectorAll(".event-card");
     const calendarEvents = document.querySelectorAll(".calendar-event");
 
@@ -51,6 +51,59 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    // Past events filtering
+    var showPastBtn = document.getElementById("show-past-btn");
+    var showingPast = false;
+
+    function getTodayISO() {
+        var now = new Date();
+        var y = now.getFullYear();
+        var m = String(now.getMonth() + 1).padStart(2, "0");
+        var d = String(now.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + d;
+    }
+
+    function updatePastVisibility() {
+        var today = getTodayISO();
+        var dateSections = document.querySelectorAll(".date-section[data-date]");
+        var calendarDays = document.querySelectorAll(".calendar-day[data-date]");
+        var hiddenCount = 0;
+
+        dateSections.forEach(function (section) {
+            if (section.dataset.date < today) {
+                section.style.display = showingPast ? "" : "none";
+                if (!showingPast) {
+                    hiddenCount += section.querySelectorAll(".event-card").length;
+                }
+            }
+        });
+
+        calendarDays.forEach(function (day) {
+            if (day.dataset.date < today) {
+                day.style.display = showingPast ? "" : "none";
+            }
+        });
+
+        if (showPastBtn) {
+            showPastBtn.textContent = showingPast ? "Hide Past Events" : "Show Past Events";
+            if (showingPast) {
+                showPastBtn.classList.add("active");
+            } else {
+                showPastBtn.classList.remove("active");
+            }
+        }
+    }
+
+    // Hide past events on page load
+    updatePastVisibility();
+
+    if (showPastBtn) {
+        showPastBtn.addEventListener("click", function () {
+            showingPast = !showingPast;
+            updatePastVisibility();
+        });
+    }
 
     // Newsletter form
     var forms = document.querySelectorAll(".newsletter-form, .newsletter-form-large");
