@@ -46,6 +46,9 @@ SITE_TITLE = "Madison Events"
 SITE_TAGLINE = "Your guide to everything happening in Madison, WI"
 SITE_URL = os.getenv("SITE_URL", "https://madison-events.example.com")
 
+# Affiliate settings
+EVENTBRITE_AFFILIATE_ID = os.getenv("EVENTBRITE_AFFILIATE_ID", "")
+
 # Monetization
 AD_SLOTS = {
     "header_banner": {"width": 728, "height": 90, "label": "Header Banner"},

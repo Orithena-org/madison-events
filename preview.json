@@ -1,0 +1,6 @@
+{
+  "name": "Madison Events",
+  "type": "static",
+  "port": 8001,
+  "serve_dir": "output/site"
+}
