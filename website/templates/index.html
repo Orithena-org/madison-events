@@ -17,18 +17,21 @@
     <meta name="twitter:description" content="{{ site_tagline }}. Updated daily.">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
     <link rel="stylesheet" href="static/css/style.css">
+    <script data-goatcounter="https://georgeauto.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
+    <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
 </head>
 <body>
     <header class="site-header">
         <div class="header-content">
-            <h1><a href="/">{{ site_title }}</a></h1>
+            <h1><a href="./">{{ site_title }}</a></h1>
             <p class="tagline">{{ site_tagline }}</p>
             <nav class="main-nav">
-                <a href="/" class="active">All Events</a>
-                <a href="#this-week">This Week</a>
-                <a href="#weekend">Weekend</a>
-                <a href="/newsletter.html">Newsletter</a>
-                <a href="/sponsors.html">Sponsors</a>
+                <a href="#all" class="nav-tab active" data-tab="all">All Events</a>
+                <a href="#this-week" class="nav-tab" data-tab="this-week">This Week</a>
+                <a href="#weekend" class="nav-tab" data-tab="weekend">Weekend</a>
+                <a href="./newsletter.html">Newsletter</a>
+                <a href="./sponsors.html">Sponsors</a>
                 <a href="https://github.com/Orithena-org/madison-events/issues/new/choose" target="_blank" rel="noopener">Feedback</a>
             </nav>
         </div>
@@ -111,7 +114,7 @@
                 <!-- Newsletter CTA in feed -->
                 <div class="newsletter-inline-cta">
                     <strong>Never miss a thing.</strong> Get the best Madison events in your inbox every Monday.
-                    <a href="/newsletter.html">Subscribe free &rarr;</a>
+                    <a href="./newsletter.html">Subscribe free &rarr;</a>
                 </div>
                 {% endif %}
                 {% endfor %}
@@ -145,16 +148,13 @@
             <div class="sidebar-widget newsletter-signup">
                 <h3>Weekly Newsletter</h3>
                 <p>Get Madison's best events delivered to your inbox every Monday.</p>
-                <form class="newsletter-form" action="#" method="post">
-                    <input type="email" placeholder="your@email.com" required>
-                    <button type="submit">Subscribe</button>
-                </form>
+                <iframe src="https://subscribe-forms.beehiiv.com/35b5011e-8a1c-4ac6-bc97-31a128521ae3" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 100%; height: 291px; margin: 0; border-radius: 0px; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
             </div>
 
             <!-- Sponsor Section -->
             <div class="sidebar-widget sponsors-widget">
                 <h3>Promote Your Event</h3>
-                <p class="sponsor-cta">Want to reach Madison's event-goers? <a href="/sponsors.html">Learn about featured listings</a></p>
+                <p class="sponsor-cta">Want to reach Madison's event-goers? <a href="./sponsors.html">Learn about featured listings</a></p>
             </div>
 
             <!-- Source Legend -->
@@ -179,7 +179,7 @@
             </div>
             <div class="footer-col">
                 <h4>For Venues & Organizers</h4>
-                <p>Want your events featured? <a href="/sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
+                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
             </div>
             <div class="footer-col">
                 <h4>Feedback</h4>
