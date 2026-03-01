@@ -19,12 +19,7 @@
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
-    <!-- Header with Ad Slot -->
     <header class="site-header">
-        <div class="ad-slot ad-header" id="ad-header-banner">
-            <span class="ad-label">Advertisement</span>
-            <div class="ad-placeholder">Your Ad Here - 728x90 Header Banner</div>
-        </div>
         <div class="header-content">
             <h1><a href="/">{{ site_title }}</a></h1>
             <p class="tagline">{{ site_tagline }}</p>
@@ -110,15 +105,15 @@
                         </div>
                     </article>
 
-                    {% if loop.index == 3 %}
-                    <!-- In-feed sponsored content -->
-                    <div class="ad-slot ad-in-feed">
-                        <span class="ad-label">Sponsored</span>
-                        <div class="ad-placeholder">Sponsored Event or Ad - Support Local Madison!</div>
-                    </div>
-                    {% endif %}
                     {% endfor %}
                 </div>
+                {% if loop.first %}
+                <!-- Newsletter CTA in feed -->
+                <div class="newsletter-inline-cta">
+                    <strong>Never miss a thing.</strong> Get the best Madison events in your inbox every Monday.
+                    <a href="/newsletter.html">Subscribe free &rarr;</a>
+                </div>
+                {% endif %}
                 {% endfor %}
             </div>
 
@@ -146,12 +141,6 @@
 
         <!-- Sidebar -->
         <aside class="sidebar">
-            <!-- Sidebar Ad -->
-            <div class="ad-slot ad-sidebar">
-                <span class="ad-label">Advertisement</span>
-                <div class="ad-placeholder">Sidebar Ad 300x250</div>
-            </div>
-
             <!-- Newsletter Signup -->
             <div class="sidebar-widget newsletter-signup">
                 <h3>Weekly Newsletter</h3>
@@ -164,11 +153,8 @@
 
             <!-- Sponsor Section -->
             <div class="sidebar-widget sponsors-widget">
-                <h3>Our Sponsors</h3>
-                <p class="sponsor-cta">Want to reach Madison's event-goers? <a href="/sponsors.html">Become a sponsor</a></p>
-                <div class="sponsor-logos">
-                    <div class="sponsor-placeholder">Your Logo Here</div>
-                </div>
+                <h3>Promote Your Event</h3>
+                <p class="sponsor-cta">Want to reach Madison's event-goers? <a href="/sponsors.html">Learn about featured listings</a></p>
             </div>
 
             <!-- Source Legend -->
