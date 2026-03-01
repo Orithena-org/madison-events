@@ -55,9 +55,49 @@ class EventbriteScraper(BaseScraper):
 
         return events[:30]
 
+    def _is_madison_event(self, data: dict) -> bool:
+        """Check if an event is actually in or relevant to Madison, WI."""
+        location = data.get("location")
+        name = (data.get("name") or "").lower()
+
+        # Events with Madison in the title are likely relevant
+        if "madison" in name:
+            return True
+
+        if isinstance(location, dict):
+            venue_name = (location.get("name") or "").lower()
+            address = location.get("address")
+
+            # Check venue name for Madison indicators
+            if "madison" in venue_name or "wisconsin" in venue_name:
+                return True
+
+            if isinstance(address, dict):
+                locality = (address.get("addressLocality") or "").lower()
+                region = (address.get("addressRegion") or "").upper()
+                # Accept Madison and nearby cities
+                madison_area = {"madison", "sun prairie", "middleton", "fitchburg",
+                                "verona", "monona", "mcfarland", "waunakee", "deforest",
+                                "cottage grove", "stoughton", "oregon"}
+                if locality in madison_area:
+                    return True
+                if region == "WI" and locality:
+                    return True
+
+            # Has a named venue (not just "Online") — likely local
+            if venue_name and "online" not in venue_name and "virtual" not in venue_name:
+                return True
+
+        # No location info and no Madison reference — skip
+        return False
+
     def _parse_jsonld(self, data: dict) -> Event | None:
         name = (data.get("name") or "").strip()
         if not name or len(name) < 3:
+            return None
+
+        # Filter out non-Madison events
+        if not self._is_madison_event(data):
             return None
 
         url = data.get("url", "")

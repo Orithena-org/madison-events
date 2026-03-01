@@ -43,6 +43,13 @@
             <!-- Filter Bar -->
             <div class="filter-bar">
                 <div class="filter-group">
+                    <label>Category:</label>
+                    <button class="filter-btn active" data-category="all">All</button>
+                    {% for cat in categories %}
+                    <button class="filter-btn" data-category="{{ cat }}">{{ cat }}</button>
+                    {% endfor %}
+                </div>
+                <div class="filter-group">
                     <label>Source:</label>
                     <button class="filter-btn active" data-source="all">All</button>
                     {% for source_id, source_name in sources.items() %}
@@ -73,7 +80,7 @@
                     <h2 class="date-header">{{ events[0].date_display }}</h2>
 
                     {% for event in events %}
-                    <article class="event-card" data-source="{{ event.source }}">
+                    <article class="event-card" data-source="{{ event.source }}" data-category="{{ event.category or '' }}">
                         {% if event.is_featured %}
                         <div class="featured-badge">Featured</div>
                         {% endif %}
@@ -92,6 +99,9 @@
                                     <span class="event-venue">{{ event.venue }}</span>
                                     {% endif %}
                                     <span class="event-source badge-{{ event.source }}">{{ event.source_display }}</span>
+                                    {% if event.category %}
+                                    <span class="event-category">{{ event.category }}</span>
+                                    {% endif %}
                                 </div>
                                 {% if event.description %}
                                 <p class="event-description">{{ event.description[:200] }}{% if event.description|length > 200 %}...{% endif %}</p>
@@ -220,5 +230,8 @@
     {% endfor %}
     {% endfor %}
     <script src="static/js/app.js"></script>
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
 </body>
 </html>
