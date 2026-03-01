@@ -78,6 +78,8 @@ class PatchScraper(BaseScraper):
             alias = evt.get("itemAlias", "")
             if alias:
                 url = f"https://patch.com{alias}"
+        if url and not url.startswith("http"):
+            url = f"https://patch.com{url}"
 
         # Venue from address
         venue = None

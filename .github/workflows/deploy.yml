@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    # Rebuild daily at 6 AM Central (noon UTC) for fresh demo data dates
+    # Rebuild daily at 6 AM Central (noon UTC) with fresh scraped events
     - cron: '0 12 * * *'
   workflow_dispatch:
 
@@ -31,9 +31,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Build site with demo data
+      - name: Scrape events and build site
         run: |
-          python run.py --demo
+          python run.py
           touch output/site/.nojekyll
         env:
           SITE_URL: https://orithena-org.github.io/madison-events
