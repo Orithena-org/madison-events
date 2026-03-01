@@ -89,5 +89,8 @@
             <p>&copy; {{ current_year }} {{ site_title }}. Built by Orithena.</p>
         </div>
     </footer>
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
 </body>
 </html>

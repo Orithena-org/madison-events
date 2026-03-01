@@ -184,6 +184,17 @@ a:hover { color: var(--primary-dark); }
 .badge-isthmus { background: #fde8eb; color: var(--dot-isthmus); }
 .badge-overture { background: #e8f4fd; color: var(--dot-overture); }
 .badge-uw_madison { background: #fde8e8; color: var(--dot-uw-madison); }
+.badge-eventbrite { background: #fde8e3; color: #f05537; }
+.badge-city_madison { background: #e3fde8; color: #27ae60; }
+.badge-patch { background: #fdf3e3; color: #e67e22; }
+.event-category {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #f0f0f0;
+    color: #555;
+}
 .event-description { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 .event-price {
     display: inline-block;
@@ -248,6 +259,9 @@ a:hover { color: var(--primary-dark); }
 .dot-isthmus { background: var(--dot-isthmus); }
 .dot-overture { background: var(--dot-overture); }
 .dot-uw_madison { background: var(--dot-uw-madison); }
+.dot-eventbrite { background: #f05537; }
+.dot-city_madison { background: #2ecc71; }
+.dot-patch { background: #f39c12; }
 
 /* Sidebar */
 .sidebar { display: flex; flex-direction: column; gap: 20px; }

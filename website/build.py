@@ -12,7 +12,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from config import (
     SITE_TITLE, SITE_TAGLINE, SITE_URL, OUTPUT_DIR, SOURCES,
-    AD_SLOTS, SPONSOR_TIERS,
+    AD_SLOTS, SPONSOR_TIERS, GOATCOUNTER_SITE,
 )
 from models import Event
 from curator import select_editors_picks
@@ -110,14 +110,19 @@ def build_site(events: list[Event], newsletter_html: str = "") -> Path:
     current_year = datetime.now().year
     editors_picks = select_editors_picks(events, count=5)
 
+    # Collect unique categories for filter buttons (sorted, exclude None)
+    categories = sorted(set(e.category for e in events if e.category))
+
     common_context = {
         "site_title": SITE_TITLE,
         "site_tagline": SITE_TAGLINE,
         "site_url": SITE_URL,
         "sources": sources,
+        "categories": categories,
         "total_events": len(events),
         "current_year": current_year,
         "last_updated": datetime.now().strftime("%B %-d, %Y at %-I:%M %p"),
+        "goatcounter_site": GOATCOUNTER_SITE,
     }
 
     # Build landing page (main entry point)

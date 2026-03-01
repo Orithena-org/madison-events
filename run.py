@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from config import DATA_DIR, OUTPUT_DIR
 from models import Event, save_events, load_events
+from categorizer import categorize_events
 from scrapers import ALL_SCRAPERS
 from website.build import build_site
 from social.generator import generate_all_social_content, save_social_content
@@ -212,6 +213,39 @@ def create_sample_events() -> list[Event]:
     ]
 
 
+def _normalize_title(title: str) -> str:
+    """Normalize event title for dedup comparison."""
+    import re
+    t = title.lower().strip()
+    # Remove common prefixes that scrapers add
+    for prefix in ("rsvp for ", "rsvp: "):
+        if t.startswith(prefix):
+            t = t[len(prefix):]
+    # Remove punctuation and extra whitespace
+    t = re.sub(r'[^\w\s]', ' ', t)
+    t = re.sub(r'\s+', ' ', t).strip()
+    return t
+
+
+def _titles_match(t1: str, t2: str) -> bool:
+    """Check if two normalized titles are similar enough to be duplicates."""
+    if t1 == t2:
+        return True
+    # Check if one title contains the other (handles "Event" vs "Event @ Venue")
+    if len(t1) > 10 and len(t2) > 10:
+        if t1 in t2 or t2 in t1:
+            return True
+    # Check word overlap for longer titles
+    words1 = set(t1.split())
+    words2 = set(t2.split())
+    if len(words1) >= 4 and len(words2) >= 4:
+        overlap = words1 & words2
+        smaller = min(len(words1), len(words2))
+        if len(overlap) / smaller >= 0.75:
+            return True
+    return False
+
+
 def scrape_events() -> list[Event]:
     """Run all scrapers and return combined events."""
     all_events = []
@@ -220,13 +254,31 @@ def scrape_events() -> list[Event]:
         events = scraper.run()
         all_events.extend(events)
 
-    # Deduplicate by title+date
-    seen = set()
+    # Deduplicate: exact title+date first, then fuzzy within same date
+    seen_exact = set()
     unique = []
     for event in all_events:
         key = (event.title.lower().strip(), event.date)
-        if key not in seen:
-            seen.add(key)
+        if key in seen_exact:
+            continue
+        seen_exact.add(key)
+
+        # Check fuzzy match against existing events on same date
+        norm = _normalize_title(event.title)
+        is_dupe = False
+        for existing in unique:
+            if existing.date == event.date:
+                if _titles_match(norm, _normalize_title(existing.title)):
+                    is_dupe = True
+                    # Keep the one with more info (longer description)
+                    existing_desc_len = len(existing.description or "")
+                    new_desc_len = len(event.description or "")
+                    if new_desc_len > existing_desc_len:
+                        # Replace with richer version
+                        idx = unique.index(existing)
+                        unique[idx] = event
+                    break
+        if not is_dupe:
             unique.append(event)
 
     return unique
@@ -245,6 +297,8 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
         logger.info("Scraping events from all sources...")
         events = scrape_events()
         if events:
+            categorized = categorize_events(events)
+            logger.info(f"Auto-categorized {categorized}/{len(events)} events")
             save_events(events, str(events_file))
             logger.info(f"Saved {len(events)} events to {events_file}")
         else:
@@ -254,6 +308,9 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
     else:
         if events_file.exists():
             events = load_events(str(events_file))
+            categorized = categorize_events(events)
+            if categorized:
+                logger.info(f"Auto-categorized {categorized} cached events")
             logger.info(f"Loaded {len(events)} cached events")
         else:
             logger.error("No cached events found. Run with --scrape or --demo first.")

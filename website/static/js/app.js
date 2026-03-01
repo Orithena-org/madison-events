@@ -1,33 +1,55 @@
 /* Madison Events - Client-side interactivity */
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Source filtering
-    const filterBtns = document.querySelectorAll(".filter-btn[data-source]");
-    const eventCards = document.querySelectorAll(".event-card");
-    const calendarEvents = document.querySelectorAll(".calendar-event");
+    var eventCards = document.querySelectorAll(".event-card");
+    var calendarEvents = document.querySelectorAll(".calendar-event");
 
-    filterBtns.forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            filterBtns.forEach(function (b) { b.classList.remove("active"); });
-            btn.classList.add("active");
+    // Active filters
+    var activeSource = "all";
+    var activeCategory = "all";
 
-            const source = btn.dataset.source;
+    function applyFilters() {
+        eventCards.forEach(function (card) {
+            var sourceMatch = activeSource === "all" || card.dataset.source === activeSource;
+            var categoryMatch = activeCategory === "all" || card.dataset.category === activeCategory;
+            card.style.display = (sourceMatch && categoryMatch) ? "" : "none";
+        });
 
+        calendarEvents.forEach(function (ev) {
+            var sourceMatch = activeSource === "all" || ev.dataset.source === activeSource;
+            ev.style.display = sourceMatch ? "" : "none";
+        });
+
+        // Update visible event count
+        var statsBar = document.querySelector(".stats-bar span");
+        if (statsBar) {
+            var visible = 0;
             eventCards.forEach(function (card) {
-                if (source === "all" || card.dataset.source === source) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
-                }
+                if (card.style.display !== "none") visible++;
             });
+            statsBar.textContent = visible + " events";
+        }
+    }
 
-            calendarEvents.forEach(function (ev) {
-                if (source === "all" || ev.dataset.source === source) {
-                    ev.style.display = "";
-                } else {
-                    ev.style.display = "none";
-                }
-            });
+    // Source filtering
+    var sourceFilterBtns = document.querySelectorAll(".filter-btn[data-source]");
+    sourceFilterBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            sourceFilterBtns.forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            activeSource = btn.dataset.source;
+            applyFilters();
+        });
+    });
+
+    // Category filtering
+    var categoryFilterBtns = document.querySelectorAll(".filter-btn[data-category]");
+    categoryFilterBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            categoryFilterBtns.forEach(function (b) { b.classList.remove("active"); });
+            btn.classList.add("active");
+            activeCategory = btn.dataset.category;
+            applyFilters();
         });
     });
 
@@ -68,14 +90,10 @@ document.addEventListener("DOMContentLoaded", function () {
         var today = getTodayISO();
         var dateSections = document.querySelectorAll(".date-section[data-date]");
         var calendarDays = document.querySelectorAll(".calendar-day[data-date]");
-        var hiddenCount = 0;
 
         dateSections.forEach(function (section) {
             if (section.dataset.date < today) {
                 section.style.display = showingPast ? "" : "none";
-                if (!showingPast) {
-                    hiddenCount += section.querySelectorAll(".event-card").length;
-                }
             }
         });
 

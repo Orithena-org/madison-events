@@ -59,6 +59,10 @@ SITE_URL = os.getenv("SITE_URL", "https://orithena-org.github.io/madison-events"
 # Affiliate settings
 EVENTBRITE_AFFILIATE_ID = os.getenv("EVENTBRITE_AFFILIATE_ID", "")
 
+# Analytics — set GOATCOUNTER_SITE to your GoatCounter site code to enable
+# Sign up free at https://www.goatcounter.com/ (privacy-friendly, no cookies)
+GOATCOUNTER_SITE = os.getenv("GOATCOUNTER_SITE", "")
+
 # Monetization
 AD_SLOTS = {
     "header_banner": {"width": 728, "height": 90, "label": "Header Banner"},
