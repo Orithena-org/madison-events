@@ -1,4 +1,10 @@
-"""Scraper for Eventbrite Madison events using JSON-LD structured data."""
+"""Scraper for Eventbrite Madison events using JSON-LD structured data.
+
+NOTE: Eventbrite is a React SPA that renders event data client-side.
+This scraper only works if JSON-LD is present in the initial HTML response,
+which is unreliable. A proper fix requires a headless browser (e.g. Playwright)
+to render the page before scraping.
+"""
 from __future__ import annotations
 
 import json

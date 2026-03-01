@@ -308,6 +308,30 @@ a:hover { color: var(--primary-dark); }
     font-size: 16px;
 }
 
+/* Inline newsletter CTA */
+.newsletter-inline-cta {
+    background: linear-gradient(135deg, var(--secondary), #2a2a4e);
+    color: white;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    margin: 16px 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.newsletter-inline-cta a {
+    color: white;
+    background: var(--primary);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.newsletter-inline-cta a:hover { background: var(--primary-dark); }
+
 /* Sponsors */
 .sponsor-cta { font-size: 13px; }
 .sponsor-placeholder {

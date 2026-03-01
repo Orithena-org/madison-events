@@ -11,16 +11,19 @@
     <meta property="og:url" content="{{ site_url }}/newsletter.html">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
     <link rel="stylesheet" href="static/css/style.css">
+    <script data-goatcounter="https://georgeauto.goatcounter.com/count"
+            async src="//gc.zgo.at/count.js"></script>
+    <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
 </head>
 <body>
     <header class="site-header">
         <div class="header-content">
-            <h1><a href="/">{{ site_title }}</a></h1>
+            <h1><a href="./">{{ site_title }}</a></h1>
             <p class="tagline">Weekly Newsletter</p>
             <nav class="main-nav">
-                <a href="/">All Events</a>
-                <a href="/newsletter.html" class="active">Newsletter</a>
-                <a href="/sponsors.html">Sponsors</a>
+                <a href="./">All Events</a>
+                <a href="./newsletter.html" class="active">Newsletter</a>
+                <a href="./sponsors.html">Sponsors</a>
             </nav>
         </div>
     </header>
@@ -29,10 +32,7 @@
         <section class="newsletter-hero">
             <h2>Never Miss What's Happening in Madison</h2>
             <p>Every Monday morning, get a curated roundup of the best events happening in Madison this week. Concerts, shows, community events, and more - all in one email.</p>
-            <form class="newsletter-form-large" action="#" method="post">
-                <input type="email" placeholder="your@email.com" required>
-                <button type="submit">Subscribe Free</button>
-            </form>
+            <iframe src="https://subscribe-forms.beehiiv.com/35b5011e-8a1c-4ac6-bc97-31a128521ae3" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 560px; height: 291px; margin: 0 auto; display: block; border-radius: 0px; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
         </section>
 
         <section class="newsletter-preview">

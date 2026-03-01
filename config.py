@@ -49,6 +49,11 @@ SOURCES = {
         "base_url": "https://patch.com",
         "events_url": "https://patch.com/wisconsin/madison-wi/calendar",
     },
+    "overture": {
+        "name": "Overture Center",
+        "base_url": "https://www.overture.org",
+        "events_url": "https://www.overture.org/events",
+    },
 }
 
 # Website settings
