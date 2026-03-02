@@ -227,6 +227,22 @@ def _normalize_title(title: str) -> str:
     return t
 
 
+def _normalize_venue(venue: str) -> str:
+    """Normalize venue name for dedup comparison."""
+    import re
+    v = venue.lower().strip()
+    # Remove common suffixes/prefixes
+    for suffix in (" - madison", ", madison", " madison wi", ", madison, wi"):
+        if v.endswith(suffix):
+            v = v[:-len(suffix)]
+    # Remove "the " prefix
+    if v.startswith("the "):
+        v = v[4:]
+    v = re.sub(r'[^\w\s]', ' ', v)
+    v = re.sub(r'\s+', ' ', v).strip()
+    return v
+
+
 def _titles_match(t1: str, t2: str) -> bool:
     """Check if two normalized titles are similar enough to be duplicates."""
     if t1 == t2:
@@ -246,6 +262,66 @@ def _titles_match(t1: str, t2: str) -> bool:
     return False
 
 
+def _venues_match(v1: str, v2: str) -> bool:
+    """Check if two venue names refer to the same place."""
+    if not v1 or not v2:
+        return False
+    n1 = _normalize_venue(v1)
+    n2 = _normalize_venue(v2)
+    if n1 == n2:
+        return True
+    # Check if one contains the other (e.g. "Overture Center" vs "Overture Center for the Arts")
+    if len(n1) > 5 and len(n2) > 5:
+        if n1 in n2 or n2 in n1:
+            return True
+    return False
+
+
+def _is_duplicate(event: Event, existing: Event) -> bool:
+    """Check if two events on the same date are duplicates."""
+    norm_new = _normalize_title(event.title)
+    norm_existing = _normalize_title(existing.title)
+
+    # Title match is strong signal
+    if _titles_match(norm_new, norm_existing):
+        return True
+
+    # Venue+date+time match catches renamed/reformatted events from different sources
+    if (event.venue and existing.venue and event.time_start and existing.time_start
+            and _venues_match(event.venue, existing.venue)
+            and event.time_start == existing.time_start):
+        # Same venue + same time + same date — very likely a dupe
+        # Require at least some title word overlap to avoid false positives
+        words_new = set(norm_new.split())
+        words_existing = set(norm_existing.split())
+        overlap = words_new & words_existing
+        if overlap:
+            return True
+
+    return False
+
+
+def _pick_richer(event: Event, existing: Event) -> Event:
+    """Return the event with more complete data."""
+    new_score = sum([
+        len(event.description or ""),
+        10 if event.venue else 0,
+        5 if event.time_start else 0,
+        5 if event.category else 0,
+        5 if event.price else 0,
+        5 if event.image_url else 0,
+    ])
+    existing_score = sum([
+        len(existing.description or ""),
+        10 if existing.venue else 0,
+        5 if existing.time_start else 0,
+        5 if existing.category else 0,
+        5 if existing.price else 0,
+        5 if existing.image_url else 0,
+    ])
+    return event if new_score > existing_score else existing
+
+
 def scrape_events() -> list[Event]:
     """Run all scrapers and return combined events."""
     all_events = []
@@ -254,33 +330,30 @@ def scrape_events() -> list[Event]:
         events = scraper.run()
         all_events.extend(events)
 
-    # Deduplicate: exact title+date first, then fuzzy within same date
+    # Deduplicate: exact title+date first, then fuzzy/venue within same date
     seen_exact = set()
     unique = []
+    dupes_removed = 0
     for event in all_events:
         key = (event.title.lower().strip(), event.date)
         if key in seen_exact:
+            dupes_removed += 1
             continue
         seen_exact.add(key)
 
-        # Check fuzzy match against existing events on same date
-        norm = _normalize_title(event.title)
+        # Check fuzzy/venue match against existing events on same date
         is_dupe = False
-        for existing in unique:
-            if existing.date == event.date:
-                if _titles_match(norm, _normalize_title(existing.title)):
-                    is_dupe = True
-                    # Keep the one with more info (longer description)
-                    existing_desc_len = len(existing.description or "")
-                    new_desc_len = len(event.description or "")
-                    if new_desc_len > existing_desc_len:
-                        # Replace with richer version
-                        idx = unique.index(existing)
-                        unique[idx] = event
-                    break
+        for i, existing in enumerate(unique):
+            if existing.date == event.date and _is_duplicate(event, existing):
+                is_dupe = True
+                dupes_removed += 1
+                unique[i] = _pick_richer(event, existing)
+                break
         if not is_dupe:
             unique.append(event)
 
+    if dupes_removed:
+        logger.info(f"Deduplication removed {dupes_removed} duplicate events ({len(all_events)} raw → {len(unique)} unique)")
     return unique
 
 
