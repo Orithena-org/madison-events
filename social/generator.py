@@ -167,6 +167,59 @@ def generate_event_spotlight(event: Event) -> dict:
     }
 
 
+def generate_reddit_post(events: list[Event]) -> dict:
+    """Generate a Reddit self-text post for r/madisonwi.
+
+    Reddit posts should contain the full content inline (not just a link)
+    to comply with the 90/10 self-promotion rule. The site link goes at
+    the bottom as a "full list" resource.
+    """
+    today = date.today()
+    week_end = today + timedelta(days=7)
+    upcoming = [e for e in events if today <= e.date <= week_end]
+    upcoming.sort(key=lambda e: (e.date, e.time_start or ""))
+
+    if not upcoming:
+        return {"text": "", "platform_variants": {}}
+
+    date_range = f"{today.strftime('%B %-d')} - {week_end.strftime('%B %-d')}"
+    title = f"What's Happening in Madison This Week ({date_range})"
+
+    body = f"Here's a roundup of {len(upcoming)} events happening around Madison this week.\n\n"
+
+    # Group by date
+    current_date = None
+    for e in upcoming:
+        if e.date != current_date:
+            current_date = e.date
+            body += f"\n**{e.date.strftime('%A, %B %-d')}**\n\n"
+        line = f"* **{e.title}**"
+        if e.venue:
+            line += f" — {e.venue}"
+        if e.time_start:
+            line += f" ({e.time_start})"
+        if e.price and e.price.lower() != "free":
+            line += f" [{e.price}]"
+        elif e.price and e.price.lower() == "free":
+            line += " [Free]"
+        line += "\n"
+        body += line
+
+    body += f"\n---\n\nFull listings with details and links: {SITE_URL}\n"
+    body += "\n*Events aggregated from Isthmus, Eventbrite, UW-Madison, City of Madison, and Patch.com.*"
+
+    return {
+        "type": "reddit_weekly",
+        "date": today.isoformat(),
+        "event_count": len(upcoming),
+        "text": body,
+        "title": title,
+        "platform_variants": {
+            "reddit": body,
+        },
+    }
+
+
 def generate_all_social_content(events: list[Event]) -> list[dict]:
     """Generate all social media content for the current batch of events."""
     content = []
@@ -183,6 +236,11 @@ def generate_all_social_content(events: list[Event]) -> list[dict]:
     roundup = generate_weekend_roundup(events)
     if roundup["text"]:
         content.append(roundup)
+
+    # Reddit weekly post
+    reddit_post = generate_reddit_post(events)
+    if reddit_post["text"]:
+        content.append(reddit_post)
 
     # Spotlights for featured events
     featured = [e for e in events if e.is_featured][:3]
