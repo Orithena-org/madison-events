@@ -52,7 +52,8 @@ def generate_rss(events: list[Event]) -> str:
     for event in sorted(events, key=lambda e: e.date, reverse=True)[:50]:
         item = SubElement(channel, "item")
         SubElement(item, "title").text = event.title
-        SubElement(item, "link").text = event.display_url or SITE_URL
+        detail_link = f"{SITE_URL}/{event.detail_url}"
+        SubElement(item, "link").text = detail_link
         desc_parts = []
         if event.venue:
             desc_parts.append(f"@ {event.venue}")
@@ -64,20 +65,33 @@ def generate_rss(events: list[Event]) -> str:
         if event.category:
             SubElement(item, "category").text = event.category
         guid = SubElement(item, "guid")
-        guid.text = event.display_url or f"{SITE_URL}/#event-{hash(event.title)}"
-        guid.set("isPermaLink", "true" if event.url else "false")
+        guid.text = detail_link
+        guid.set("isPermaLink", "true")
 
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + tostring(rss, encoding="unicode")
 
 
 def generate_sitemap(events: list[Event]) -> str:
-    """Generate a sitemap.xml."""
+    """Generate a sitemap.xml including individual event pages."""
     now = datetime.utcnow().strftime("%Y-%m-%d")
     urls = [
         (f"{SITE_URL}/", "daily", "1.0"),
+        (f"{SITE_URL}/index.html", "daily", "0.9"),
         (f"{SITE_URL}/newsletter.html", "weekly", "0.8"),
         (f"{SITE_URL}/sponsors.html", "monthly", "0.5"),
     ]
+    # Add individual event pages
+    today = datetime.utcnow().date()
+    for event in events:
+        days_away = (event.date - today).days
+        if days_away >= 0:
+            priority = "0.7"  # upcoming events
+            freq = "daily"
+        else:
+            priority = "0.4"  # past events
+            freq = "weekly"
+        urls.append((f"{SITE_URL}/{event.detail_url}", freq, priority))
+
     lines = ['<?xml version="1.0" encoding="UTF-8"?>']
     lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     for url, freq, priority in urls:
@@ -161,6 +175,23 @@ def build_site(events: list[Event], newsletter_html: str = "") -> Path:
     )
     (SITE_OUTPUT / "newsletter.html").write_text(newsletter_page_html)
     logger.info("Built newsletter.html")
+
+    # Build individual event detail pages
+    detail_tmpl = env.get_template("event_detail.html")
+    events_dir = SITE_OUTPUT / "events"
+    events_dir.mkdir(exist_ok=True)
+    # Group events by date for related events
+    for event in events:
+        same_day = [e for e in events if e.date == event.date and e.title != event.title][:4]
+        event_dir = events_dir / event.slug
+        event_dir.mkdir(parents=True, exist_ok=True)
+        detail_html = detail_tmpl.render(
+            event=event,
+            related_events=same_day,
+            **common_context,
+        )
+        (event_dir / "index.html").write_text(detail_html)
+    logger.info(f"Built {len(events)} event detail pages")
 
     # Generate RSS feed
     rss_xml = generate_rss(events)

@@ -87,11 +87,7 @@
                         <div class="event-content">
                             <div class="event-info">
                                 <h3 class="event-title">
-                                    {% if event.url %}
-                                    <a href="{{ event.display_url }}" target="_blank" rel="noopener">{{ event.title }}</a>
-                                    {% else %}
-                                    {{ event.title }}
-                                    {% endif %}
+                                    <a href="{{ event.detail_url }}">{{ event.title }}</a>
                                 </h3>
                                 <div class="event-meta">
                                     <span class="event-time">{{ event.time_display }}</span>

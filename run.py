@@ -16,7 +16,7 @@ import argparse
 import json
 import logging
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 # Add project root to path
@@ -323,12 +323,32 @@ def _pick_richer(event: Event, existing: Event) -> Event:
 
 
 def scrape_events() -> list[Event]:
-    """Run all scrapers and return combined events."""
+    """Run all scrapers and return combined events with health tracking."""
     all_events = []
+    health = {
+        "timestamp": datetime.now().isoformat(),
+        "scrapers": {},
+        "total_raw": 0,
+        "total_unique": 0,
+        "dupes_removed": 0,
+    }
+
     for scraper_cls in ALL_SCRAPERS:
         scraper = scraper_cls()
-        events = scraper.run()
-        all_events.extend(events)
+        scraper_health = {"status": "ok", "events": 0, "error": None}
+        try:
+            events = scraper.run()
+            scraper_health["events"] = len(events)
+            if not events:
+                scraper_health["status"] = "empty"
+            all_events.extend(events)
+        except Exception as e:
+            scraper_health["status"] = "error"
+            scraper_health["error"] = str(e)
+            logger.error(f"[{scraper.source_name}] Unexpected error: {e}")
+        health["scrapers"][scraper.source_id] = scraper_health
+
+    health["total_raw"] = len(all_events)
 
     # Deduplicate: exact title+date first, then fuzzy/venue within same date
     seen_exact = set()
@@ -354,6 +374,16 @@ def scrape_events() -> list[Event]:
 
     if dupes_removed:
         logger.info(f"Deduplication removed {dupes_removed} duplicate events ({len(all_events)} raw → {len(unique)} unique)")
+
+    health["total_unique"] = len(unique)
+    health["dupes_removed"] = dupes_removed
+
+    # Write health report
+    health_file = DATA_DIR / "scraper_health.json"
+    with open(health_file, "w") as f:
+        json.dump(health, f, indent=2)
+    logger.info(f"Scraper health report: {sum(1 for s in health['scrapers'].values() if s['status'] == 'ok')}/{len(health['scrapers'])} sources OK, {health['total_unique']} unique events")
+
     return unique
 
 
@@ -374,8 +404,12 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
             logger.info(f"Auto-categorized {categorized}/{len(events)} events")
             save_events(events, str(events_file))
             logger.info(f"Saved {len(events)} events to {events_file}")
+        elif events_file.exists():
+            logger.warning("No events scraped. Using previously cached events.")
+            events = load_events(str(events_file))
+            logger.info(f"Loaded {len(events)} cached events as fallback")
         else:
-            logger.warning("No events scraped. Using sample data as fallback.")
+            logger.error("No events scraped and no cached data available. Using sample data.")
             events = create_sample_events()
             save_events(events, str(events_file))
     else:

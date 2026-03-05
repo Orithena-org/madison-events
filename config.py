@@ -54,6 +54,11 @@ SOURCES = {
         "base_url": "https://www.overture.org",
         "events_url": "https://www.overture.org/events",
     },
+    "visitmadison": {
+        "name": "Visit Madison",
+        "base_url": "https://www.visitmadison.com",
+        "rss_url": "https://www.visitmadison.com/event/rss/",
+    },
 }
 
 # Website settings
