@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -31,12 +31,55 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Scrape events and build site
+      - name: Scrape events
+        id: scrape
+        continue-on-error: true
+        run: python run.py --scrape-only
+        env:
+          SITE_URL: https://orithena-org.github.io/madison-events
+
+      - name: Check scrape results
         run: |
-          python run.py
+          if [ -f data/events.json ]; then
+            EVENT_COUNT=$(python -c "import json; print(len(json.load(open('data/events.json'))))")
+            echo "Events scraped: $EVENT_COUNT"
+            if [ "$EVENT_COUNT" -gt 0 ]; then
+              echo "SCRAPE_OK=true" >> $GITHUB_ENV
+            else
+              echo "SCRAPE_OK=false" >> $GITHUB_ENV
+              echo "::warning::Scrape returned 0 events, will use cached data if available"
+            fi
+          else
+            echo "SCRAPE_OK=false" >> $GITHUB_ENV
+            echo "::warning::No events.json produced by scrape"
+          fi
+
+      - name: Restore cached events if scrape failed
+        if: env.SCRAPE_OK != 'true'
+        run: |
+          # Try to get events.json from the deployed branch
+          if git show origin/main:data/events.json > /dev/null 2>&1; then
+            git show origin/main:data/events.json > data/events.json
+            echo "Restored cached events.json from main branch"
+          else
+            echo "::warning::No cached events available. Building with demo data."
+            python run.py --demo --scrape-only || true
+          fi
+
+      - name: Build site
+        run: |
+          python run.py --build-only
           touch output/site/.nojekyll
         env:
           SITE_URL: https://orithena-org.github.io/madison-events
+
+      - name: Commit updated events data
+        if: env.SCRAPE_OK == 'true' && github.event_name == 'schedule'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/events.json
+          git diff --staged --quiet || git commit -m "Update scraped events data [skip ci]" && git push origin main
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
