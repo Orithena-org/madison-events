@@ -15,6 +15,7 @@ Usage:
 import argparse
 import json
 import logging
+import os
 import sys
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -422,6 +423,13 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
         else:
             logger.error("No cached events found. Run with --scrape or --demo first.")
             return
+
+    # Post new events to Discord (if webhook is configured)
+    webhook_url = os.environ.get("DISCORD_WEBHOOK_MADISON_EVENTS")
+    if webhook_url:
+        from discord_poster import post_events
+        logger.info("Posting new events to Discord...")
+        post_events(webhook_url)
 
     if not build:
         logger.info("Scrape-only mode. Done.")
