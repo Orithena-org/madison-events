@@ -85,6 +85,7 @@ class Event:
             "uw_madison": "UW-Madison",
             "city_madison": "City of Madison",
             "patch": "Patch.com",
+            "visitmadison": "Visit Madison",
         }
         return names.get(self.source, self.source)
 

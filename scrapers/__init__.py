@@ -7,5 +7,6 @@ from .eventbrite import EventbriteScraper
 from .uw_madison import UWMadisonScraper
 from .city_madison import CityMadisonScraper
 from .patch import PatchScraper
+from .visitmadison import VisitMadisonScraper
 
-ALL_SCRAPERS = [IsthmusScraper, EventbriteScraper, UWMadisonScraper, CityMadisonScraper, PatchScraper]
+ALL_SCRAPERS = [IsthmusScraper, EventbriteScraper, UWMadisonScraper, CityMadisonScraper, PatchScraper, VisitMadisonScraper]
