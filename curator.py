@@ -177,8 +177,11 @@ DEFAULT_COMMENTARY = [
 
 
 def score_event(event: Event, feedback_loader=None, message_id: str | None = None,
-                thread_context: list[str] | None = None) -> float:
+                thread_context: list[str] | None = None) -> tuple[float, str]:
     """Score an event for curation. Higher = more likely to be picked.
+
+    Returns (score, curation_reason) tuple. The reason is a 1-2 sentence
+    human-readable explanation of the top signals that contributed to the score.
 
     If feedback_loader and message_id are provided, community feedback is applied:
       - Each 👍 from a unique user adds +5
@@ -188,28 +191,37 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
     thread_context: Optional list of thread feedback strings to check against this event.
     """
     score = 0.0
+    signals = []  # track top scoring signals for curation reason
 
     # Apply community feedback if available (explicit params or module-level)
     fl = feedback_loader or _feedback_loader
     mid = message_id or _feedback_message_ids.get(event.url)
     if fl and mid:
         if fl.is_suppressed(mid):
-            return -999.0
+            return -999.0, "Suppressed by community feedback."
         data = fl._load()
         entry = data.get(str(mid), {})
         reactions = entry.get("reactions", {})
         thumbs = reactions.get("\U0001f44d", {})
-        score += thumbs.get("count", 0) * 5
+        thumbs_count = thumbs.get("count", 0)
         fire = reactions.get("\U0001f525", {})
-        score += fire.get("count", 0) * 15
+        fire_count = fire.get("count", 0)
+        fb_score = thumbs_count * 5 + fire_count * 15
+        score += fb_score
+        if fire_count:
+            signals.append(("community favorite", fb_score))
+        elif thumbs_count:
+            signals.append(("community upvoted", fb_score))
 
     # Category bonus
     if event.category in HIGH_VALUE_CATEGORIES:
         score += 3.0
+        signals.append((f"{event.category.lower()} priority", 3.0))
 
     # Featured events get a boost
     if event.is_featured:
         score += 5.0
+        signals.append(("featured event", 5.0))
 
     # Notable venue bonus
     if event.venue:
@@ -217,6 +229,8 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
         for notable in NOTABLE_VENUES:
             if notable in venue_lower:
                 score += 2.0
+                matched_venue = notable.title()
+                signals.append((f"notable venue ({event.venue})", 2.0))
                 break
 
     # Events with prices tend to be more "real" / production-quality
@@ -240,6 +254,7 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
     days_away = (event.date - date.today()).days
     if 0 <= days_away <= 2:
         score += 2.0
+        signals.append(("happening soon", 2.0))
     elif 3 <= days_away <= 4:
         score += 1.0
 
@@ -253,6 +268,7 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
             keywords = [w for w in pref.split() if len(w) > 3]
             if keywords and any(kw in text for kw in keywords):
                 score += 1.5
+                signals.append((f"matches preference: {pref[:40]}", 1.5))
                 log.debug("Preference boost (+1.5) for %r matching like: %s", event.title, pref)
                 break  # one boost per event from likes
 
@@ -301,9 +317,38 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
                     log.info("Thread feedback penalty (-5) for %r: %s", event.title, fb_text[:60])
                 elif is_positive:
                     score += 3.0
+                    signals.append(("community thread feedback positive", 3.0))
                     log.info("Thread feedback boost (+3) for %r: %s", event.title, fb_text[:60])
 
-    return score
+    reason = _build_curation_reason(event, signals)
+    return score, reason
+
+
+def _build_curation_reason(event: Event, signals: list[tuple[str, float]]) -> str:
+    """Build a concise 1-2 sentence curation reason from top scoring signals."""
+    if not signals:
+        return "Picked for upcoming date and complete event details."
+
+    # Sort by score contribution, take top 2
+    signals.sort(key=lambda x: x[1], reverse=True)
+    top = signals[:2]
+    parts = [s[0] for s in top]
+
+    if len(parts) == 1:
+        return f"Picked for: {parts[0]}."
+    return f"Picked for: {parts[0]}. {parts[1].capitalize()}."
+
+
+def generate_curation_reason(event: Event, feedback_loader=None,
+                             message_id: str | None = None,
+                             thread_context: list[str] | None = None) -> str:
+    """Generate a curation reason for an event without needing the full score.
+
+    Convenience wrapper around score_event that returns just the reason string.
+    """
+    _, reason = score_event(event, feedback_loader=feedback_loader,
+                            message_id=message_id, thread_context=thread_context)
+    return reason
 
 
 def _build_thread_context(fl) -> list[str]:
@@ -361,22 +406,22 @@ def select_editors_picks(
 
     # Score all events (feedback applied via explicit params or module-level state)
     scored = [
-        (score_event(e, feedback_loader=feedback_loader,
-                     message_id=(message_ids or {}).get(e.url),
-                     thread_context=thread_ctx),
+        (*score_event(e, feedback_loader=feedback_loader,
+                      message_id=(message_ids or {}).get(e.url),
+                      thread_context=thread_ctx),
          e)
         for e in upcoming
     ]
 
     # Filter out suppressed events
-    scored = [(s, e) for s, e in scored if s > -999]
+    scored = [(s, r, e) for s, r, e in scored if s > -999]
     scored.sort(key=lambda x: x[0], reverse=True)
 
     # Select with source diversity
     picks = []
     sources_used = {}
 
-    for _score, event in scored:
+    for _score, _reason, event in scored:
         if len(picks) >= count:
             break
 
@@ -389,6 +434,7 @@ def select_editors_picks(
             "event": event,
             "commentary": get_commentary(event),
             "score": _score,
+            "curation_reason": _reason,
         })
         sources_used[event.source] = source_count + 1
 
@@ -412,15 +458,16 @@ def select_weekend_picks(
     if not weekend_events:
         return []
 
-    scored = [(score_event(e), e) for e in weekend_events]
+    scored = [(*score_event(e), e) for e in weekend_events]
     scored.sort(key=lambda x: x[0], reverse=True)
 
     picks = []
-    for _score, event in scored[:count]:
+    for _score, _reason, event in scored[:count]:
         picks.append({
             "event": event,
             "commentary": get_commentary(event),
             "score": _score,
+            "curation_reason": _reason,
         })
 
     return picks

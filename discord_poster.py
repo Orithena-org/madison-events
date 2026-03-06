@@ -91,10 +91,13 @@ def build_embed(event: dict) -> dict:
     category = event.get("category") or "Uncategorized"
     color = CATEGORY_COLORS.get(category, DEFAULT_COLOR)
 
-    # Truncate description
+    # Prepend curation reason in italics if present
     desc = event.get("description") or ""
     if len(desc) > 150:
         desc = desc[:147] + "..."
+    curation_reason = event.get("curation_reason")
+    if curation_reason:
+        desc = f"*{curation_reason}*\n\n{desc}" if desc else f"*{curation_reason}*"
 
     # Build time string
     time_str = event.get("time_start") or ""
@@ -128,6 +131,23 @@ def build_embed(event: dict) -> dict:
     return embed
 
 
+def _enrich_with_curation_reasons(events: list[dict]) -> None:
+    """Score events and attach curation_reason to each event dict in-place."""
+    try:
+        from models import Event
+        from curator import generate_curation_reason
+        for event in events:
+            if event.get("curation_reason"):
+                continue
+            try:
+                ev = Event.from_dict(event)
+                event["curation_reason"] = generate_curation_reason(ev)
+            except Exception:
+                pass
+    except ImportError:
+        logger.debug("Curator not available, skipping curation reasons")
+
+
 def post_events(webhook_url: str, dry_run: bool = False) -> int:
     """Post new events to Discord. Returns count of events posted."""
     events = load_events()
@@ -143,6 +163,9 @@ def post_events(webhook_url: str, dry_run: bool = False) -> int:
         return 0
 
     logger.info("Found %d new events to post", len(new_events))
+
+    # Enrich events with curation reasons before posting
+    _enrich_with_curation_reasons(new_events)
 
     msg_ids = load_message_ids()
     # Use ?wait=true to get message ID back from webhook
