@@ -23,6 +23,8 @@ CATEGORY_RULES: list[tuple[str, list[str]]] = [
         "bur oak", "sylvee", "frequency", "hip-hop", "hip hop",
         "folk music", "bluegrass", "acoustic", "karaoke",
         "cafe coda", "coda presents",
+        "open jam", "quartet", "music tour", "the dumb tour",
+        "scene tour",
     ]),
     ("Sports", [
         "badger basketball", "badger football", "badger hockey",
@@ -30,6 +32,7 @@ CATEGORY_RULES: list[tuple[str, list[str]]] = [
         "tournament", "5k run", "marathon", "triathlon", "race",
         "wrestling", "volleyball", "soccer", "tennis",
         "archery", "fencing", "combat", "rapier", "intramural",
+        "climbing", "active badger",
     ]),
     ("Food & Drink", [
         "brunch", "beer", "wine", "food", "cooking class", "tasting",
@@ -44,6 +47,7 @@ CATEGORY_RULES: list[tuple[str, list[str]]] = [
         "overture", "chazen", "mmoca", "forward theater",
         "drag", "burlesque", "puppet", "magic show",
         "scavenger hunt", "game night", "puzzle", "reception",
+        "juggler", "under the stars",
     ]),
     ("Education", [
         "lecture", "workshop", "seminar", "class", "webinar",
@@ -51,6 +55,7 @@ CATEGORY_RULES: list[tuple[str, list[str]]] = [
         "conference", "training", "certification", "learn",
         "science", "research", "discovery building",
         "career fair", "sat practice", "test prep",
+        "drop-in hours", "teaching kitchen", "open house",
     ]),
     ("Outdoors", [
         "hike", "hiking", "garden", "birding", "bird ", "nature",
@@ -61,6 +66,8 @@ CATEGORY_RULES: list[tuple[str, list[str]]] = [
     ("Wellness", [
         "meditation", "yoga", "mindfulness", "zen", "exercise",
         "fitness", "health", "wellness", "tai chi", "qigong",
+        "vaccination", "clinic", "bra fitting",
+        "skin prep", "beauty and bubbles",
     ]),
     ("Family", [
         "kids", "children", "family", "storytime", "story time",
@@ -72,6 +79,10 @@ CATEGORY_RULES: list[tuple[str, list[str]]] = [
         "fundraiser", "charity", "benefit", "rally", "protest",
         "democracy", "election", "voting", "voter", "political",
         "naturalization", "citizenship", "league of women",
+        "women's day", "international women",
+        "ceilidh", "c\u00e8ilidh",
+        "job jams", "job fair",
+        "tartan day",
     ]),
 ]
 

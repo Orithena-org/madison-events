@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-04T19:03:21.502904",
+  "timestamp": "2026-03-05T19:06:24.825148",
   "scrapers": {
     "isthmus": {
       "status": "ok",
@@ -25,9 +25,14 @@
       "status": "ok",
       "events": 20,
       "error": null
+    },
+    "visitmadison": {
+      "status": "ok",
+      "events": 30,
+      "error": null
     }
   },
-  "total_raw": 110,
-  "total_unique": 102,
-  "dupes_removed": 8
+  "total_raw": 140,
+  "total_unique": 117,
+  "dupes_removed": 23
 }
