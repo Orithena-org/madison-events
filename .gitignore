@@ -1,5 +1,6 @@
 output/
-data/events.json
+data/pipeline.log
+data/discord_state.json
 __pycache__/
 *.pyc
 .env
