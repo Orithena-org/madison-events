@@ -35,3 +35,9 @@ clean: ## Remove generated output
 
 serve: build ## Build and serve locally on port 8001
 	cd output/site && $(PYTHON) -m http.server 8001
+
+run-new: ## Run unified pipeline in shadow mode (no Discord posting)
+	cd ../orithena-org && $(PYTHON) -m content.pipeline --domain madison_events --no-post
+
+run-new-demo: ## Run unified pipeline with demo data
+	cd ../orithena-org && $(PYTHON) -m content.pipeline --domain madison_events --demo --no-post
