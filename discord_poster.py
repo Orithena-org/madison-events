@@ -22,6 +22,7 @@ from config import DATA_DIR
 logger = logging.getLogger(__name__)
 
 POSTED_FILE = DATA_DIR / "discord_posted.json"
+STATE_FILE = DATA_DIR / "discord_state.json"
 EVENTS_FILE = DATA_DIR / "events.json"
 
 # Category -> embed color (Discord int format)
@@ -109,7 +110,50 @@ def build_embed(event: dict) -> dict:
     return embed
 
 
-def post_events(webhook_url: str, dry_run: bool = False) -> int:
+def load_state() -> dict:
+    """Load discord posting state (last_message_id, etc.)."""
+    if STATE_FILE.exists():
+        try:
+            return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    return {}
+
+
+def save_state(state: dict) -> None:
+    """Persist discord posting state."""
+    STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+
+
+def check_last_post_reactions(state: dict) -> bool:
+    """Check if the last posted message has at least 1 reaction."""
+    last_msg_id = state.get("last_message_id")
+    channel_id = os.environ.get("DISCORD_CHANNEL_MADISON_EVENTS")
+    bot_token = os.environ.get("DISCORD_BOT_TOKEN")
+
+    if not all([last_msg_id, channel_id, bot_token]):
+        logger.warning("Missing last_message_id, DISCORD_CHANNEL_MADISON_EVENTS, or DISCORD_BOT_TOKEN for reaction check")
+        return False
+
+    try:
+        resp = requests.get(
+            f"https://discord.com/api/v10/channels/{channel_id}/messages/{last_msg_id}",
+            headers={"Authorization": f"Bot {bot_token}"},
+            timeout=10,
+        )
+        if resp.status_code != 200:
+            logger.warning("Failed to fetch last message: HTTP %d", resp.status_code)
+            return False
+        msg = resp.json()
+        reactions = msg.get("reactions", [])
+        total = sum(r.get("count", 0) for r in reactions)
+        return total >= 1
+    except requests.RequestException as e:
+        logger.warning("Error checking reactions: %s", e)
+        return False
+
+
+def post_events(webhook_url: str, top_n: int = 5, dry_run: bool = False) -> int:
     """Post new events to Discord. Returns count of events posted."""
     events = load_events()
     if not events:
@@ -123,10 +167,18 @@ def post_events(webhook_url: str, dry_run: bool = False) -> int:
         logger.info("No new events to post (%d already posted)", len(posted))
         return 0
 
-    logger.info("Found %d new events to post", len(new_events))
+    # Sort by date ascending (most upcoming first)
+    new_events.sort(key=lambda e: e.get("date", ""))
 
+    # Limit to top N
+    to_post = new_events[:top_n]
+
+    logger.info("Found %d new events, posting top %d", len(new_events), len(to_post))
+
+    state = load_state()
+    last_message_id = None
     count = 0
-    for event in new_events:
+    for event in to_post:
         embed = build_embed(event)
 
         if dry_run:
@@ -136,31 +188,41 @@ def post_events(webhook_url: str, dry_run: bool = False) -> int:
 
         payload = {"embeds": [embed]}
         try:
-            resp = requests.post(webhook_url, json=payload, timeout=10)
+            resp = requests.post(f"{webhook_url}?wait=true", json=payload, timeout=10)
             if resp.status_code in (200, 204):
                 posted.add(event["url"])
                 count += 1
                 logger.info("Posted: %s", event.get("title"))
+                try:
+                    last_message_id = resp.json().get("id")
+                except (ValueError, KeyError):
+                    pass
             elif resp.status_code == 429:
                 retry_after = resp.json().get("retry_after", 5)
                 logger.warning("Rate limited, waiting %.1fs", retry_after)
                 time.sleep(retry_after)
-                # Retry once
-                resp = requests.post(webhook_url, json=payload, timeout=10)
+                resp = requests.post(f"{webhook_url}?wait=true", json=payload, timeout=10)
                 if resp.status_code in (200, 204):
                     posted.add(event["url"])
                     count += 1
+                    try:
+                        last_message_id = resp.json().get("id")
+                    except (ValueError, KeyError):
+                        pass
             else:
                 logger.error("Failed to post %s: HTTP %d", event.get("title"), resp.status_code)
         except requests.RequestException as e:
             logger.error("Error posting %s: %s", event.get("title"), e)
 
-        time.sleep(0.5)  # Small delay between posts
+        time.sleep(0.5)
 
     if not dry_run:
         save_posted(posted)
+        if last_message_id:
+            state["last_message_id"] = last_message_id
+            save_state(state)
 
-    logger.info("Posted %d/%d new events", count, len(new_events))
+    logger.info("Posted %d/%d new events", count, len(to_post))
     return count
 
 
@@ -173,6 +235,8 @@ def main():
 
     parser = argparse.ArgumentParser(description="Post events to Discord")
     parser.add_argument("--dry-run", action="store_true", help="Preview without posting")
+    parser.add_argument("--top", type=int, default=5, help="Number of top events to post (default: 5)")
+    parser.add_argument("--more", action="store_true", help="Post next batch only if last post got reactions")
     args = parser.parse_args()
 
     webhook_url = os.environ.get("DISCORD_WEBHOOK_MADISON_EVENTS")
@@ -180,7 +244,17 @@ def main():
         logger.warning("DISCORD_WEBHOOK_MADISON_EVENTS not set, skipping Discord posting")
         return
 
-    post_events(webhook_url, dry_run=args.dry_run)
+    if args.more:
+        state = load_state()
+        if not state.get("last_message_id"):
+            logger.info("No previous post found — run without --more first")
+            return
+        if not check_last_post_reactions(state):
+            logger.info("No reactions yet on last post — skipping.")
+            return
+        logger.info("Last post has reactions, posting next batch")
+
+    post_events(webhook_url, top_n=args.top, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":
