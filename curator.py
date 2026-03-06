@@ -6,14 +6,21 @@ editorial product with personality.
 """
 from __future__ import annotations
 
-import random
+import logging
+import re
 from datetime import date, timedelta
+from pathlib import Path
 from models import Event
 
+log = logging.getLogger(__name__)
 
 # --- Module-level feedback state (set via configure_feedback) ---
 _feedback_loader = None
 _feedback_message_ids: dict[str, str] = {}  # event URL -> Discord message ID
+
+# --- Module-level preferences (loaded once via load_preferences) ---
+_preferences: dict[str, list[str]] | None = None
+PREFERENCES_PATH = Path(__file__).resolve().parent / "preferences.md"
 
 
 def configure_feedback(loader=None, message_ids: dict[str, str] | None = None):
@@ -25,6 +32,87 @@ def configure_feedback(loader=None, message_ids: dict[str, str] | None = None):
     global _feedback_loader, _feedback_message_ids
     _feedback_loader = loader
     _feedback_message_ids = message_ids or {}
+
+
+def load_preferences(path: Path | str | None = None) -> dict[str, list[str]]:
+    """Parse preferences.md and cache the result module-wide.
+
+    Returns a dict with keys like 'like', 'avoid', 'venue_boost', 'venue_deprioritize'
+    each mapping to a list of lowercase keyword strings extracted from the bullet points.
+    """
+    global _preferences
+    p = Path(path) if path else PREFERENCES_PATH
+    if not p.exists():
+        log.warning("preferences.md not found at %s — using defaults", p)
+        _preferences = {}
+        return _preferences
+
+    text = p.read_text()
+    sections = _parse_preference_sections(text)
+    _preferences = sections
+    log.info("Loaded preferences: %s", {k: len(v) for k, v in sections.items()})
+    return _preferences
+
+
+def _parse_preference_sections(text: str) -> dict[str, list[str]]:
+    """Extract bullet-point items from each section of preferences.md."""
+    section_map = {
+        "what we like": "like",
+        "what we avoid": "avoid",
+        "audience notes": "audience",
+        "venue preferences": "venue_boost",
+        "category preferences": "category",
+    }
+    result: dict[str, list[str]] = {}
+    current_key = None
+    in_deprioritize = False
+
+    for line in text.splitlines():
+        stripped = line.strip()
+        # Detect section headers (## ...)
+        if stripped.startswith("## "):
+            header = stripped.lstrip("# ").strip().lower()
+            matched = False
+            for pattern, key in section_map.items():
+                if pattern in header:
+                    current_key = key
+                    in_deprioritize = False
+                    if key not in result:
+                        result[key] = []
+                    matched = True
+                    break
+            if not matched:
+                current_key = None
+            continue
+
+        # Detect sub-headers for venue deprioritize
+        if current_key == "venue_boost" and "deprioritize" in stripped.lower():
+            in_deprioritize = True
+            if "venue_deprioritize" not in result:
+                result["venue_deprioritize"] = []
+            continue
+
+        # Extract bullet items (- or numbered 1.)
+        if current_key and re.match(r"^[-*]\s+|^\d+\.\s+", stripped):
+            item = re.sub(r"^[-*]\s+|^\d+\.\s+", "", stripped).strip()
+            # Strip parenthetical qualifiers for cleaner matching
+            clean = re.sub(r"\(.*?\)", "", item).strip().lower()
+            if not clean:
+                continue
+            if in_deprioritize:
+                result.setdefault("venue_deprioritize", []).append(clean)
+            else:
+                result[current_key].append(clean)
+
+    return result
+
+
+def get_preferences() -> dict[str, list[str]]:
+    """Return cached preferences, loading from disk if needed."""
+    global _preferences
+    if _preferences is None:
+        load_preferences()
+    return _preferences or {}
 
 
 # Categories we care most about (for scoring)
@@ -88,13 +176,16 @@ DEFAULT_COMMENTARY = [
 ]
 
 
-def score_event(event: Event, feedback_loader=None, message_id: str | None = None) -> float:
+def score_event(event: Event, feedback_loader=None, message_id: str | None = None,
+                thread_context: list[str] | None = None) -> float:
     """Score an event for curation. Higher = more likely to be picked.
 
     If feedback_loader and message_id are provided, community feedback is applied:
       - Each 👍 from a unique user adds +5
       - Each 🔥 from a unique user adds +15
       - Any ❌ sets score to -999 (suppressed)
+
+    thread_context: Optional list of thread feedback strings to check against this event.
     """
     score = 0.0
 
@@ -152,7 +243,83 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
     elif 3 <= days_away <= 4:
         score += 1.0
 
+    # --- Preference-based scoring ---
+    prefs = get_preferences()
+    if prefs:
+        text = _event_text(event)
+
+        # Boost for "like" preferences
+        for pref in prefs.get("like", []):
+            keywords = [w for w in pref.split() if len(w) > 3]
+            if keywords and any(kw in text for kw in keywords):
+                score += 1.5
+                log.debug("Preference boost (+1.5) for %r matching like: %s", event.title, pref)
+                break  # one boost per event from likes
+
+        # Penalty for "avoid" preferences
+        for pref in prefs.get("avoid", []):
+            keywords = [w for w in pref.split() if len(w) > 3]
+            if keywords and any(kw in text for kw in keywords):
+                score -= 10.0
+                log.info("Preference penalty (-10) for %r matching avoid: %s", event.title, pref)
+                break  # one penalty per event from avoids
+
+        # Venue deprioritize
+        if event.venue:
+            venue_lower = event.venue.lower()
+            for vp in prefs.get("venue_deprioritize", []):
+                keywords = [w for w in vp.split() if len(w) > 3]
+                if keywords and any(kw in venue_lower for kw in keywords):
+                    score -= 1.0
+                    log.debug("Venue deprioritize (-1) for %r: %s", event.venue, vp)
+                    break
+
+    # --- Thread feedback scoring ---
+    # Check if any thread feedback (from all events) contains signals relevant to this event
+    _thread_ctx = thread_context
+    if _thread_ctx is None and fl:
+        _thread_ctx = _build_thread_context(fl)
+    if _thread_ctx:
+        text = _event_text(event)
+        for fb_text in _thread_ctx:
+            fb_lower = fb_text.lower()
+            # Negative signals: "skip", "not interested", "don't like", "boring", "stop"
+            is_negative = any(w in fb_lower for w in ("skip", "not interested", "don't like",
+                                                       "boring", "stop", "hate", "avoid"))
+            # Positive signals: "love", "more like this", "great", "want", "yes"
+            is_positive = any(w in fb_lower for w in ("love", "more like this", "great",
+                                                       "want", "yes", "amazing", "awesome"))
+            # Extract topic keywords from feedback (words > 4 chars, skip common words)
+            skip_words = {"this", "that", "these", "those", "would", "could", "should",
+                          "about", "really", "there", "their", "where", "which", "being",
+                          "other", "every", "after", "before", "because", "through"}
+            topic_words = [w for w in re.findall(r"[a-z]{5,}", fb_lower) if w not in skip_words]
+
+            if topic_words and any(tw in text for tw in topic_words):
+                if is_negative:
+                    score -= 5.0
+                    log.info("Thread feedback penalty (-5) for %r: %s", event.title, fb_text[:60])
+                elif is_positive:
+                    score += 3.0
+                    log.info("Thread feedback boost (+3) for %r: %s", event.title, fb_text[:60])
+
     return score
+
+
+def _build_thread_context(fl) -> list[str]:
+    """Extract all thread feedback text from the feedback loader."""
+    try:
+        all_fb = fl.all_thread_feedback()
+        return [fb["text"] for fb in all_fb if fb.get("text")]
+    except AttributeError:
+        return []
+
+
+def _event_text(event: Event) -> str:
+    """Build a lowercase searchable string from event fields."""
+    parts = [event.title or "", event.description or "", event.venue or "",
+             event.category or ""]
+    return " ".join(parts).lower()
 
 
 def get_commentary(event: Event) -> str:
@@ -188,10 +355,15 @@ def select_editors_picks(
     if not upcoming:
         return []
 
+    # Pre-compute thread context once for all events
+    fl = feedback_loader or _feedback_loader
+    thread_ctx = _build_thread_context(fl) if fl else []
+
     # Score all events (feedback applied via explicit params or module-level state)
     scored = [
         (score_event(e, feedback_loader=feedback_loader,
-                     message_id=(message_ids or {}).get(e.url)),
+                     message_id=(message_ids or {}).get(e.url),
+                     thread_context=thread_ctx),
          e)
         for e in upcoming
     ]

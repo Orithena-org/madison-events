@@ -109,9 +109,35 @@ class FeedbackLoader:
                 suppressed.add(msg_id)
         return suppressed
 
+    def thread_feedback(self, message_id: str) -> list[dict]:
+        """Return thread feedback entries for a specific message.
+
+        Each entry has: author, author_id, text, timestamp.
+        Returns empty list if no thread feedback exists.
+        """
+        data = self._load()
+        entry = data.get(str(message_id), {})
+        return entry.get("thread_feedback", [])
+
+    def all_thread_feedback(self) -> list[dict]:
+        """Return all thread feedback across all messages.
+
+        Each entry includes the parent message_id plus the feedback fields.
+        Useful for building aggregate context for the curator.
+        """
+        data = self._load()
+        all_fb = []
+        for msg_id, entry in data.items():
+            for fb in entry.get("thread_feedback", []):
+                all_fb.append({"message_id": msg_id, **fb})
+        return all_fb
+
     def summary(self) -> dict:
         """Return a summary of all feedback for logging/debugging."""
         data = self._load()
+        thread_fb_count = sum(
+            len(e.get("thread_feedback", [])) for e in data.values()
+        )
         return {
             "total_messages": len(data),
             "thumbs_up": sum(
@@ -126,4 +152,5 @@ class FeedbackLoader:
                 1 for e in data.values()
                 if e.get("reactions", {}).get("\U0001f525", {}).get("count", 0) > 0
             ),
+            "thread_feedback": thread_fb_count,
         }
