@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 POSTED_FILE = DATA_DIR / "discord_posted.json"
 STATE_FILE = DATA_DIR / "discord_state.json"
+MESSAGE_IDS_FILE = DATA_DIR / "discord_message_ids.json"
 EVENTS_FILE = DATA_DIR / "events.json"
 
 # Category -> embed color (Discord int format)
@@ -56,6 +57,24 @@ def save_posted(posted: set[str]) -> None:
     """Persist the set of posted event URLs."""
     POSTED_FILE.write_text(
         json.dumps(sorted(posted), indent=2),
+        encoding="utf-8",
+    )
+
+
+def load_message_ids() -> dict[str, str]:
+    """Load mapping of event URL -> Discord message ID."""
+    if MESSAGE_IDS_FILE.exists():
+        try:
+            return json.loads(MESSAGE_IDS_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    return {}
+
+
+def save_message_ids(msg_ids: dict[str, str]) -> None:
+    """Persist event URL -> Discord message ID mapping."""
+    MESSAGE_IDS_FILE.write_text(
+        json.dumps(msg_ids, indent=2),
         encoding="utf-8",
     )
 
@@ -176,6 +195,7 @@ def post_events(webhook_url: str, top_n: int = 5, dry_run: bool = False) -> int:
     logger.info("Found %d new events, posting top %d", len(new_events), len(to_post))
 
     state = load_state()
+    msg_ids = load_message_ids()
     last_message_id = None
     count = 0
     for event in to_post:
@@ -194,7 +214,11 @@ def post_events(webhook_url: str, top_n: int = 5, dry_run: bool = False) -> int:
                 count += 1
                 logger.info("Posted: %s", event.get("title"))
                 try:
-                    last_message_id = resp.json().get("id")
+                    msg_data = resp.json()
+                    msg_id = msg_data.get("id")
+                    if msg_id:
+                        msg_ids[event["url"]] = msg_id
+                        last_message_id = msg_id
                 except (ValueError, KeyError):
                     pass
             elif resp.status_code == 429:
@@ -206,7 +230,11 @@ def post_events(webhook_url: str, top_n: int = 5, dry_run: bool = False) -> int:
                     posted.add(event["url"])
                     count += 1
                     try:
-                        last_message_id = resp.json().get("id")
+                        msg_data = resp.json()
+                        msg_id = msg_data.get("id")
+                        if msg_id:
+                            msg_ids[event["url"]] = msg_id
+                            last_message_id = msg_id
                     except (ValueError, KeyError):
                         pass
             else:
@@ -218,6 +246,7 @@ def post_events(webhook_url: str, top_n: int = 5, dry_run: bool = False) -> int:
 
     if not dry_run:
         save_posted(posted)
+        save_message_ids(msg_ids)
         if last_message_id:
             state["last_message_id"] = last_message_id
             save_state(state)
