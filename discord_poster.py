@@ -22,6 +22,7 @@ from config import DATA_DIR
 logger = logging.getLogger(__name__)
 
 POSTED_FILE = DATA_DIR / "discord_posted.json"
+MESSAGE_IDS_FILE = DATA_DIR / "discord_message_ids.json"
 EVENTS_FILE = DATA_DIR / "events.json"
 
 # Category -> embed color (Discord int format)
@@ -55,6 +56,24 @@ def save_posted(posted: set[str]) -> None:
     """Persist the set of posted event URLs."""
     POSTED_FILE.write_text(
         json.dumps(sorted(posted), indent=2),
+        encoding="utf-8",
+    )
+
+
+def load_message_ids() -> dict[str, str]:
+    """Load mapping of event URL -> Discord message ID."""
+    if MESSAGE_IDS_FILE.exists():
+        try:
+            return json.loads(MESSAGE_IDS_FILE.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, TypeError):
+            return {}
+    return {}
+
+
+def save_message_ids(msg_ids: dict[str, str]) -> None:
+    """Persist event URL -> Discord message ID mapping."""
+    MESSAGE_IDS_FILE.write_text(
+        json.dumps(msg_ids, indent=2),
         encoding="utf-8",
     )
 
@@ -125,6 +144,10 @@ def post_events(webhook_url: str, dry_run: bool = False) -> int:
 
     logger.info("Found %d new events to post", len(new_events))
 
+    msg_ids = load_message_ids()
+    # Use ?wait=true to get message ID back from webhook
+    post_url = webhook_url + ("&" if "?" in webhook_url else "?") + "wait=true"
+
     count = 0
     for event in new_events:
         embed = build_embed(event)
@@ -136,19 +159,35 @@ def post_events(webhook_url: str, dry_run: bool = False) -> int:
 
         payload = {"embeds": [embed]}
         try:
-            resp = requests.post(webhook_url, json=payload, timeout=10)
-            if resp.status_code in (200, 204):
+            resp = requests.post(post_url, json=payload, timeout=10)
+            if resp.status_code == 200:
                 posted.add(event["url"])
+                # Capture the Discord message ID
+                try:
+                    msg_data = resp.json()
+                    if "id" in msg_data:
+                        msg_ids[event["url"]] = msg_data["id"]
+                except (ValueError, KeyError):
+                    pass
                 count += 1
                 logger.info("Posted: %s", event.get("title"))
+            elif resp.status_code == 204:
+                posted.add(event["url"])
+                count += 1
+                logger.info("Posted: %s (no message ID returned)", event.get("title"))
             elif resp.status_code == 429:
                 retry_after = resp.json().get("retry_after", 5)
                 logger.warning("Rate limited, waiting %.1fs", retry_after)
                 time.sleep(retry_after)
-                # Retry once
-                resp = requests.post(webhook_url, json=payload, timeout=10)
-                if resp.status_code in (200, 204):
+                resp = requests.post(post_url, json=payload, timeout=10)
+                if resp.status_code == 200:
                     posted.add(event["url"])
+                    try:
+                        msg_data = resp.json()
+                        if "id" in msg_data:
+                            msg_ids[event["url"]] = msg_data["id"]
+                    except (ValueError, KeyError):
+                        pass
                     count += 1
             else:
                 logger.error("Failed to post %s: HTTP %d", event.get("title"), resp.status_code)
@@ -159,6 +198,7 @@ def post_events(webhook_url: str, dry_run: bool = False) -> int:
 
     if not dry_run:
         save_posted(posted)
+        save_message_ids(msg_ids)
 
     logger.info("Posted %d/%d new events", count, len(new_events))
     return count

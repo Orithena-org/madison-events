@@ -11,6 +11,22 @@ from datetime import date, timedelta
 from models import Event
 
 
+# --- Module-level feedback state (set via configure_feedback) ---
+_feedback_loader = None
+_feedback_message_ids: dict[str, str] = {}  # event URL -> Discord message ID
+
+
+def configure_feedback(loader=None, message_ids: dict[str, str] | None = None):
+    """Set the module-level feedback loader and message ID map.
+
+    Call this before scoring/selecting to enable community feedback.
+    Gracefully no-ops if loader is None (feedback unavailable).
+    """
+    global _feedback_loader, _feedback_message_ids
+    _feedback_loader = loader
+    _feedback_message_ids = message_ids or {}
+
+
 # Categories we care most about (for scoring)
 HIGH_VALUE_CATEGORIES = {
     "Arts & Entertainment", "Music", "Food & Drink", "Comedy",
@@ -72,9 +88,29 @@ DEFAULT_COMMENTARY = [
 ]
 
 
-def score_event(event: Event) -> float:
-    """Score an event for curation. Higher = more likely to be picked."""
+def score_event(event: Event, feedback_loader=None, message_id: str | None = None) -> float:
+    """Score an event for curation. Higher = more likely to be picked.
+
+    If feedback_loader and message_id are provided, community feedback is applied:
+      - Each 👍 from a unique user adds +5
+      - Each 🔥 from a unique user adds +15
+      - Any ❌ sets score to -999 (suppressed)
+    """
     score = 0.0
+
+    # Apply community feedback if available (explicit params or module-level)
+    fl = feedback_loader or _feedback_loader
+    mid = message_id or _feedback_message_ids.get(event.url)
+    if fl and mid:
+        if fl.is_suppressed(mid):
+            return -999.0
+        data = fl._load()
+        entry = data.get(str(mid), {})
+        reactions = entry.get("reactions", {})
+        thumbs = reactions.get("\U0001f44d", {})
+        score += thumbs.get("count", 0) * 5
+        fire = reactions.get("\U0001f525", {})
+        score += fire.get("count", 0) * 15
 
     # Category bonus
     if event.category in HIGH_VALUE_CATEGORIES:
@@ -132,11 +168,17 @@ def select_editors_picks(
     events: list[Event],
     count: int = 5,
     days_ahead: int = 7,
+    feedback_loader=None,
+    message_ids: dict[str, str] | None = None,
 ) -> list[dict]:
     """Select top events as Editor's Picks with commentary.
 
     Returns a list of dicts with 'event' and 'commentary' keys.
     Ensures source diversity in the picks.
+
+    Args:
+        feedback_loader: Optional FeedbackLoader for community scoring.
+        message_ids: Optional mapping of event URL -> Discord message ID.
     """
     today = date.today()
     end = today + timedelta(days=days_ahead)
@@ -146,8 +188,16 @@ def select_editors_picks(
     if not upcoming:
         return []
 
-    # Score all events
-    scored = [(score_event(e), e) for e in upcoming]
+    # Score all events (feedback applied via explicit params or module-level state)
+    scored = [
+        (score_event(e, feedback_loader=feedback_loader,
+                     message_id=(message_ids or {}).get(e.url)),
+         e)
+        for e in upcoming
+    ]
+
+    # Filter out suppressed events
+    scored = [(s, e) for s, e in scored if s > -999]
     scored.sort(key=lambda x: x[0], reverse=True)
 
     # Select with source diversity

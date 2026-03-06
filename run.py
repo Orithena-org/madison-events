@@ -431,6 +431,25 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
         logger.info("Posting new events to Discord...")
         post_events(webhook_url)
 
+    # Load community feedback to influence curation (suppressed events, score boosts)
+    try:
+        from feedback_loader import FeedbackLoader
+        from discord_poster import load_message_ids
+        from curator import configure_feedback
+
+        fl = FeedbackLoader()
+        msg_ids = load_message_ids()
+        if msg_ids:
+            configure_feedback(loader=fl, message_ids=msg_ids)
+            summary = fl.summary()
+            logger.info(
+                f"Feedback loaded: {summary['total_messages']} messages, "
+                f"{summary['thumbs_up']} boosted, {summary['suppressed']} suppressed, "
+                f"{summary['community_picks']} community picks"
+            )
+    except Exception as e:
+        logger.warning(f"Could not load feedback (skipping): {e}")
+
     if not build:
         logger.info("Scrape-only mode. Done.")
         return
