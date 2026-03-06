@@ -199,13 +199,9 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
     if fl and mid:
         if fl.is_suppressed(mid):
             return -999.0, "Suppressed by community feedback."
-        data = fl._load()
-        entry = data.get(str(mid), {})
-        reactions = entry.get("reactions", {})
-        thumbs = reactions.get("\U0001f44d", {})
-        thumbs_count = thumbs.get("count", 0)
-        fire = reactions.get("\U0001f525", {})
-        fire_count = fire.get("count", 0)
+        counts = fl.reaction_counts(mid)
+        thumbs_count = counts["thumbs_up"]
+        fire_count = counts["fire"]
         fb_score = thumbs_count * 5 + fire_count * 15
         score += fb_score
         if fire_count:
@@ -229,7 +225,6 @@ def score_event(event: Event, feedback_loader=None, message_id: str | None = Non
         for notable in NOTABLE_VENUES:
             if notable in venue_lower:
                 score += 2.0
-                matched_venue = notable.title()
                 signals.append((f"notable venue ({event.venue})", 2.0))
                 break
 
