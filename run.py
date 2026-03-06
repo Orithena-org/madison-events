@@ -424,14 +424,7 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
             logger.error("No cached events found. Run with --scrape or --demo first.")
             return
 
-    # Post new events to Discord (if webhook is configured)
-    webhook_url = os.environ.get("DISCORD_WEBHOOK_MADISON_EVENTS")
-    if webhook_url:
-        from discord_poster import post_events
-        logger.info("Posting new events to Discord...")
-        post_events(webhook_url)
-
-    # Load community feedback to influence curation (suppressed events, score boosts)
+    # Load community feedback before posting so curation reasons reflect it
     try:
         from feedback_loader import FeedbackLoader
         from discord_poster import load_message_ids
@@ -439,16 +432,22 @@ def run_pipeline(scrape: bool = True, build: bool = True, demo: bool = False):
 
         fl = FeedbackLoader()
         msg_ids = load_message_ids()
-        if msg_ids:
-            configure_feedback(loader=fl, message_ids=msg_ids)
-            summary = fl.summary()
-            logger.info(
-                f"Feedback loaded: {summary['total_messages']} messages, "
-                f"{summary['thumbs_up']} boosted, {summary['suppressed']} suppressed, "
-                f"{summary['community_picks']} community picks"
-            )
+        configure_feedback(loader=fl, message_ids=msg_ids)
+        summary = fl.summary()
+        logger.info(
+            f"Feedback loaded: {summary['total_messages']} messages, "
+            f"{summary['thumbs_up']} boosted, {summary['suppressed']} suppressed, "
+            f"{summary['community_picks']} community picks"
+        )
     except Exception as e:
         logger.warning(f"Could not load feedback (skipping): {e}")
+
+    # Post new events to Discord (if webhook is configured)
+    webhook_url = os.environ.get("DISCORD_WEBHOOK_MADISON_EVENTS")
+    if webhook_url:
+        from discord_poster import post_events
+        logger.info("Posting new events to Discord...")
+        post_events(webhook_url)
 
     if not build:
         logger.info("Scrape-only mode. Done.")

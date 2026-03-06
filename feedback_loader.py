@@ -109,6 +109,21 @@ class FeedbackLoader:
                 suppressed.add(msg_id)
         return suppressed
 
+    def reaction_counts(self, message_id: str) -> dict[str, int]:
+        """Return raw reaction counts for a message.
+
+        Returns dict with keys: thumbs_up, fire, x.
+        Callers can apply their own weights.
+        """
+        data = self._load()
+        entry = data.get(str(message_id), {})
+        reactions = entry.get("reactions", {})
+        return {
+            "thumbs_up": reactions.get("\U0001f44d", {}).get("count", 0),
+            "fire": reactions.get("\U0001f525", {}).get("count", 0),
+            "x": reactions.get("\u274c", {}).get("count", 0),
+        }
+
     def thread_feedback(self, message_id: str) -> list[dict]:
         """Return thread feedback entries for a specific message.
 
