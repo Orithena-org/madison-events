@@ -5,6 +5,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, date
 from typing import Optional
 import json
+import re
+import hashlib
 
 
 @dataclass
@@ -33,6 +35,24 @@ class Event:
         d = d.copy()
         d["date"] = date.fromisoformat(d["date"])
         return cls(**d)
+
+    @property
+    def slug(self) -> str:
+        """Generate a URL-safe slug from title and date."""
+        text = re.sub(r'[^\w\s-]', '', self.title.lower())
+        text = re.sub(r'[\s_]+', '-', text).strip('-')
+        text = re.sub(r'-+', '-', text)
+        # Truncate long slugs and add date for uniqueness
+        text = text[:60].rstrip('-')
+        date_str = self.date.isoformat()
+        # Add short hash for uniqueness when titles collide
+        unique = hashlib.md5(f"{self.title}{date_str}{self.venue or ''}".encode()).hexdigest()[:6]
+        return f"{text}-{date_str}-{unique}"
+
+    @property
+    def detail_url(self) -> str:
+        """URL path to this event's detail page on our site."""
+        return f"events/{self.slug}/"
 
     @property
     def display_url(self) -> str:
@@ -65,6 +85,7 @@ class Event:
             "uw_madison": "UW-Madison",
             "city_madison": "City of Madison",
             "patch": "Patch.com",
+            "visitmadison": "Visit Madison",
         }
         return names.get(self.source, self.source)
 

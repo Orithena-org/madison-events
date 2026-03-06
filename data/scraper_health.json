@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-03-04T19:03:21.502904",
+  "scrapers": {
+    "isthmus": {
+      "status": "ok",
+      "events": 30,
+      "error": null
+    },
+    "eventbrite": {
+      "status": "ok",
+      "events": 30,
+      "error": null
+    },
+    "uw_madison": {
+      "status": "ok",
+      "events": 20,
+      "error": null
+    },
+    "city_madison": {
+      "status": "ok",
+      "events": 10,
+      "error": null
+    },
+    "patch": {
+      "status": "ok",
+      "events": 20,
+      "error": null
+    }
+  },
+  "total_raw": 110,
+  "total_unique": 102,
+  "dupes_removed": 8
+}
