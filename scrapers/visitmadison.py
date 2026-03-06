@@ -1,6 +1,11 @@
-"""Scraper for Visit Madison tourism events (visitmadison.com RSS feed)."""
+"""Scraper for Visit Madison tourism events (visitmadison.com RSS feed).
+
+Fetches the RSS feed for event listings, then hits each detail page to
+extract venue name from JSON-LD structured data.
+"""
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
@@ -44,6 +49,19 @@ CATEGORY_MAP = {
     "trivia": "Nightlife",
 }
 
+# Map JSON-LD @type to our categories (fallback when RSS tags miss)
+JSONLD_TYPE_MAP = {
+    "FoodEvent": "Food & Drink",
+    "SocialEvent": "Community",
+    "MusicEvent": "Music",
+    "SportsEvent": "Sports",
+    "EducationEvent": "Education",
+    "DanceEvent": "Arts",
+    "TheaterEvent": "Arts",
+    "ScreeningEvent": "Arts & Entertainment",
+    "Festival": "Festivals",
+}
+
 
 class VisitMadisonScraper(BaseScraper):
     source_id = "visitmadison"
@@ -75,6 +93,9 @@ class VisitMadisonScraper(BaseScraper):
                     events.append(event)
             except Exception as e:
                 logger.debug(f"Failed to parse Visit Madison entry: {e}")
+
+        # Enrich events with venue data from detail pages
+        self._enrich_from_detail_pages(events)
 
         return events[:30]
 
@@ -145,6 +166,53 @@ class VisitMadisonScraper(BaseScraper):
             category=category,
             price=price,
         )
+
+    def _enrich_from_detail_pages(self, events: list[Event]) -> None:
+        """Fetch each event's detail page to extract venue from JSON-LD."""
+        enriched = 0
+        for event in events:
+            if not event.url:
+                continue
+            try:
+                resp = requests.get(
+                    event.url, headers=REQUEST_HEADERS, timeout=REQUEST_TIMEOUT
+                )
+                resp.raise_for_status()
+                ld = self._extract_jsonld(resp.text)
+                if not ld:
+                    continue
+
+                # Venue from location.name
+                location = ld.get("location", {})
+                if isinstance(location, dict):
+                    venue_name = location.get("name", "").strip()
+                    if venue_name:
+                        event.venue = venue_name
+
+                # Use JSON-LD @type as category fallback
+                if not event.category:
+                    ld_type = ld.get("@type", "")
+                    if ld_type in JSONLD_TYPE_MAP:
+                        event.category = JSONLD_TYPE_MAP[ld_type]
+
+                enriched += 1
+                time.sleep(0.2)  # polite delay between requests
+            except Exception as e:
+                logger.debug(f"[Visit Madison] Failed to enrich {event.title}: {e}")
+
+        logger.info(f"[Visit Madison] Enriched {enriched}/{len(events)} events from detail pages")
+
+    def _extract_jsonld(self, html: str) -> dict | None:
+        """Extract first Event JSON-LD block from page HTML."""
+        soup = BeautifulSoup(html, "lxml")
+        for script in soup.find_all("script", type="application/ld+json"):
+            try:
+                data = json.loads(script.string)
+                if isinstance(data, dict) and data.get("@context"):
+                    return data
+            except (json.JSONDecodeError, TypeError):
+                continue
+        return None
 
     def _map_category(self, categories: list[str]) -> str | None:
         for cat in categories:
