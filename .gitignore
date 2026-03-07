@@ -1,5 +1,10 @@
 output/
 data/events.json
+data/discord_posted.json
+data/discord_state.json
+data/discord_message_ids.json
+data/pipeline.log
+data/scraper_health.json
 __pycache__/
 *.pyc
 .env
