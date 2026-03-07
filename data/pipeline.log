@@ -1,0 +1,56 @@
+/Users/georgeauto/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+08:30:03 [INFO] Scraping events from all sources...
+08:30:03 [INFO] [Isthmus] Starting scrape...
+08:30:04 [INFO] [Isthmus] Found 30 events
+08:30:04 [INFO] [Eventbrite] Starting scrape...
+08:30:06 [INFO] [Eventbrite] Found 30 events
+08:30:06 [INFO] [UW-Madison] Starting scrape...
+08:30:07 [INFO] [UW-Madison] Found 20 events
+08:30:07 [INFO] [City of Madison] Starting scrape...
+08:30:07 [INFO] [City of Madison] Found 10 events
+08:30:07 [INFO] [Patch.com] Starting scrape...
+08:30:08 [INFO] [Patch.com] Found 20 events
+08:30:08 [INFO] [Visit Madison] Starting scrape...
+08:30:29 [INFO] [Visit Madison] Enriched 30/30 events from detail pages
+08:30:29 [INFO] [Visit Madison] Found 30 events
+08:30:29 [INFO] Deduplication removed 12 duplicate events (140 raw → 128 unique)
+08:30:29 [INFO] Scraper health report: 6/6 sources OK, 128 unique events
+08:30:29 [INFO] Auto-categorized 80/128 events
+08:30:29 [INFO] Saved 128 events to /Users/georgeauto/orithena/madison-events/data/events.json
+08:30:29 [INFO] Posting new events to Discord...
+08:30:29 [INFO] Found 73 new events, posting top 5
+08:30:30 [INFO] Posted: RSVP for Sandy Wojtal-Weber & David McKee reception
+08:30:31 [INFO] Posted: RSVP for Toto's Gala
+08:30:32 [INFO] Posted: LEXFest
+08:30:33 [INFO] Posted: WIAA State Team Wrestling Tournament
+08:30:34 [INFO] Posted: Creative Power Showcase
+08:30:34 [INFO] Posted 5/5 new events
+08:30:34 [INFO] Generating newsletter...
+08:30:34 [INFO] Saved newsletter to /Users/georgeauto/orithena/madison-events/output/newsletter
+08:30:34 [INFO] Building website...
+08:30:34 [INFO] Building site with 128 events...
+08:30:34 [INFO] Built landing.html
+08:30:34 [INFO] Built index.html
+08:30:34 [INFO] Built sponsors.html
+08:30:34 [INFO] Built newsletter.html
+08:30:34 [INFO] Built 128 event detail pages
+08:30:34 [INFO] Built feed.xml (RSS)
+08:30:34 [INFO] Built sitemap.xml
+08:30:34 [INFO] Built robots.txt
+08:30:34 [INFO] Copied static assets
+08:30:34 [INFO] Site built at: /Users/georgeauto/orithena/madison-events/output/site
+08:30:34 [INFO] Generating social media content...
+08:30:34 [INFO] Saved 8 social posts to /Users/georgeauto/orithena/madison-events/output/social/social_posts.json
+08:30:34 [INFO] Saved social summary to /Users/georgeauto/orithena/madison-events/output/social/social_summary.txt
+08:30:34 [INFO] 
+08:30:34 [INFO] ==================================================
+08:30:34 [INFO] PIPELINE COMPLETE
+08:30:34 [INFO] ==================================================
+08:30:34 [INFO]   Events:     128
+08:30:34 [INFO]   Website:    /Users/georgeauto/orithena/madison-events/output/site/index.html
+08:30:34 [INFO]   Newsletter: /Users/georgeauto/orithena/madison-events/output/newsletter/newsletter.html
+08:30:34 [INFO]   Social:     8 posts generated
+08:30:34 [INFO]   Sponsors:   /Users/georgeauto/orithena/madison-events/output/site/sponsors.html
+08:30:34 [INFO] 
+08:30:34 [INFO] Open the site: file:///Users/georgeauto/orithena/madison-events/output/site/index.html
