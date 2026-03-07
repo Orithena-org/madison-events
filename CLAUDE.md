@@ -1,6 +1,6 @@
 # Madison Events — Events Aggregator
 
-Madison WI events aggregator. Scrapes local event sources, builds a static site, and generates newsletter/social content.
+Madison WI events aggregator. GitHub Pages shell — templates, static assets, and output live here. Pipeline code lives in `orithena-org/content/`.
 
 For system-wide context, see `../CLAUDE.md`. For the org mission, see `../orithena-org/NORTH_STAR.md`.
 
@@ -8,14 +8,25 @@ For system-wide context, see `../CLAUDE.md`. For the org mission, see `../orithe
 
 | Command | What it does |
 |---|---|
-| `make run` | Full pipeline (scrape + build) |
+| `make run` | Full pipeline (scrape + build + post) |
 | `make scrape` | Scrape events only |
 | `make build` | Build site from cached events |
 | `make demo` | Run with sample data (no network) |
 
-## Pipeline
+## Architecture
 
-Scrapers -> event models -> site / social / newsletter (output in `output/`)
+This repo is a **product shell**. All pipeline logic is in `orithena-org/content/`:
+- Adapters, scoring, dedup, categorization → `content/adapters/`, `content/curation/`
+- Discord posting → `content/discord/`
+- Newsletter, social → `content/output/`
+- Site builder → `content/sitegen/madison_build.py`
+- Domain config → `content/domains/madison_events.yaml`
+
+This repo contains only:
+- `website/templates/` — Jinja2 templates (product identity)
+- `website/static/` — CSS, JS, images
+- `output/` — Generated site (gitignored)
+- `Makefile` — Delegates to unified pipeline
 
 ## Git Rules
 
