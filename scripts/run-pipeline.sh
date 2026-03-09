@@ -15,5 +15,6 @@ if [[ -f "$CORE_ROOT/.env" ]]; then
     set +a
 fi
 
-cd "$MADISON_ROOT"
-exec python3 -u run.py
+ORG_ROOT="$(cd "$MADISON_ROOT/../orithena-org" && pwd)"
+cd "$ORG_ROOT"
+exec python3 -u -m content.pipeline --domain madison_events
