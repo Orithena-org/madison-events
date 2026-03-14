@@ -8,6 +8,10 @@
     <meta property="og:title" content="{{ site_title }}">
     <meta property="og:description" content="{{ site_tagline }}">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}/">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <link rel="canonical" href="{{ site_url }}/">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
     <link rel="stylesheet" href="static/css/style.css">
     <style>
         .landing-hero {
@@ -193,8 +197,6 @@
             .value-grid { grid-template-columns: 1fr; gap: 16px; }
         }
     </style>
-    <script data-goatcounter="https://georgeauto.goatcounter.com/count"
-            async src="//gc.zgo.at/count.js"></script>
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
 </head>
 <body>

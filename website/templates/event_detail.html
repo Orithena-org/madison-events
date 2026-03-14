@@ -20,7 +20,7 @@
     <meta name="twitter:description" content="{% if event.venue %}{{ event.venue }} | {% endif %}{{ event.date_display }}">
     <link rel="canonical" href="{{ site_url }}/{{ event.detail_url }}">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
-    <link rel="stylesheet" href="../../static/css/style.css">
+    <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
     <style>
         .event-detail-page {
             max-width: 800px;
@@ -172,20 +172,20 @@
 <body>
     <header class="site-header">
         <div class="header-content">
-            <h1><a href="../../landing.html">{{ site_title }}</a></h1>
+            <h1><a href="{{ site_url }}/">{{ site_title }}</a></h1>
             <p class="tagline">{{ site_tagline }}</p>
             <nav class="main-nav">
-                <a href="../../index.html">All Events</a>
-                <a href="../../newsletter.html">Newsletter</a>
-                <a href="../../sponsors.html">Sponsors</a>
+                <a href="{{ site_url }}/index.html">All Events</a>
+                <a href="{{ site_url }}/newsletter.html">Newsletter</a>
+                <a href="{{ site_url }}/sponsors.html">Sponsors</a>
             </nav>
         </div>
     </header>
 
     <div class="event-detail-page">
         <div class="breadcrumb">
-            <a href="../../landing.html">Home</a> &rsaquo;
-            <a href="../../index.html">Events</a> &rsaquo;
+            <a href="{{ site_url }}/">Home</a> &rsaquo;
+            <a href="{{ site_url }}/index.html">Events</a> &rsaquo;
             {{ event.title[:50] }}{% if event.title|length > 50 %}...{% endif %}
         </div>
 
@@ -239,7 +239,7 @@
                     {% if event.url %}
                     <a href="{{ event.display_url }}" target="_blank" rel="noopener" class="btn-primary">View on {{ event.source_display }}</a>
                     {% endif %}
-                    <a href="../../index.html" class="btn-secondary">Browse All Events</a>
+                    <a href="{{ site_url }}/index.html" class="btn-secondary">Browse All Events</a>
                 </div>
             </div>
         </article>
