@@ -1,4 +1,6 @@
-output/
+output/data/
+output/logs/
+# output/site/ is tracked — GitHub Pages deploys from committed output
 data/events.json
 data/discord_posted.json
 data/discord_state.json

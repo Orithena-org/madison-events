@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Wrapper script for launchd — loads .env and runs the Madison Events pipeline.
+# Wrapper script for launchd — loads .env, runs the Madison Events pipeline,
+# then commits and pushes site output so GitHub Pages deploys automatically.
 set -euo pipefail
 
 MADISON_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -17,4 +18,15 @@ fi
 
 ORG_ROOT="$(cd "$MADISON_ROOT/../orithena-org" && pwd)"
 cd "$ORG_ROOT"
-exec python3 -u -m content.pipeline --domain madison_events
+python3 -u -m content.pipeline --domain madison_events
+
+# --- Deploy: commit and push site output if changed ---
+cd "$MADISON_ROOT"
+if ! git diff --quiet output/site/ 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard output/site/)" ]; then
+    git add output/site/
+    git commit -m "chore(site): update generated site output $(date +%Y-%m-%d)"
+    git push origin main
+    echo "[deploy] Site output committed and pushed."
+else
+    echo "[deploy] No site changes to commit."
+fi
