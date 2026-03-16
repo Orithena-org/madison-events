@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from collections import OrderedDict
 from datetime import date, datetime
@@ -55,6 +56,22 @@ def _load_data() -> dict:
     if not DATA_FILE.exists():
         raise FileNotFoundError(f"Data file not found: {DATA_FILE}")
     return json.loads(DATA_FILE.read_text(encoding="utf-8"))
+
+
+def _time_to_iso(time_str: str) -> str:
+    """Convert human-readable time like '7:00 PM' to ISO 24h format like '19:00'."""
+    if not time_str:
+        return ""
+    # Match patterns like "7:00 PM", "10:30 AM", "12:00 PM"
+    m = re.match(r'(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)', time_str.strip())
+    if not m:
+        return ""
+    hour, minute, ampm = int(m.group(1)), m.group(2), m.group(3).upper()
+    if ampm == "PM" and hour != 12:
+        hour += 12
+    elif ampm == "AM" and hour == 12:
+        hour = 0
+    return f"{hour:02d}:{minute}"
 
 
 def _group_events_by_date(events: list[AttrDict]) -> OrderedDict:
@@ -151,6 +168,7 @@ def build() -> None:
 
     # Set up Jinja2
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
+    env.filters["time_to_iso"] = _time_to_iso
 
     site_title = "Madison Events"
     site_url = ""
