@@ -284,7 +284,7 @@
         "@context": "https://schema.org",
         "@type": "Event",
         "name": "{{ event.title | e }}",
-        "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
+        "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{% endif %}",
         {% if event.description %}"description": "{{ event.description | e }}",{% endif %}
         {% if event.venue %}"location": {
             "@type": "Place",
@@ -296,12 +296,19 @@
             }
         },{% endif %}
         {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
-        {% if event.price %}"offers": {
+        {% if event.price %}{% if event.price|lower == 'free' %}"isAccessibleForFree": true,
+        "offers": {
             "@type": "Offer",
-            "price": "{{ event.price }}",
+            "price": "0",
             "priceCurrency": "USD",
-            "url": "{{ site_url }}/{{ event.detail_url }}"
-        },{% endif %}
+            "url": "{{ site_url }}/{{ event.detail_url }}",
+            "availability": "https://schema.org/InStock"
+        },{% else %}"offers": {
+            "@type": "Offer",
+            "url": "{{ site_url }}/{{ event.detail_url }}",
+            "availability": "https://schema.org/InStock",
+            "description": "{{ event.price | e }}"
+        },{% endif %}{% endif %}
         "url": "{{ site_url }}/{{ event.detail_url }}",
         "eventStatus": "https://schema.org/EventScheduled"
     }
