@@ -11,11 +11,12 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ site_url }}/{{ event.detail_url }}">
     <meta property="og:site_name" content="{{ site_title }}">
-    {% if event.image_url %}
-    <meta property="og:image" content="{{ event.image_url }}">
-    {% endif %}
+    <meta property="og:image" content="{{ event.image_url if event.image_url else site_url ~ '/static/images/og-default.png' }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary{% if event.image_url %}_large_image{% endif %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ event.image_url if event.image_url else site_url ~ '/static/images/og-default.png' }}">
     <meta name="twitter:title" content="{{ event.title }}">
     <meta name="twitter:description" content="{% if event.venue %}{{ event.venue }} | {% endif %}{{ event.date_display }}">
     <link rel="canonical" href="{{ site_url }}/{{ event.detail_url }}">
@@ -109,6 +110,68 @@
             transition: all 0.2s;
         }
         .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-calendar {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 24px;
+            background: #4285f4;
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-calendar:hover { background: #3367d6; color: white; }
+        .btn-ics {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 24px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: transparent;
+            text-decoration: none;
+        }
+        .btn-ics:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* Share buttons */
+        .share-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .share-row .share-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .share-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(196,30,58,0.05); }
+        .share-btn.copied { border-color: #28a745; color: #28a745; }
         .event-detail-tags {
             display: flex;
             gap: 8px;
@@ -239,7 +302,24 @@
                     {% if event.url %}
                     <a href="{{ event.display_url }}" target="_blank" rel="noopener" class="btn-primary">View on {{ event.source_display }}</a>
                     {% endif %}
+                    {% set gcal_date = event.date.strftime('%Y%m%d') %}
+                    {% set gcal_time = event.time_start|time_to_iso if event.time_start else '' %}
+                    {% if gcal_time %}
+                    {% set gcal_start = gcal_date ~ 'T' ~ gcal_time.replace(':', '') ~ '00' %}
+                    {% else %}
+                    {% set gcal_start = gcal_date %}
+                    {% endif %}
+                    <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ event.title | urlencode }}&dates={{ gcal_start }}/{{ gcal_start }}{% if event.venue %}&location={{ event.venue | urlencode }}{% endif %}&details={{ ('Details: ' ~ site_url ~ '/' ~ event.detail_url) | urlencode }}" target="_blank" rel="noopener" class="btn-calendar">&#128197; Add to Google Calendar</a>
+                    <button class="btn-ics" onclick="downloadICS()">&#128229; Download .ics</button>
                     <a href="{{ site_url }}/index.html" class="btn-secondary">Browse All Events</a>
+                </div>
+
+                <div class="share-row">
+                    <span class="share-label">Share:</span>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ (site_url ~ '/' ~ event.detail_url) | urlencode }}" target="_blank" rel="noopener" class="share-btn" title="Share on Facebook">f</a>
+                    <a href="https://twitter.com/intent/tweet?text={{ (event.title ~ ' - ' ~ event.date_display) | urlencode }}&url={{ (site_url ~ '/' ~ event.detail_url) | urlencode }}" target="_blank" rel="noopener" class="share-btn" title="Share on X/Twitter">&#120143;</a>
+                    <a href="mailto:?subject={{ (event.title ~ ' - ' ~ event.date_display) | urlencode }}&body={{ ('Check out this event: ' ~ site_url ~ '/' ~ event.detail_url) | urlencode }}" class="share-btn" title="Share via Email">&#9993;</a>
+                    <button class="share-btn" onclick="copyLink(this)" title="Copy link">&#128279;</button>
                 </div>
             </div>
         </article>
@@ -326,6 +406,60 @@
     }
     </script>
 
+    <script>
+    function downloadICS() {
+        var title = {{ event.title | tojson }};
+        var dateStr = "{{ event.date.strftime('%Y%m%d') }}";
+        var timeStart = "{{ event.time_start|time_to_iso if event.time_start else '' }}";
+        var venue = {{ event.venue | tojson if event.venue else '""' }};
+        var desc = {{ event.description[:200] | tojson if event.description else '""' }};
+        var url = "{{ site_url }}/{{ event.detail_url }}";
+
+        var dtStart, dtEnd;
+        if (timeStart) {
+            dtStart = dateStr + "T" + timeStart.replace(":", "") + "00";
+            // Default 2 hour duration
+            var h = parseInt(timeStart.split(":")[0]) + 2;
+            var m = timeStart.split(":")[1];
+            dtEnd = dateStr + "T" + String(h).padStart(2, "0") + m + "00";
+        } else {
+            dtStart = dateStr;
+            dtEnd = dateStr;
+        }
+
+        var ics = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Madison Events//EN",
+            "BEGIN:VEVENT",
+            "DTSTART:" + dtStart,
+            "DTEND:" + dtEnd,
+            "SUMMARY:" + title,
+            venue ? "LOCATION:" + venue : "",
+            "DESCRIPTION:" + desc + "\\n\\n" + url,
+            "URL:" + url,
+            "END:VEVENT",
+            "END:VCALENDAR"
+        ].filter(Boolean).join("\r\n");
+
+        var blob = new Blob([ics], {type: "text/calendar"});
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "event.ics";
+        a.click();
+    }
+
+    function copyLink(btn) {
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            btn.classList.add("copied");
+            btn.innerHTML = "&#10003;";
+            setTimeout(function() {
+                btn.classList.remove("copied");
+                btn.innerHTML = "&#128279;";
+            }, 2000);
+        });
+    }
+    </script>
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
     {% if goatcounter_site %}
     <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
