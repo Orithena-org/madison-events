@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'output/data/events.json'
+      - 'build.py'
+      - 'website/templates/**'
+      - 'website/static/**'
   workflow_dispatch:
 
 permissions:
