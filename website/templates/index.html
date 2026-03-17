@@ -199,14 +199,28 @@
         </div>
     </footer>
 
-    <!-- JSON-LD Structured Data for Events -->
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "{{ site_title }}",
         "url": "{{ site_url }}/",
-        "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin."
+        "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "{{ site_title }}",
+            "url": "{{ site_url }}/",
+            "description": "A community events aggregator for Madison, Wisconsin — pulling together events from {{ sources|length }} local sources.",
+            "areaServed": {
+                "@type": "City",
+                "name": "Madison",
+                "containedInPlace": {
+                    "@type": "State",
+                    "name": "Wisconsin"
+                }
+            }
+        }
     }
     </script>
     {% for date_group, events in events_by_date.items() %}

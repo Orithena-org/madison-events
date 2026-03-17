@@ -94,6 +94,11 @@ def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
     SubElement(channel, "lastBuildDate").text = datetime.utcnow().strftime(
         "%a, %d %b %Y %H:%M:%S +0000")
 
+    atom_link = SubElement(channel, "{http://www.w3.org/2005/Atom}link")
+    atom_link.set("href", f"{site_url}/feed.xml")
+    atom_link.set("rel", "self")
+    atom_link.set("type", "application/rss+xml")
+
     sorted_events = sorted(events, key=lambda e: str(e["date"]), reverse=True)[:50]
     for event in sorted_events:
         item = SubElement(channel, "item")
@@ -120,13 +125,16 @@ def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
         rss, encoding="unicode")
 
 
-def _generate_sitemap(events: list[AttrDict], site_url: str) -> str:
+def _generate_sitemap(events: list[AttrDict], site_url: str,
+                      category_slugs: list[str] | None = None) -> str:
     now = datetime.utcnow().strftime("%Y-%m-%d")
     today = datetime.utcnow().date()
     urls = [
         (f"{site_url}/", "daily", "1.0"),
         (f"{site_url}/index.html", "daily", "0.9"),
     ]
+    for slug in (category_slugs or []):
+        urls.append((f"{site_url}/category/{slug}/", "daily", "0.8"))
     for event in events:
         d = event["date"]
         if isinstance(d, date):
@@ -171,7 +179,7 @@ def build() -> None:
     env.filters["time_to_iso"] = _time_to_iso
 
     site_title = "Madison Events"
-    site_url = ""
+    site_url = "https://orithena-org.github.io/madison-events"
     tagline = "Your guide to everything happening in Madison, WI"
     goatcounter_site = "georgeauto"
 
@@ -226,12 +234,38 @@ def build() -> None:
             (event_dir / "index.html").write_text(html, encoding="utf-8")
         print(f"  Built {len(events)} event detail pages")
 
+    # Category landing pages
+    try:
+        cat_tmpl = env.get_template("category.html")
+    except TemplateNotFound:
+        cat_tmpl = None
+
+    if cat_tmpl:
+        cat_dir = SITE_DIR / "category"
+        cat_dir.mkdir(exist_ok=True)
+        for cat_name in categories:
+            cat_slug = re.sub(r'[^a-z0-9]+', '-', cat_name.lower()).strip('-')
+            cat_events = [e for e in events if e.category == cat_name]
+            cat_events_by_date = _group_events_by_date(cat_events)
+            page_dir = cat_dir / cat_slug
+            page_dir.mkdir(exist_ok=True)
+            html = cat_tmpl.render(
+                category_name=cat_name,
+                category_slug=cat_slug,
+                events_by_date=cat_events_by_date,
+                category_event_count=len(cat_events),
+                **common_context,
+            )
+            (page_dir / "index.html").write_text(html, encoding="utf-8")
+        print(f"  Built {len(categories)} category pages")
+
     # RSS
     rss_xml = _generate_rss(events, site_title, site_url, tagline)
     (SITE_DIR / "feed.xml").write_text(rss_xml, encoding="utf-8")
 
-    # Sitemap
-    sitemap_xml = _generate_sitemap(events, site_url)
+    # Sitemap (include category pages)
+    category_slugs = [re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-') for c in categories]
+    sitemap_xml = _generate_sitemap(events, site_url, category_slugs)
     (SITE_DIR / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8")
 
     # robots.txt

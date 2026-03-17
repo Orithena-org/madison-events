@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category_name }} Events in Madison, WI | {{ site_title }}</title>
+    <meta name="description" content="Find {{ category_name | lower }} events in Madison, Wisconsin. {{ category_event_count }} upcoming events from local sources, updated daily.">
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ category_name }} Events in Madison, WI | {{ site_title }}">
+    <meta property="og:description" content="Find {{ category_name | lower }} events in Madison, Wisconsin. Updated daily.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}/category/{{ category_slug }}/">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ category_name }} Events | {{ site_title }}">
+    <meta name="twitter:description" content="{{ category_event_count }} {{ category_name | lower }} events in Madison, WI. Updated daily.">
+    <link rel="canonical" href="{{ site_url }}/category/{{ category_slug }}/">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
+    <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="{{ site_url }}/">{{ site_title }}</a></h1>
+            <p class="tagline">{{ site_tagline }}</p>
+            <nav class="main-nav">
+                <a href="{{ site_url }}/index.html">All Events</a>
+                <a href="{{ site_url }}/newsletter.html">Newsletter</a>
+                <a href="{{ site_url }}/sponsors.html">Sponsors</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-layout">
+        <main class="events-main">
+            <div class="breadcrumb">
+                <a href="{{ site_url }}/">Home</a> &rsaquo;
+                <strong>{{ category_name }}</strong>
+            </div>
+
+            <h2 style="font-size:28px; font-weight:800; margin:0 0 8px;">{{ category_name }} Events in Madison</h2>
+            <p style="color:var(--text-muted); margin:0 0 24px;">{{ category_event_count }} upcoming events &middot; Updated {{ last_updated }}</p>
+
+            {% if categories %}
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Browse:</label>
+                    {% for cat in categories %}
+                    <a href="{{ site_url }}/category/{{ cat | lower | replace(' ', '-') | replace('/', '-') }}/"
+                       class="filter-btn{% if cat == category_name %} active{% endif %}"
+                       style="text-decoration:none;">{{ cat }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="stats-bar">
+                <span>{{ category_event_count }} {{ category_name | lower }} events</span>
+                <span>from {{ sources|length }} sources</span>
+            </div>
+
+            <div id="events-list" class="events-list">
+                {% for date_group, events in events_by_date.items() %}
+                <div class="date-section" data-date="{{ date_group }}">
+                    <h3 class="date-header">{{ events[0].date_display }}</h3>
+                    {% for event in events %}
+                    <article class="event-card">
+                        {% if event.is_featured %}
+                        <div class="featured-badge">Featured</div>
+                        {% endif %}
+                        <div class="event-content">
+                            <div class="event-info">
+                                <h4 class="event-title">
+                                    <a href="{{ site_url }}/{{ event.detail_url }}">{{ event.title }}</a>
+                                </h4>
+                                <div class="event-meta">
+                                    <span class="event-time">{{ event.time_display }}</span>
+                                    {% if event.venue %}
+                                    <span class="event-venue">{{ event.venue }}</span>
+                                    {% endif %}
+                                    <span class="event-source badge-{{ event.source }}">{{ event.source_display }}</span>
+                                </div>
+                                {% if event.description %}
+                                <p class="event-description">{{ event.description[:200] }}{% if event.description|length > 200 %}...{% endif %}</p>
+                                {% endif %}
+                                {% if event.price %}
+                                <span class="event-price">{{ event.price }}</span>
+                                {% endif %}
+                            </div>
+                            {% if event.image_url %}
+                            <div class="event-image">
+                                <img src="{{ event.image_url }}" alt="{{ event.title }}" loading="lazy">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% if loop.first %}
+                <div class="newsletter-inline-cta">
+                    <strong>Never miss a {{ category_name | lower }} event.</strong> Get the best Madison events in your inbox every Monday.
+                    <a href="{{ site_url }}/newsletter.html">Subscribe free &rarr;</a>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <div class="sidebar-widget newsletter-signup">
+                <h3>Weekly Newsletter</h3>
+                <p>Get Madison's best events delivered to your inbox every Monday.</p>
+                <a href="{{ site_url }}/newsletter.html" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">Subscribe Free</a>
+            </div>
+            <div class="sidebar-widget">
+                <h3>Categories</h3>
+                <ul style="list-style:none; padding:0; margin:0;">
+                    {% for cat in categories %}
+                    <li style="margin-bottom:8px;">
+                        <a href="{{ site_url }}/category/{{ cat | lower | replace(' ', '-') | replace('/', '-') }}/"
+                           style="{% if cat == category_name %}font-weight:700; color:var(--primary);{% endif %}">{{ cat }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; {{ current_year }} {{ site_title }}. Data from {{ sources|length }} local sources, updated daily.</p>
+        <p><a href="{{ site_url }}/feed.xml">RSS Feed</a></p>
+    </footer>
+
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
+</body>
+</html>
