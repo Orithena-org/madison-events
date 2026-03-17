@@ -303,13 +303,21 @@
                     <a href="{{ event.display_url }}" target="_blank" rel="noopener" class="btn-primary">View on {{ event.source_display }}</a>
                     {% endif %}
                     {% set gcal_date = event.date.strftime('%Y%m%d') %}
-                    {% set gcal_time = event.time_start|time_to_iso if event.time_start else '' %}
-                    {% if gcal_time %}
-                    {% set gcal_start = gcal_date ~ 'T' ~ gcal_time.replace(':', '') ~ '00' %}
+                    {% set gcal_time_start = event.time_start|time_to_iso if event.time_start else '' %}
+                    {% set gcal_time_end = event.time_end|time_to_iso if event.time_end else '' %}
+                    {% if gcal_time_start %}
+                    {% set gcal_start = gcal_date ~ 'T' ~ gcal_time_start.replace(':', '') ~ '00' %}
+                    {% if gcal_time_end %}
+                    {% set gcal_end = gcal_date ~ 'T' ~ gcal_time_end.replace(':', '') ~ '00' %}
+                    {% else %}
+                    {% set end_hour = (gcal_time_start.split(':')[0] | int + 2) %}
+                    {% set gcal_end = gcal_date ~ 'T' ~ '%02d' % end_hour ~ gcal_time_start.split(':')[1] ~ '00' %}
+                    {% endif %}
                     {% else %}
                     {% set gcal_start = gcal_date %}
+                    {% set gcal_end = gcal_date %}
                     {% endif %}
-                    <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ event.title | urlencode }}&dates={{ gcal_start }}/{{ gcal_start }}{% if event.venue %}&location={{ event.venue | urlencode }}{% endif %}&details={{ ('Details: ' ~ site_url ~ '/' ~ event.detail_url) | urlencode }}" target="_blank" rel="noopener" class="btn-calendar">&#128197; Add to Google Calendar</a>
+                    <a href="https://www.google.com/calendar/render?action=TEMPLATE&text={{ event.title | urlencode }}&dates={{ gcal_start }}/{{ gcal_end }}{% if event.venue %}&location={{ event.venue | urlencode }}{% endif %}&details={{ ('Details: ' ~ site_url ~ '/' ~ event.detail_url) | urlencode }}" target="_blank" rel="noopener" class="btn-calendar">&#128197; Add to Google Calendar</a>
                     <button class="btn-ics" onclick="downloadICS()">&#128229; Download .ics</button>
                     <a href="{{ site_url }}/index.html" class="btn-secondary">Browse All Events</a>
                 </div>
@@ -411,6 +419,7 @@
         var title = {{ event.title | tojson }};
         var dateStr = "{{ event.date.strftime('%Y%m%d') }}";
         var timeStart = "{{ event.time_start|time_to_iso if event.time_start else '' }}";
+        var timeEnd = "{{ event.time_end|time_to_iso if event.time_end else '' }}";
         var venue = {{ event.venue | tojson if event.venue else '""' }};
         var desc = {{ event.description[:200] | tojson if event.description else '""' }};
         var url = "{{ site_url }}/{{ event.detail_url }}";
@@ -418,10 +427,14 @@
         var dtStart, dtEnd;
         if (timeStart) {
             dtStart = dateStr + "T" + timeStart.replace(":", "") + "00";
-            // Default 2 hour duration
-            var h = parseInt(timeStart.split(":")[0]) + 2;
-            var m = timeStart.split(":")[1];
-            dtEnd = dateStr + "T" + String(h).padStart(2, "0") + m + "00";
+            if (timeEnd) {
+                dtEnd = dateStr + "T" + timeEnd.replace(":", "") + "00";
+            } else {
+                // Default 2 hour duration
+                var h = parseInt(timeStart.split(":")[0]) + 2;
+                var m = timeStart.split(":")[1];
+                dtEnd = dateStr + "T" + String(h).padStart(2, "0") + m + "00";
+            }
         } else {
             dtStart = dateStr;
             dtEnd = dateStr;
