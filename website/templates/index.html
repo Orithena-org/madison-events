@@ -163,6 +163,24 @@
                 </div>
             </div>
 
+            <!-- Calendar Subscribe -->
+            <div class="sidebar-widget">
+                <h3>Subscribe to Calendar</h3>
+                <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">Add Madison events directly to your calendar app. Auto-updates daily.</p>
+                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add All Events</a>
+                <details style="margin-top:8px;">
+                    <summary style="cursor:pointer; font-size:13px; color:var(--text-muted);">Subscribe by category</summary>
+                    <div style="margin-top:8px;">
+                        {% for cat in categories %}
+                        {% if category_slugs %}
+                        <a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[cat] }}.ics"
+                           style="display:block; font-size:13px; padding:4px 0; color:var(--primary);">{{ cat }}</a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+
             <!-- Sponsor Section -->
             <div class="sidebar-widget sponsors-widget">
                 <h3>Promote Your Event</h3>
