@@ -119,6 +119,14 @@
                 <a href="{{ site_url }}/newsletter.html" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">Subscribe Free</a>
             </div>
             <div class="sidebar-widget">
+                <h3>Subscribe to Calendar</h3>
+                <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">Get {{ category_name | lower }} events in your calendar. Auto-updates daily.</p>
+                {% if category_slugs %}
+                <a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[category_name] }}.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add {{ category_name }} Events</a>
+                {% endif %}
+                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" style="display:block; font-size:13px; text-align:center; color:var(--text-muted);">or subscribe to all events</a>
+            </div>
+            <div class="sidebar-widget">
                 <h3>Categories</h3>
                 <ul style="list-style:none; padding:0; margin:0;">
                     {% for cat in categories %}

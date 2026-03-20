@@ -12,8 +12,9 @@ from __future__ import annotations
 import json
 import re
 import shutil
+import uuid
 from collections import OrderedDict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -160,6 +161,85 @@ def _generate_sitemap(events: list[AttrDict], site_url: str,
     return "\n".join(lines)
 
 
+def _ical_escape(text: str) -> str:
+    """Escape text for iCalendar format (RFC 5545)."""
+    if not text:
+        return ""
+    return text.replace("\\", "\\\\").replace(",", "\\,").replace(";", "\\;").replace("\n", "\\n")
+
+
+def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
+                   category: str | None = None) -> str:
+    """Generate an iCalendar (.ics) feed from events.
+
+    Args:
+        events: List of event dicts.
+        cal_name: Display name for the calendar.
+        site_url: Base URL for event links.
+        category: If set, filter to this category only.
+    """
+    if category:
+        events = [e for e in events if e.category == category]
+
+    # Only include future/today events
+    today = date.today()
+    events = [e for e in events if isinstance(e["date"], date) and e["date"] >= today]
+
+    lines = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        f"PRODID:-//Madison Events//orithena//EN",
+        f"X-WR-CALNAME:{_ical_escape(cal_name)}",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+    ]
+
+    for event in sorted(events, key=lambda e: e["date"]):
+        d = event["date"]
+        start_time = _time_to_iso(event.time_display.split(" - ")[0] if event.time_display else "")
+        uid = f"{event.url_slug}@madison-events.orithena.org"
+
+        lines.append("BEGIN:VEVENT")
+        if start_time:
+            dtstart = f"{d.strftime('%Y%m%d')}T{start_time.replace(':', '')}00"
+            lines.append(f"DTSTART:{dtstart}")
+            # Parse end time if available
+            end_time = ""
+            if event.time_display and " - " in event.time_display:
+                end_time = _time_to_iso(event.time_display.split(" - ")[1])
+            if end_time:
+                dtend = f"{d.strftime('%Y%m%d')}T{end_time.replace(':', '')}00"
+            else:
+                # Default 2 hour duration
+                h, m = start_time.split(":")
+                end_h = int(h) + 2
+                dtend = f"{d.strftime('%Y%m%d')}T{end_h:02d}{m}00"
+            lines.append(f"DTEND:{dtend}")
+        else:
+            # All-day event
+            lines.append(f"DTSTART;VALUE=DATE:{d.strftime('%Y%m%d')}")
+            next_day = d + timedelta(days=1)
+            lines.append(f"DTEND;VALUE=DATE:{next_day.strftime('%Y%m%d')}")
+
+        lines.append(f"SUMMARY:{_ical_escape(event.title)}")
+        lines.append(f"UID:{uid}")
+        lines.append(f"URL:{site_url}/{event.detail_url}")
+
+        if event.venue:
+            lines.append(f"LOCATION:{_ical_escape(event.venue)}")
+        if event.description:
+            desc = str(event.description)[:500]
+            lines.append(f"DESCRIPTION:{_ical_escape(desc)}")
+        if event.category:
+            lines.append(f"CATEGORIES:{_ical_escape(event.category)}")
+
+        lines.append(f"DTSTAMP:{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}")
+        lines.append("END:VEVENT")
+
+    lines.append("END:VCALENDAR")
+    return "\r\n".join(lines)
+
+
 def build() -> None:
     """Build the Madison Events static site from JSON data."""
     data = _load_data()
@@ -187,11 +267,18 @@ def build() -> None:
     categories = sorted(set(e.category for e in events if e.category))
     sources = {e.source: e.source_display for e in events if e.source}
 
+    # Build category slug map for calendar URLs
+    category_slugs_map = {
+        cat: re.sub(r'[^a-z0-9]+', '-', cat.lower()).strip('-')
+        for cat in categories
+    }
+
     common_context = {
         "site_title": site_title,
         "site_tagline": tagline,
         "site_url": site_url,
         "categories": categories,
+        "category_slugs": category_slugs_map,
         "sources": sources,
         "total_events": len(events),
         "current_year": datetime.now().year,
@@ -272,6 +359,24 @@ def build() -> None:
     (SITE_DIR / "robots.txt").write_text(
         f"User-agent: *\nAllow: /\nSitemap: {site_url}/sitemap.xml\n",
         encoding="utf-8")
+
+    # iCal subscription feeds
+    cal_dir = SITE_DIR / "calendar"
+    cal_dir.mkdir(exist_ok=True)
+
+    # Main feed — all upcoming events
+    main_ical = _generate_ical(events, "Madison Events", site_url)
+    (cal_dir / "all.ics").write_text(main_ical, encoding="utf-8")
+
+    # Per-category feeds
+    ical_count = 1  # counting main feed
+    for cat_name in categories:
+        cat_slug = re.sub(r'[^a-z0-9]+', '-', cat_name.lower()).strip('-')
+        cat_ical = _generate_ical(events, f"Madison Events — {cat_name}", site_url,
+                                  category=cat_name)
+        (cal_dir / f"{cat_slug}.ics").write_text(cat_ical, encoding="utf-8")
+        ical_count += 1
+    print(f"  Built {ical_count} iCal feeds")
 
     # Static assets
     if STATIC_DIR.exists():
