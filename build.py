@@ -286,10 +286,52 @@ def build() -> None:
         "goatcounter_site": goatcounter_site,
     }
 
+    # Sponsor tiers and ad slots for sponsors page
+    sponsor_tiers = {
+        "community": {
+            "price": 50,
+            "perks": [
+                "Logo on website sidebar",
+                "Mention in weekly newsletter",
+                "Listed on sponsors page",
+            ],
+        },
+        "featured": {
+            "price": 150,
+            "perks": [
+                "Everything in Community",
+                "Featured event placement",
+                "Social media mentions",
+                "Banner ad on homepage",
+            ],
+        },
+        "premier": {
+            "price": 500,
+            "perks": [
+                "Everything in Featured",
+                "Dedicated newsletter section",
+                "Custom event category page",
+                "Priority event listing",
+                "Monthly analytics report",
+            ],
+        },
+    }
+
+    ad_slots = {
+        "sidebar": {"label": "Sidebar Banner", "width": 300, "height": 250},
+        "newsletter_header": {"label": "Newsletter Header", "width": 600, "height": 100},
+        "homepage_banner": {"label": "Homepage Banner", "width": 728, "height": 90},
+    }
+
     # Render main templates
     template_renders = [
         ("landing.html", "landing.html", {"editors_picks": editors_picks}),
         ("index.html", "index.html", {"events_by_date": events_by_date}),
+        ("newsletter_page.html", "newsletter.html", {"newsletter_preview": ""}),
+        ("sponsors.html", "sponsors.html", {
+            "sponsor_tiers": sponsor_tiers,
+            "ad_slots": ad_slots,
+        }),
     ]
 
     for tmpl_name, out_name, extra in template_renders:
