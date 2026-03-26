@@ -3,24 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Newsletter - {{ site_title }}</title>
-    <meta name="description" content="Get Madison's best events delivered to your inbox every Monday. Free weekly newsletter.">
-    <meta property="og:title" content="{{ site_title }} Newsletter">
-    <meta property="og:description" content="Madison's best events delivered to your inbox every Monday. Subscribe free.">
+    <title>Subscribe - {{ site_title }}</title>
+    <meta name="description" content="Stay connected to Madison events. Subscribe via email, RSS, or add events directly to your calendar.">
+    <meta property="og:title" content="Subscribe to {{ site_title }}">
+    <meta property="og:description" content="Madison's best events delivered to your inbox, RSS reader, or calendar app. Subscribe free.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ site_url }}/newsletter.html">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Subscribe to {{ site_title }}">
+    <meta name="twitter:description" content="Stay connected to Madison events via email, RSS, or calendar.">
+    <link rel="canonical" href="{{ site_url }}/newsletter.html">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
     <link rel="stylesheet" href="static/css/style.css">
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
+    <style>
+        .subscribe-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin: 24px 0; }
+        @media (min-width: 768px) { .subscribe-grid { grid-template-columns: 1fr 1fr; } }
+        .subscribe-card {
+            background: var(--surface, #1a1a2e);
+            border: 1px solid var(--border, #333);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .subscribe-card h3 { margin-top: 0; font-size: 1.2em; }
+        .subscribe-card p { color: var(--text-muted, #888); font-size: 14px; line-height: 1.5; }
+        .subscribe-card .card-icon { font-size: 2em; margin-bottom: 12px; }
+        .subscribe-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--accent, #4a9eff);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .subscribe-btn:hover { opacity: 0.9; }
+        .subscribe-btn-outline {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid var(--accent, #4a9eff);
+            color: var(--accent, #4a9eff);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .subscribe-btn-outline:hover { background: var(--accent, #4a9eff); color: white; }
+        .category-cal-list { list-style: none; padding: 0; margin: 12px 0 0; }
+        .category-cal-list li { margin: 6px 0; }
+        .category-cal-list a { color: var(--text-muted, #888); text-decoration: none; font-size: 13px; }
+        .category-cal-list a:hover { color: var(--accent, #4a9eff); }
+        .email-card { grid-column: 1 / -1; }
+        .newsletter-hero { text-align: center; margin-bottom: 32px; }
+        .newsletter-hero h2 { font-size: 1.8em; margin-bottom: 8px; }
+        .newsletter-hero p { color: var(--text-muted, #888); font-size: 1.1em; max-width: 600px; margin: 0 auto; }
+    </style>
 </head>
 <body>
     <header class="site-header">
         <div class="header-content">
             <h1><a href="./">{{ site_title }}</a></h1>
-            <p class="tagline">Weekly Newsletter</p>
+            <p class="tagline">Subscribe</p>
             <nav class="main-nav">
                 <a href="./">All Events</a>
-                <a href="./newsletter.html" class="active">Newsletter</a>
+                <a href="./newsletter.html" class="active">Subscribe</a>
                 <a href="./sponsors.html">Sponsors</a>
             </nav>
         </div>
@@ -28,20 +76,46 @@
 
     <main class="page-content">
         <section class="newsletter-hero">
-            <h2>Never Miss What's Happening in Madison</h2>
-            <p>Every Monday morning, get a curated roundup of the best events happening in Madison this week. Concerts, shows, community events, and more - all in one email.</p>
-            <div class="beehiiv-wrapper">
-                <iframe src="https://subscribe-forms.beehiiv.com/35b5011e-8a1c-4ac6-bc97-31a128521ae3" frameborder="0" scrolling="no" width="100%" height="320"></iframe>
-                <p class="beehiiv-fallback">Not loading? <a href="https://subscribe-forms.beehiiv.com/35b5011e-8a1c-4ac6-bc97-31a128521ae3" target="_blank" rel="noopener">Subscribe here</a></p>
-            </div>
+            <h2>Stay Connected to Madison Events</h2>
+            <p>Choose how you want to get updates. All options are free and updated daily.</p>
         </section>
 
-        <section class="newsletter-preview">
-            <h2>Latest Newsletter Preview</h2>
-            <div class="newsletter-preview-content">
-                {{ newsletter_preview }}
+        <div class="subscribe-grid">
+            <div class="subscribe-card email-card">
+                <div class="card-icon">&#9993;</div>
+                <h3>Email Newsletter</h3>
+                <p>Get a curated roundup of the best events happening in Madison this week. Delivered every Monday morning.</p>
+                <div class="beehiiv-wrapper">
+                    <iframe src="https://subscribe-forms.beehiiv.com/35b5011e-8a1c-4ac6-bc97-31a128521ae3" frameborder="0" scrolling="no" width="100%" height="320"></iframe>
+                    <p class="beehiiv-fallback">Not loading? <a href="https://subscribe-forms.beehiiv.com/35b5011e-8a1c-4ac6-bc97-31a128521ae3" target="_blank" rel="noopener">Subscribe here</a></p>
+                </div>
             </div>
-        </section>
+
+            <div class="subscribe-card">
+                <div class="card-icon">&#128197;</div>
+                <h3>Calendar Subscription</h3>
+                <p>Add Madison events directly to Apple Calendar, Google Calendar, or any calendar app. Events update automatically every day.</p>
+                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="subscribe-btn">Add All Events to Calendar</a>
+                <br>
+                <details style="margin-top: 16px;">
+                    <summary style="cursor: pointer; font-size: 13px; color: var(--text-muted, #888);">Subscribe by category</summary>
+                    <ul class="category-cal-list">
+                        {% for cat in categories %}
+                        <li><a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[cat] }}.ics">&#128197; {{ cat }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            </div>
+
+            <div class="subscribe-card">
+                <div class="card-icon">&#128246;</div>
+                <h3>RSS Feed</h3>
+                <p>Follow in your favorite RSS reader (Feedly, Inoreader, NetNewsWire, etc.). Get every new event as it's discovered.</p>
+                <a href="{{ site_url }}/feed.xml" class="subscribe-btn">Subscribe via RSS</a>
+                <br>
+                <a href="https://feedly.com/i/subscription/feed/{{ site_url }}/feed.xml" target="_blank" rel="noopener" class="subscribe-btn-outline">Add to Feedly</a>
+            </div>
+        </div>
     </main>
 
     <footer class="site-footer">
