@@ -33,9 +33,10 @@
                 <a href="#all" class="nav-tab active" data-tab="all">All Events</a>
                 <a href="#this-week" class="nav-tab" data-tab="this-week">This Week</a>
                 <a href="#weekend" class="nav-tab" data-tab="weekend">Weekend</a>
+                <a href="./today/">Today</a>
+                <a href="./free-events/">Free</a>
                 <a href="./newsletter.html">Newsletter</a>
                 <a href="./sponsors.html">Sponsors</a>
-                <a href="https://github.com/Orithena-org/madison-events/issues/new/choose" target="_blank" rel="noopener">Feedback</a>
             </nav>
         </div>
     </header>
@@ -215,6 +216,13 @@
                 <h4>Feedback</h4>
                 <p>Know an event source we're missing? Found incorrect info? <a href="https://github.com/Orithena-org/madison-events/issues/new/choose" target="_blank" rel="noopener">Let us know</a>.</p>
             </div>
+        </div>
+        <div class="footer-subscribe">
+            <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="./newsletter.html" title="Email Newsletter">Newsletter</a>
         </div>
         <div class="footer-bottom">
             <p>&copy; {{ current_year }} {{ site_title }}. Events data sourced from public listings. Built by Orithena.</p>

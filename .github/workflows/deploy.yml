@@ -48,3 +48,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Submit to IndexNow (Bing/Yandex)
+        if: success()
+        run: |
+          curl -s -X POST "https://api.indexnow.org/IndexNow" \
+            -H "Content-Type: application/json" \
+            -d @_site/indexnow-urls.json \
+            -o /dev/null -w "IndexNow response: %{http_code}\n" || true
