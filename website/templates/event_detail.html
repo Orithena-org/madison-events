@@ -8,7 +8,7 @@
     <!-- Open Graph -->
     <meta property="og:title" content="{{ event.title }} | {{ site_title }}">
     <meta property="og:description" content="{% if event.venue %}{{ event.venue }} | {% endif %}{{ event.date_display }} {{ event.time_display }}{% if event.description %} — {{ event.description[:200] }}{% endif %}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="event">
     <meta property="og:url" content="{{ site_url }}/{{ event.detail_url }}">
     <meta property="og:site_name" content="{{ site_title }}">
     <meta property="og:image" content="{{ event.image_url if event.image_url else site_url ~ '/static/images/og-default.png' }}">
@@ -380,7 +380,9 @@
         "@type": "Event",
         "name": "{{ event.title | e }}",
         "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{% endif %}",
-        {% if event.description %}"description": "{{ event.description | e }}",{% endif %}
+        {% if event.time_end and event.time_end|time_to_iso %}"endDate": "{{ event.date.isoformat() }}T{{ event.time_end|time_to_iso }}",
+        {% elif event.time_start and event.time_start|time_to_iso %}{% set start_h = (event.time_start|time_to_iso).split(':')[0]|int %}"endDate": "{{ event.date.isoformat() }}T{{ '%02d' % (start_h + 2) }}:{{ (event.time_start|time_to_iso).split(':')[1] }}",
+        {% endif %}{% if event.description %}"description": "{{ event.description | e }}",{% endif %}
         {% if event.venue %}"location": {
             "@type": "Place",
             "name": "{{ event.venue | e }}",
@@ -404,8 +406,14 @@
             "availability": "https://schema.org/InStock",
             "description": "{{ event.price | e }}"
         },{% endif %}{% endif %}
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
         "url": "{{ site_url }}/{{ event.detail_url }}",
-        "eventStatus": "https://schema.org/EventScheduled"
+        "eventStatus": "https://schema.org/EventScheduled",
+        "organizer": {
+            "@type": "Organization",
+            "name": "Madison Events",
+            "url": "{{ site_url }}/"
+        }
     }
     </script>
 

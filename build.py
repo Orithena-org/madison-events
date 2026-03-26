@@ -509,6 +509,32 @@ def build() -> None:
         dest = SITE_DIR / "static"
         shutil.copytree(str(STATIC_DIR), str(dest))
 
+    # IndexNow key file for Bing/Yandex instant indexing
+    indexnow_key = "6846b3e2fc5b4a778c9b994e0ec146e9"
+    (SITE_DIR / f"{indexnow_key}.txt").write_text(indexnow_key, encoding="utf-8")
+
+    # Generate IndexNow URL list for submission
+    indexnow_urls = [f"{site_url}/"]
+    indexnow_urls.append(f"{site_url}/index.html")
+    for slug in temporal_slugs:
+        indexnow_urls.append(f"{site_url}/{slug}/")
+    for slug in category_slugs:
+        indexnow_urls.append(f"{site_url}/category/{slug}/")
+    # Include upcoming event detail pages
+    today_date = date.today()
+    for event in events:
+        if isinstance(event["date"], date) and event["date"] >= today_date:
+            indexnow_urls.append(f"{site_url}/{event.detail_url}")
+    indexnow_data = {
+        "host": "orithena-org.github.io",
+        "key": indexnow_key,
+        "keyLocation": f"{site_url}/{indexnow_key}.txt",
+        "urlList": indexnow_urls,
+    }
+    (SITE_DIR / "indexnow-urls.json").write_text(
+        json.dumps(indexnow_data, indent=2), encoding="utf-8")
+    print(f"  Prepared {len(indexnow_urls)} URLs for IndexNow submission")
+
     # .nojekyll
     (SITE_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
