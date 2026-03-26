@@ -127,13 +127,17 @@ def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
 
 
 def _generate_sitemap(events: list[AttrDict], site_url: str,
-                      category_slugs: list[str] | None = None) -> str:
+                      category_slugs: list[str] | None = None,
+                      temporal_slugs: list[str] | None = None) -> str:
     now = datetime.utcnow().strftime("%Y-%m-%d")
     today = datetime.utcnow().date()
     urls = [
         (f"{site_url}/", "daily", "1.0"),
         (f"{site_url}/index.html", "daily", "0.9"),
     ]
+    # Temporal pages get high priority — they target high-intent search queries
+    for slug in (temporal_slugs or []):
+        urls.append((f"{site_url}/{slug}/", "daily", "0.9"))
     for slug in (category_slugs or []):
         urls.append((f"{site_url}/category/{slug}/", "daily", "0.8"))
     for event in events:
@@ -328,6 +332,21 @@ def build() -> None:
         cat_tmpl = None
 
     if cat_tmpl:
+        # SEO-optimized descriptions per category
+        category_seo = {
+            "Music": "Live music in Madison, WI — concerts, jazz, open mics, and performances at The Sylvee, Majestic Theatre, High Noon Saloon, and more.",
+            "Arts & Entertainment": "Arts and entertainment in Madison, WI — gallery openings, theater, film screenings, and cultural events happening this week.",
+            "Food & Drink": "Food and drink events in Madison, WI — tastings, cooking classes, food festivals, and restaurant specials from local venues.",
+            "Comedy": "Comedy shows in Madison, WI — stand-up, improv, and open mic nights at Comedy on State and local venues.",
+            "Community": "Community events in Madison, WI — meetups, volunteer opportunities, markets, and neighborhood gatherings.",
+            "Education": "Educational events in Madison, WI — workshops, lectures, classes, and learning opportunities at UW-Madison and beyond.",
+            "Sports": "Sports events in Madison, WI — Badgers games, recreational leagues, and spectator sports happening this week.",
+            "Outdoors": "Outdoor events in Madison, WI — hiking, biking, nature walks, and outdoor activities around the lakes and trails.",
+            "Wellness": "Wellness events in Madison, WI — yoga, meditation, fitness classes, and health workshops.",
+            "Parks & Recreation": "Parks and recreation events in Madison, WI — activities at city parks, community centers, and recreation facilities.",
+            "Festival": "Festivals in Madison, WI — music festivals, street fairs, cultural celebrations, and seasonal events.",
+        }
+
         cat_dir = SITE_DIR / "category"
         cat_dir.mkdir(exist_ok=True)
         for cat_name in categories:
@@ -336,23 +355,130 @@ def build() -> None:
             cat_events_by_date = _group_events_by_date(cat_events)
             page_dir = cat_dir / cat_slug
             page_dir.mkdir(exist_ok=True)
+
+            seo_desc = category_seo.get(cat_name, "")
+
             html = cat_tmpl.render(
                 category_name=cat_name,
                 category_slug=cat_slug,
                 events_by_date=cat_events_by_date,
                 category_event_count=len(cat_events),
+                category_seo_description=seo_desc,
                 **common_context,
             )
             (page_dir / "index.html").write_text(html, encoding="utf-8")
         print(f"  Built {len(categories)} category pages")
 
+    # Temporal landing pages (this-week, this-weekend, today, free-events)
+    try:
+        temporal_tmpl = env.get_template("temporal.html")
+    except TemplateNotFound:
+        temporal_tmpl = None
+
+    temporal_slugs: list[str] = []
+    if temporal_tmpl:
+        today = date.today()
+        # Calculate date ranges
+        weekday = today.weekday()  # Monday=0 ... Sunday=6
+        week_end = today + timedelta(days=(6 - weekday))  # end of this week (Sunday)
+        # Weekend: Saturday-Sunday of this week (or today if already weekend)
+        if weekday < 5:  # Mon-Fri
+            saturday = today + timedelta(days=(5 - weekday))
+        else:
+            saturday = today  # Already Sat or Sun
+        sunday = saturday + timedelta(days=(6 - saturday.weekday()))
+
+        def _events_in_range(start: date, end: date) -> list[AttrDict]:
+            return [e for e in events
+                    if isinstance(e["date"], date) and start <= e["date"] <= end]
+
+        def _free_events() -> list[AttrDict]:
+            future = [e for e in events
+                      if isinstance(e["date"], date) and e["date"] >= today]
+            return [e for e in future
+                    if e.price and any(kw in str(e.price).lower()
+                                       for kw in ("free", "$0", "no cost", "no charge"))]
+
+        temporal_pages = [
+            {
+                "slug": "today",
+                "page_title": f"Things to Do in Madison Today — {today.strftime('%A, %B %-d')}",
+                "page_heading": f"Things to Do in Madison Today",
+                "meta_description": f"What's happening in Madison, WI today ({today.strftime('%A, %B %-d, %Y')}). Live music, food events, arts, comedy, and more — updated daily.",
+                "date_range_display": today.strftime("%A, %B %-d, %Y"),
+                "events_fn": lambda: _events_in_range(today, today),
+            },
+            {
+                "slug": "this-week",
+                "page_title": f"Madison Events This Week — {today.strftime('%b %-d')} to {week_end.strftime('%b %-d')}",
+                "page_heading": "Things to Do in Madison This Week",
+                "meta_description": f"Discover {today.strftime('%b %-d')}–{week_end.strftime('%b %-d')} events in Madison, WI. Concerts, festivals, food events, free activities, and more from {len(sources)} local sources.",
+                "date_range_display": f"{today.strftime('%A, %B %-d')} — {week_end.strftime('%A, %B %-d, %Y')}",
+                "events_fn": lambda: _events_in_range(today, week_end),
+            },
+            {
+                "slug": "this-weekend",
+                "page_title": f"Madison Events This Weekend — {saturday.strftime('%b %-d')}–{sunday.strftime('%-d')}",
+                "page_heading": "Things to Do in Madison This Weekend",
+                "meta_description": f"Weekend events in Madison, WI ({saturday.strftime('%b %-d')}–{sunday.strftime('%-d')}). Find live music, food, art, comedy, and free activities happening this Saturday and Sunday.",
+                "date_range_display": f"{saturday.strftime('%A, %B %-d')} — {sunday.strftime('%A, %B %-d, %Y')}",
+                "events_fn": lambda: _events_in_range(saturday, sunday),
+            },
+            {
+                "slug": "free-events",
+                "page_title": "Free Events in Madison, WI — No Cost Activities & Things to Do",
+                "page_heading": "Free Events in Madison",
+                "meta_description": "Free things to do in Madison, Wisconsin. Concerts, festivals, art shows, outdoor activities, and community events that cost nothing. Updated daily.",
+                "date_range_display": f"Upcoming free events from {today.strftime('%B %-d, %Y')}",
+                "events_fn": _free_events,
+            },
+        ]
+
+        all_temporal_links = [
+            {"slug": "today", "label": "Today's Events"},
+            {"slug": "this-week", "label": "This Week"},
+            {"slug": "this-weekend", "label": "This Weekend"},
+            {"slug": "free-events", "label": "Free Events"},
+        ]
+
+        for page in temporal_pages:
+            page_events = page["events_fn"]()
+            page_events_by_date = _group_events_by_date(page_events)
+            page_dir = SITE_DIR / page["slug"]
+            page_dir.mkdir(exist_ok=True)
+
+            # Category counts for this time slice
+            cat_counts = {}
+            for e in page_events:
+                if e.category:
+                    cat_counts[e.category] = cat_counts.get(e.category, 0) + 1
+
+            related = [lnk for lnk in all_temporal_links if lnk["slug"] != page["slug"]]
+
+            html = temporal_tmpl.render(
+                page_slug=page["slug"],
+                page_title=page["page_title"],
+                page_heading=page["page_heading"],
+                meta_description=page["meta_description"],
+                date_range_display=page["date_range_display"],
+                event_count=len(page_events),
+                events_by_date=page_events_by_date,
+                categories_with_counts=cat_counts,
+                related_pages=related,
+                **common_context,
+            )
+            (page_dir / "index.html").write_text(html, encoding="utf-8")
+            temporal_slugs.append(page["slug"])
+
+        print(f"  Built {len(temporal_pages)} temporal landing pages")
+
     # RSS
     rss_xml = _generate_rss(events, site_title, site_url, tagline)
     (SITE_DIR / "feed.xml").write_text(rss_xml, encoding="utf-8")
 
-    # Sitemap (include category pages)
+    # Sitemap (include category + temporal pages)
     category_slugs = [re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-') for c in categories]
-    sitemap_xml = _generate_sitemap(events, site_url, category_slugs)
+    sitemap_xml = _generate_sitemap(events, site_url, category_slugs, temporal_slugs)
     (SITE_DIR / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8")
 
     # robots.txt

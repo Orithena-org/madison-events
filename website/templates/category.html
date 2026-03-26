@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ category_name }} Events in Madison, WI | {{ site_title }}</title>
-    <meta name="description" content="Find {{ category_name | lower }} events in Madison, Wisconsin. {{ category_event_count }} upcoming events from local sources, updated daily.">
+    <meta name="description" content="{% if category_seo_description %}{{ category_seo_description }} {{ category_event_count }} upcoming events, updated daily.{% else %}Find {{ category_name | lower }} events in Madison, Wisconsin. {{ category_event_count }} upcoming events from local sources, updated daily.{% endif %}">
     <!-- Open Graph -->
     <meta property="og:title" content="{{ category_name }} Events in Madison, WI | {{ site_title }}">
-    <meta property="og:description" content="Find {{ category_name | lower }} events in Madison, Wisconsin. Updated daily.">
+    <meta property="og:description" content="{% if category_seo_description %}{{ category_seo_description }}{% else %}Find {{ category_name | lower }} events in Madison, Wisconsin. Updated daily.{% endif %}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ site_url }}/category/{{ category_slug }}/">
     <meta property="og:site_name" content="{{ site_title }}">
@@ -31,8 +31,11 @@
             <p class="tagline">{{ site_tagline }}</p>
             <nav class="main-nav">
                 <a href="{{ site_url }}/index.html">All Events</a>
+                <a href="{{ site_url }}/this-week/">This Week</a>
+                <a href="{{ site_url }}/this-weekend/">Weekend</a>
+                <a href="{{ site_url }}/today/">Today</a>
+                <a href="{{ site_url }}/free-events/">Free</a>
                 <a href="{{ site_url }}/newsletter.html">Newsletter</a>
-                <a href="{{ site_url }}/sponsors.html">Sponsors</a>
             </nav>
         </div>
     </header>
