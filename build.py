@@ -84,7 +84,10 @@ def _group_events_by_date(events: list[AttrDict]) -> OrderedDict:
 
 
 def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
-                  tagline: str) -> str:
+                  tagline: str, feed_path: str = "feed.xml",
+                  category: str | None = None) -> str:
+    if category:
+        events = [e for e in events if e.get("category") == category]
     rss = Element("rss", version="2.0",
                   attrib={"xmlns:atom": "http://www.w3.org/2005/Atom"})
     channel = SubElement(rss, "channel")
@@ -96,7 +99,7 @@ def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
         "%a, %d %b %Y %H:%M:%S +0000")
 
     atom_link = SubElement(channel, "{http://www.w3.org/2005/Atom}link")
-    atom_link.set("href", f"{site_url}/feed.xml")
+    atom_link.set("href", f"{site_url}/{feed_path}")
     atom_link.set("rel", "self")
     atom_link.set("type", "application/rss+xml")
 
@@ -514,9 +517,23 @@ def build() -> None:
 
         print(f"  Built {len(temporal_pages)} temporal landing pages")
 
-    # RSS
+    # RSS — main feed
     rss_xml = _generate_rss(events, site_title, site_url, tagline)
     (SITE_DIR / "feed.xml").write_text(rss_xml, encoding="utf-8")
+
+    # RSS — per-category feeds
+    feed_dir = SITE_DIR / "feed"
+    feed_dir.mkdir(exist_ok=True)
+    rss_count = 1  # counting main feed
+    for cat_name in categories:
+        cat_slug = re.sub(r'[^a-z0-9]+', '-', cat_name.lower()).strip('-')
+        feed_path = f"feed/{cat_slug}.xml"
+        cat_rss = _generate_rss(events, f"{site_title} — {cat_name}",
+                                site_url, tagline, feed_path=feed_path,
+                                category=cat_name)
+        (SITE_DIR / feed_path).write_text(cat_rss, encoding="utf-8")
+        rss_count += 1
+    print(f"  Built {rss_count} RSS feeds")
 
     # Sitemap (include category + temporal pages)
     category_slugs = [re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-') for c in categories]
