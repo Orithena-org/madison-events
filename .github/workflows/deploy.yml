@@ -56,3 +56,11 @@ jobs:
             -H "Content-Type: application/json" \
             -d @_site/indexnow-urls.json \
             -o /dev/null -w "IndexNow response: %{http_code}\n" || true
+
+      - name: Ping WebSub hub (real-time RSS push)
+        if: success()
+        run: |
+          curl -s -X POST "https://pubsubhubbub.appspot.com/" \
+            -d "hub.mode=publish" \
+            -d "hub.url=https://orithena-org.github.io/madison-events/feed.xml" \
+            -o /dev/null -w "WebSub hub ping: %{http_code}\n" || true

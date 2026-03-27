@@ -253,24 +253,43 @@
         }
     }
     </script>
-    {% for date_group, events in events_by_date.items() %}
-    {% for event in events %}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Event",
-        "name": "{{ event.title | e }}",
-        "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
-        {% if event.description %}"description": "{{ event.description[:200] | e }}",{% endif %}
-        {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
-        {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
-        {% if event.price %}"offers": { "@type": "Offer", "price": "{{ event.price }}", "priceCurrency": "USD", "url": "{{ event.display_url }}" },{% endif %}
-        "url": "{{ event.display_url }}",
-        "eventStatus": "https://schema.org/EventScheduled"
+        "@type": "ItemList",
+        "name": "Upcoming Events in Madison, WI",
+        "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.",
+        "url": "{{ site_url }}/",
+        "numberOfItems": {{ total_events }},
+        "itemListElement": [
+            {% set ns = namespace(pos=0, items=[]) %}
+            {% for date_group, day_events in events_by_date.items() %}
+            {% for event in day_events %}
+            {% if ns.pos < 50 %}
+            {% set ns.pos = ns.pos + 1 %}
+            {% set _ = ns.items.append(event) %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% for event in ns.items %}
+            {
+                "@type": "ListItem",
+                "position": {{ loop.index }},
+                "item": {
+                    "@type": "Event",
+                    "name": "{{ event.title | e }}",
+                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
+                    {% if event.description %}"description": "{{ event.description[:200] | e }}",{% endif %}
+                    {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
+                    {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
+                    "url": "{{ site_url }}/{{ event.detail_url }}",
+                    "eventStatus": "https://schema.org/EventScheduled"
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
     }
     </script>
-    {% endfor %}
-    {% endfor %}
     <script src="static/js/app.js"></script>
     {% if goatcounter_site %}
     <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
