@@ -8,10 +8,13 @@
  *        data-limit="5"
  *        data-theme="light">
  *   </div>
- *   <script src="https://orithena-org.github.io/madison-events/static/js/embed.js" async></script>
+ *   <script src="https://YOUR-SITE/static/js/embed.js" async></script>
  */
 (function() {
-  var SITE = 'https://orithena-org.github.io/madison-events';
+  // Derive base URL from the script's own src so embeds work on any host
+  var scripts = document.getElementsByTagName('script');
+  var currentScript = scripts[scripts.length - 1];
+  var SITE = currentScript.src.replace(/\/static\/js\/embed\.js(\?.*)?$/, '');
   var DATA_URL = SITE + '/data/events.json';
 
   function init() {
@@ -55,7 +58,7 @@
   }
 
   function filterEvents(events, category, venue, limit) {
-    var today = new Date().toISOString().slice(0, 10);
+    var today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
     var filtered = events.filter(function(e) {
       if (e.date < today) return false;
       if (category && (e.category || '').toLowerCase() !== category) return false;

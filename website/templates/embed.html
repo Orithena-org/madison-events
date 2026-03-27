@@ -215,7 +215,7 @@
             <p>Beyond the widget, you can integrate Madison Events data in other ways:</p>
             <ul style="margin-top: 12px; padding-left: 20px; line-height: 2;">
                 <li><strong>RSS Feed:</strong> <a href="{{ site_url }}/feed.xml">{{ site_url }}/feed.xml</a> (also available per-category)</li>
-                <li><strong>iCal Calendar:</strong> <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics">Subscribe to calendar</a></li>
+                <li><strong>iCal Calendar:</strong> <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics">Subscribe to calendar</a></li>
                 <li><strong>JSON Data:</strong> <code>{{ site_url }}/data/events.json</code> for custom integrations</li>
             </ul>
         </div>
@@ -225,7 +225,7 @@
         <div class="footer-subscribe">
             <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
             <span class="footer-sep">&middot;</span>
-            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
             <span class="footer-sep">&middot;</span>
             <a href="./newsletter.html" title="Email Newsletter">Newsletter</a>
         </div>
@@ -255,7 +255,7 @@
                 container.innerHTML = '<div style="padding:24px 16px;text-align:center;color:#c41e3a;font-size:14px;">Unable to load events.</div>';
                 return;
             }
-            var today = new Date().toISOString().slice(0, 10);
+            var today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
             var events = (data.events || []).filter(function(e) { return e.date >= today; });
             events.sort(function(a, b) { return a.date.localeCompare(b.date); });
             events = events.slice(0, 5);

@@ -96,13 +96,13 @@
                 <div class="card-icon">&#128197;</div>
                 <h3>Calendar Subscription</h3>
                 <p>Add Madison events directly to Apple Calendar, Google Calendar, or any calendar app. Events update automatically every day.</p>
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="subscribe-btn">Add All Events to Calendar</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" class="subscribe-btn">Add All Events to Calendar</a>
                 <br>
                 <details style="margin-top: 16px;">
                     <summary style="cursor: pointer; font-size: 13px; color: var(--text-muted, #888);">Subscribe by category</summary>
                     <ul class="category-cal-list">
                         {% for cat in categories %}
-                        <li><a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[cat] }}.ics">&#128197; {{ cat }}</a></li>
+                        <li><a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/{{ category_slugs[cat] }}.ics">&#128197; {{ cat }}</a></li>
                         {% endfor %}
                     </ul>
                 </details>
