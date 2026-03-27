@@ -39,7 +39,12 @@
         container.innerHTML = '<div class="mew-error">Unable to load events.</div>';
         return;
       }
-      var data = JSON.parse(xhr.responseText);
+      try {
+        var data = JSON.parse(xhr.responseText);
+      } catch (e) {
+        container.innerHTML = '<div class="mew-error">Unable to load events.</div>';
+        return;
+      }
       var events = filterEvents(data.events || [], category, venue, limit);
       render(container, events, theme);
     };

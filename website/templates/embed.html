@@ -249,7 +249,12 @@
         xhr.open('GET', SITE + '/data/events.json');
         xhr.onload = function() {
             if (xhr.status !== 200) return;
-            var data = JSON.parse(xhr.responseText);
+            try {
+                var data = JSON.parse(xhr.responseText);
+            } catch (e) {
+                container.innerHTML = '<div style="padding:24px 16px;text-align:center;color:#c41e3a;font-size:14px;">Unable to load events.</div>';
+                return;
+            }
             var today = new Date().toISOString().slice(0, 10);
             var events = (data.events || []).filter(function(e) { return e.date >= today; });
             events.sort(function(a, b) { return a.date.localeCompare(b.date); });
