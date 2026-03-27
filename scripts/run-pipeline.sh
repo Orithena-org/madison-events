@@ -37,6 +37,9 @@ if ! git diff --quiet output/site/ 2>/dev/null || [ -n "$(git ls-files --others 
     git commit -m "chore(site): update generated site output $(date +%Y-%m-%d)"
     git push origin main
     echo "[deploy] Site output committed and pushed."
+
+    # Notify search engines about the update
+    python3 "$MADISON_ROOT/scripts/notify_search_engines.py" || true
 else
     echo "[deploy] No site changes to commit."
 fi
