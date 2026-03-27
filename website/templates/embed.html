@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed Madison Events on Your Website | {{ site_title }}</title>
+    <meta name="description" content="Add a free Madison events widget to your website. Show upcoming events by category or venue with a single line of code.">
+    <meta property="og:title" content="Embed Madison Events Widget">
+    <meta property="og:description" content="Add a free events widget to your website. Show upcoming Madison events with a single code snippet.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}/embed.html">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <link rel="canonical" href="{{ site_url }}/embed.html">
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        .embed-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .embed-page h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .embed-page .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .embed-section {
+            margin-bottom: 40px;
+        }
+        .embed-section h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .code-block {
+            background: var(--secondary);
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: var(--radius);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            position: relative;
+        }
+        .code-block .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ccc;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .code-block .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .code-block .copy-btn.copied {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        .options-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        .options-table th,
+        .options-table td {
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .options-table th {
+            font-weight: 600;
+            background: var(--bg);
+        }
+        .options-table code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .preview-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .preview-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        .preview-card h4 {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        @media (max-width: 768px) {
+            .preview-section { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="./">{{ site_title }}</a></h1>
+            <p class="tagline">{{ site_tagline }}</p>
+            <nav class="main-nav">
+                <a href="./index.html">All Events</a>
+                <a href="./today/">Today</a>
+                <a href="./free-events/">Free</a>
+                <a href="./newsletter.html">Newsletter</a>
+                <a href="./sponsors.html">Sponsors</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="embed-page">
+        <h2>Embed Madison Events on Your Site</h2>
+        <p class="subtitle">Add a free, auto-updating events widget to your website. Great for venues, blogs, community organizations, and local businesses.</p>
+
+        <div class="embed-section">
+            <h3>Quick Start</h3>
+            <p style="margin-bottom: 12px;">Paste this code anywhere on your page to show upcoming Madison events:</p>
+            <div class="code-block" id="code-basic">
+                <button class="copy-btn" onclick="copyCode('code-basic', this)">Copy</button>
+&lt;div id="madison-events-widget"&gt;&lt;/div&gt;
+&lt;script src="{{ site_url }}/static/js/embed.js" async&gt;&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="embed-section">
+            <h3>Customization Options</h3>
+            <p style="margin-bottom: 12px;">Add data attributes to the widget div to customize what events are shown:</p>
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Values</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>data-category</code></td>
+                        <td>Music, Comedy, Community, etc.</td>
+                        <td>Show only events from this category</td>
+                    </tr>
+                    <tr>
+                        <td><code>data-venue</code></td>
+                        <td>Any venue name (partial match)</td>
+                        <td>Show only events at this venue</td>
+                    </tr>
+                    <tr>
+                        <td><code>data-limit</code></td>
+                        <td>1-20 (default: 5)</td>
+                        <td>Number of events to display</td>
+                    </tr>
+                    <tr>
+                        <td><code>data-theme</code></td>
+                        <td><code>light</code> or <code>dark</code></td>
+                        <td>Widget color theme</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="embed-section">
+            <h3>Examples</h3>
+
+            <p style="margin-bottom: 8px; font-weight: 600;">Show only music events:</p>
+            <div class="code-block" id="code-music">
+                <button class="copy-btn" onclick="copyCode('code-music', this)">Copy</button>
+&lt;div id="madison-events-widget"
+     data-category="Music"
+     data-limit="5"&gt;
+&lt;/div&gt;
+&lt;script src="{{ site_url }}/static/js/embed.js" async&gt;&lt;/script&gt;
+            </div>
+
+            <p style="margin-top: 20px; margin-bottom: 8px; font-weight: 600;">Show events at a specific venue (dark theme):</p>
+            <div class="code-block" id="code-venue">
+                <button class="copy-btn" onclick="copyCode('code-venue', this)">Copy</button>
+&lt;div id="madison-events-widget"
+     data-venue="Majestic"
+     data-limit="10"
+     data-theme="dark"&gt;
+&lt;/div&gt;
+&lt;script src="{{ site_url }}/static/js/embed.js" async&gt;&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="embed-section">
+            <h3>Live Preview</h3>
+            <div class="preview-section">
+                <div class="preview-card">
+                    <h4>Light Theme</h4>
+                    <div id="madison-events-widget-preview-light"></div>
+                </div>
+                <div class="preview-card" style="background: #1a1a2e; border-color: #333;">
+                    <h4 style="color: #e0e0e0;">Dark Theme</h4>
+                    <div id="madison-events-widget-preview-dark"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="embed-section">
+            <h3>Other Integration Options</h3>
+            <p>Beyond the widget, you can integrate Madison Events data in other ways:</p>
+            <ul style="margin-top: 12px; padding-left: 20px; line-height: 2;">
+                <li><strong>RSS Feed:</strong> <a href="{{ site_url }}/feed.xml">{{ site_url }}/feed.xml</a> (also available per-category)</li>
+                <li><strong>iCal Calendar:</strong> <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics">Subscribe to calendar</a></li>
+                <li><strong>JSON Data:</strong> <code>{{ site_url }}/data/events.json</code> for custom integrations</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-subscribe">
+            <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="./newsletter.html" title="Email Newsletter">Newsletter</a>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Built by <a href="https://orithena.org" style="color:var(--primary);">Orithena</a>.</p>
+        </div>
+    </footer>
+
+    <script>
+    // Live preview widgets (modified to use different container IDs)
+    function loadPreview(containerId, theme) {
+        var SITE = {{ site_url | tojson }};
+        var container = document.getElementById(containerId);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', SITE + '/data/events.json');
+        xhr.onload = function() {
+            if (xhr.status !== 200) return;
+            var data = JSON.parse(xhr.responseText);
+            var today = new Date().toISOString().slice(0, 10);
+            var events = (data.events || []).filter(function(e) { return e.date >= today; });
+            events.sort(function(a, b) { return a.date.localeCompare(b.date); });
+            events = events.slice(0, 5);
+
+            var isDark = theme === 'dark';
+            var bg = isDark ? '#1a1a2e' : '#ffffff';
+            var text = isDark ? '#e0e0e0' : '#1a1a2e';
+            var muted = isDark ? '#999' : '#666';
+            var border = isDark ? '#333' : '#e0e0e0';
+            var accent = '#c41e3a';
+
+            var html = '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;overflow:hidden;font-family:-apple-system,sans-serif;">';
+            html += '<div style="padding:12px 16px;border-bottom:1px solid ' + border + ';font-weight:700;font-size:15px;"><a href="' + SITE + '/" target="_blank" style="color:' + accent + ';text-decoration:none;">Madison Events</a></div>';
+            for (var i = 0; i < events.length; i++) {
+                var e = events[i];
+                html += '<a href="' + SITE + '/' + e.detail_url + '" target="_blank" style="display:block;padding:12px 16px;border-bottom:1px solid ' + border + ';text-decoration:none;color:' + text + ';">';
+                html += '<div style="font-size:12px;color:' + accent + ';font-weight:600;margin-bottom:2px;">' + (e.date_display || e.date) + '</div>';
+                html += '<div style="font-size:14px;font-weight:600;line-height:1.3;margin-bottom:2px;">' + e.title + '</div>';
+                html += '<div style="font-size:12px;color:' + muted + ';">';
+                if (e.venue) html += e.venue;
+                if (e.venue && e.time_display) html += ' &middot; ';
+                if (e.time_display) html += e.time_display;
+                html += '</div></a>';
+            }
+            html += '<div style="padding:10px 16px;border-top:1px solid ' + border + ';text-align:center;font-size:13px;"><a href="' + SITE + '/" target="_blank" style="color:' + accent + ';text-decoration:none;font-weight:600;">View all events &rarr;</a></div>';
+            html += '</div>';
+            container.innerHTML = html;
+        };
+        xhr.send();
+    }
+
+    loadPreview('madison-events-widget-preview-light', 'light');
+    loadPreview('madison-events-widget-preview-dark', 'dark');
+
+    function copyCode(blockId, btn) {
+        var block = document.getElementById(blockId);
+        var text = block.textContent.replace('Copy', '').trim();
+        // Decode HTML entities back to actual tags
+        text = text.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+        navigator.clipboard.writeText(text).then(function() {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function() {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+    </script>
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
+</body>
+</html>

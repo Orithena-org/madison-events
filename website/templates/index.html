@@ -211,7 +211,7 @@
             </div>
             <div class="footer-col">
                 <h4>For Venues & Organizers</h4>
-                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
+                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or <a href="./embed.html">embed our widget</a> on your site.</p>
             </div>
             <div class="footer-col">
                 <h4>Feedback</h4>
@@ -238,6 +238,14 @@
         "name": "{{ site_title }}",
         "url": "{{ site_url }}/",
         "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "{{ site_url }}/search/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        },
         "publisher": {
             "@type": "Organization",
             "name": "{{ site_title }}",

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Events - {{ site_title }}</title>
+    <meta name="description" content="Search for events in Madison, WI. Find concerts, shows, festivals, and community events by keyword.">
+    <meta property="og:title" content="Search Events - {{ site_title }}">
+    <meta property="og:description" content="Search for events in Madison, WI by keyword, venue, or category.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}/search/">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <link rel="canonical" href="{{ site_url }}/search/">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
+    <style>
+        .search-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 14px 18px;
+            font-size: 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            border-color: var(--primary);
+        }
+        .search-box button {
+            padding: 14px 28px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-box button:hover {
+            background: var(--primary-dark);
+        }
+        .search-stats {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .no-results h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        .search-result {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: box-shadow 0.2s;
+        }
+        .search-result:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .search-result h3 {
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+        .search-result h3 a {
+            color: var(--text);
+        }
+        .search-result h3 a:hover {
+            color: var(--primary);
+        }
+        .search-result .result-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+        .search-result .result-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .search-result mark {
+            background: #fff3cd;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="{{ site_url }}/">{{ site_title }}</a></h1>
+            <p class="tagline">{{ site_tagline }}</p>
+            <nav class="main-nav">
+                <a href="{{ site_url }}/index.html">All Events</a>
+                <a href="{{ site_url }}/today/">Today</a>
+                <a href="{{ site_url }}/free-events/">Free</a>
+                <a href="{{ site_url }}/newsletter.html">Newsletter</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="search-page">
+        <h2 style="margin-bottom: 16px;">Search Madison Events</h2>
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search by event name, venue, or keyword..." autofocus>
+            <button onclick="doSearch()">Search</button>
+        </div>
+        <div id="search-stats" class="search-stats"></div>
+        <div id="search-results"></div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-subscribe">
+            <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="{{ site_url }}/newsletter.html" title="Email Newsletter">Newsletter</a>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Built by <a href="https://orithena.org" style="color:var(--primary);">Orithena</a>.</p>
+        </div>
+    </footer>
+
+    <script>
+    var eventsData = null;
+    var BASE_URL = {{ site_url | tojson }};
+
+    function loadEvents() {
+        if (eventsData) return Promise.resolve(eventsData);
+        return fetch(BASE_URL + '/data/events.json')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                eventsData = data.events || [];
+                return eventsData;
+            });
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function highlight(text, query) {
+        if (!text || !query) return escapeHtml(text || '');
+        var escaped = escapeHtml(text);
+        var words = query.trim().split(/\s+/).filter(Boolean);
+        words.forEach(function(word) {
+            var re = new RegExp('(' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+            escaped = escaped.replace(re, '<mark>$1</mark>');
+        });
+        return escaped;
+    }
+
+    function doSearch() {
+        var query = document.getElementById('search-input').value.trim();
+        if (!query) return;
+
+        // Update URL without reload
+        var url = new URL(window.location);
+        url.searchParams.set('q', query);
+        history.replaceState(null, '', url);
+
+        loadEvents().then(function(events) {
+            var words = query.toLowerCase().split(/\s+/).filter(Boolean);
+            var results = events.filter(function(e) {
+                var searchable = [e.title, e.venue, e.category, e.description, e.source_display].join(' ').toLowerCase();
+                return words.every(function(w) { return searchable.indexOf(w) !== -1; });
+            });
+
+            // Sort: upcoming first, then by date
+            var today = new Date().toISOString().slice(0, 10);
+            results.sort(function(a, b) {
+                var aFuture = a.date >= today ? 0 : 1;
+                var bFuture = b.date >= today ? 0 : 1;
+                if (aFuture !== bFuture) return aFuture - bFuture;
+                return a.date.localeCompare(b.date);
+            });
+
+            renderResults(results, query);
+        });
+    }
+
+    function renderResults(results, query) {
+        var stats = document.getElementById('search-stats');
+        var container = document.getElementById('search-results');
+
+        if (results.length === 0) {
+            stats.textContent = '';
+            container.innerHTML = '<div class="no-results"><h3>No events found</h3><p>Try different keywords or browse <a href="' + BASE_URL + '/index.html">all events</a>.</p></div>';
+            return;
+        }
+
+        stats.textContent = results.length + ' event' + (results.length !== 1 ? 's' : '') + ' found';
+
+        var html = '';
+        var shown = Math.min(results.length, 50);
+        for (var i = 0; i < shown; i++) {
+            var e = results[i];
+            var desc = e.description ? e.description.substring(0, 200) : '';
+            html += '<div class="search-result">';
+            html += '<h3><a href="' + BASE_URL + '/' + escapeHtml(e.detail_url) + '">' + highlight(e.title, query) + '</a></h3>';
+            html += '<div class="result-meta">';
+            html += '<span>' + escapeHtml(e.date_display || e.date) + '</span>';
+            if (e.venue) html += '<span>' + highlight(e.venue, query) + '</span>';
+            if (e.category) html += '<span>' + highlight(e.category, query) + '</span>';
+            html += '</div>';
+            if (desc) html += '<div class="result-desc">' + highlight(desc, query) + '...</div>';
+            html += '</div>';
+        }
+        if (results.length > 50) {
+            html += '<p class="search-stats">Showing 50 of ' + results.length + ' results. Try a more specific search.</p>';
+        }
+        container.innerHTML = html;
+    }
+
+    // Handle ?q= parameter on page load
+    var params = new URLSearchParams(window.location.search);
+    var initialQuery = params.get('q');
+    if (initialQuery) {
+        document.getElementById('search-input').value = initialQuery;
+        doSearch();
+    }
+
+    // Search on Enter key
+    document.getElementById('search-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') doSearch();
+    });
+    </script>
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
+</body>
+</html>

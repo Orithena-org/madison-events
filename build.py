@@ -137,6 +137,8 @@ def _generate_sitemap(events: list[AttrDict], site_url: str,
     urls = [
         (f"{site_url}/", "daily", "1.0"),
         (f"{site_url}/index.html", "daily", "0.9"),
+        (f"{site_url}/search/", "daily", "0.7"),
+        (f"{site_url}/embed.html", "monthly", "0.5"),
     ]
     # Temporal pages get high priority — they target high-intent search queries
     for slug in (temporal_slugs or []):
@@ -339,6 +341,7 @@ def build() -> None:
             "sponsor_tiers": sponsor_tiers,
             "ad_slots": ad_slots,
         }),
+        ("embed.html", "embed.html", {}),
     ]
 
     for tmpl_name, out_name, extra in template_renders:
@@ -350,6 +353,23 @@ def build() -> None:
         html = tmpl.render(**common_context, **extra)
         (SITE_DIR / out_name).write_text(html, encoding="utf-8")
         print(f"  Wrote {out_name}")
+
+    # Search page (in /search/ directory for SearchAction schema)
+    try:
+        search_tmpl = env.get_template("search.html")
+        search_dir = SITE_DIR / "search"
+        search_dir.mkdir(exist_ok=True)
+        html = search_tmpl.render(**common_context)
+        (search_dir / "index.html").write_text(html, encoding="utf-8")
+        print("  Wrote search/index.html")
+    except TemplateNotFound:
+        pass
+
+    # Copy events data for client-side search and embed widget
+    data_dir = SITE_DIR / "data"
+    data_dir.mkdir(exist_ok=True)
+    shutil.copy2(str(DATA_FILE), str(data_dir / "events.json"))
+    print("  Copied events.json to data/")
 
     # Event detail pages
     try:
