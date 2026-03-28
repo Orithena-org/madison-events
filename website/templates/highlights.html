@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} | {{ site_title }}</title>
+    <meta name="description" content="{{ meta_description }}">
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ page_title }}">
+    <meta property="og:description" content="{{ meta_description }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ site_url }}/highlights/">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <meta property="og:image" content="{{ site_url }}/static/images/og-default.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ site_url }}/static/images/og-default.png">
+    <meta name="twitter:title" content="{{ page_title }}">
+    <meta name="twitter:description" content="{{ meta_description }}">
+    <link rel="canonical" href="{{ site_url }}/highlights/">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
+    <style>
+        .highlights-hero {
+            background: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 48px 20px 40px;
+        }
+        .highlights-hero h2 {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 0 0 8px;
+        }
+        .highlights-hero .date-range {
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+            margin: 0 0 4px;
+        }
+        .highlights-hero .event-count {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+        .picks-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+        .picks-section h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 24px;
+            color: var(--primary);
+        }
+        .pick-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+        .pick-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .pick-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .pick-card h4 {
+            font-size: 20px;
+            margin: 0 0 8px;
+        }
+        .pick-card h4 a {
+            color: var(--text-main);
+            text-decoration: none;
+        }
+        .pick-card h4 a:hover {
+            color: var(--primary);
+        }
+        .pick-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .pick-meta span {
+            margin-right: 12px;
+        }
+        .pick-commentary {
+            font-style: italic;
+            color: var(--text-muted);
+            margin: 12px 0 0;
+            font-size: 15px;
+        }
+        .more-events-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 32px;
+        }
+        .more-events-section h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 16px;
+            padding-top: 24px;
+            border-top: 2px solid var(--border);
+        }
+        .more-event-row {
+            display: flex;
+            align-items: baseline;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+        }
+        .more-event-row .event-date-badge {
+            flex-shrink: 0;
+            width: 48px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+        .more-event-row .event-date-badge .day {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: block;
+        }
+        .more-event-row .event-info {
+            flex: 1;
+        }
+        .more-event-row .event-title-link {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .more-event-row .event-venue-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .more-event-row .event-cat-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .share-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 48px;
+            text-align: center;
+        }
+        .share-section p {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .share-url {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--text-main);
+            user-select: all;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="{{ site_url }}/">{{ site_title }}</a></h1>
+            <p class="tagline">{{ site_tagline }}</p>
+            <nav class="main-nav">
+                <a href="{{ site_url }}/index.html">All Events</a>
+                <a href="{{ site_url }}/this-week/">This Week</a>
+                <a href="{{ site_url }}/this-weekend/">This Weekend</a>
+                <a href="{{ site_url }}/highlights/" style="border-bottom:2px solid var(--primary);">Highlights</a>
+                <a href="{{ site_url }}/newsletter.html">Newsletter</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="highlights-hero">
+        <h2>{{ page_heading }}</h2>
+        <p class="date-range">{{ date_range_display }}</p>
+        <p class="event-count">{{ total_this_week }} events this week &middot; Updated {{ last_updated }}</p>
+    </div>
+
+    {% if editors_picks %}
+    <section class="picks-section">
+        <h3>Editor's Picks</h3>
+        {% for pick in editors_picks %}
+        <div class="pick-card">
+            <span class="pick-number">{{ loop.index }}</span>
+            <h4><a href="{{ site_url }}/{{ pick.event.detail_url }}">{{ pick.event.title }}</a></h4>
+            <div class="pick-meta">
+                <span>{{ pick.event.date_display }}</span>
+                {% if pick.event.time_display %}<span>{{ pick.event.time_display }}</span>{% endif %}
+                {% if pick.event.venue %}<span>@ {{ pick.event.venue }}</span>{% endif %}
+            </div>
+            {% if pick.event.description %}
+            <p style="margin:8px 0 0; font-size:14px; color:var(--text-muted);">{{ pick.event.description[:200] }}{% if pick.event.description|length > 200 %}...{% endif %}</p>
+            {% endif %}
+            {% if pick.commentary %}
+            <p class="pick-commentary">"{{ pick.commentary }}"</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if more_events %}
+    <section class="more-events-section">
+        <h3>More Worth Checking Out</h3>
+        {% for event in more_events %}
+        <div class="more-event-row">
+            <div class="event-date-badge">
+                <span class="day">{{ event.date.strftime('%-d') }}</span>
+                {{ event.date.strftime('%b') }}
+            </div>
+            <div class="event-info">
+                <a href="{{ site_url }}/{{ event.detail_url }}" class="event-title-link">{{ event.title }}</a>
+                {% if event.venue %}
+                <div class="event-venue-text">@ {{ event.venue }}</div>
+                {% endif %}
+            </div>
+            {% if event.category %}
+            <span class="event-cat-badge">{{ event.category }}</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="share-section">
+        <p>Know someone who'd enjoy these events? Share this page:</p>
+        <span class="share-url">{{ site_url }}/highlights/</span>
+    </section>
+
+    <div style="max-width:800px; margin:0 auto; padding:0 20px 48px;">
+        <div style="padding:24px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); text-align:center;">
+            <h3 style="margin:0 0 8px; font-size:18px;">Never Miss the Best Events</h3>
+            <p style="color:var(--text-muted); margin:0 0 16px; font-size:14px;">Get a curated weekly roundup delivered to your inbox every Monday.</p>
+            <a href="{{ site_url }}/newsletter.html" class="btn-primary" style="display:inline-block; text-decoration:none; padding:10px 24px;">Subscribe Free</a>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>&copy; {{ current_year }} {{ site_title }}. Data from {{ sources|length }} local sources, updated daily.</p>
+        <div class="footer-subscribe">
+            <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <span class="footer-sep">&middot;</span>
+            <a href="{{ site_url }}/newsletter.html" title="Email Newsletter">Newsletter</a>
+        </div>
+    </footer>
+
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
+</body>
+</html>

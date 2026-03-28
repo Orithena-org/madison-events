@@ -17,6 +17,7 @@
     <meta name="twitter:image" content="{{ site_url }}/static/images/og-default.png">
     <link rel="canonical" href="{{ site_url }}/">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
     <link rel="stylesheet" href="static/css/style.css">
     <style>
         .landing-hero {
@@ -296,7 +297,7 @@
         <h2>Also available</h2>
         <div class="also-links">
             <a href="/index.html">Browse All Events</a>
-            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics">Add to Calendar</a>
+            <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics">Add to Calendar</a>
             <a href="/feed.xml">RSS Feed</a>
             <a href="/sponsors.html">Advertise With Us</a>
         </div>

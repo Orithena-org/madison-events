@@ -21,6 +21,7 @@
     <meta name="twitter:description" content="{% if event.venue %}{{ event.venue }} | {% endif %}{{ event.date_display }}">
     <link rel="canonical" href="{{ site_url }}/{{ event.detail_url }}">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
     <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
     <style>
         .event-detail-page {
@@ -240,6 +241,7 @@
             <nav class="main-nav">
                 <a href="{{ site_url }}/index.html">All Events</a>
                 <a href="{{ site_url }}/newsletter.html">Newsletter</a>
+                <a href="{{ site_url }}/highlights/">Highlights</a>
                 <a href="{{ site_url }}/sponsors.html">Sponsors</a>
             </nav>
         </div>
@@ -364,7 +366,7 @@
         <div class="footer-subscribe">
             <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
             <span class="footer-sep">&middot;</span>
-            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
             <span class="footer-sep">&middot;</span>
             <a href="{{ site_url }}/newsletter.html" title="Email Newsletter">Newsletter</a>
         </div>
@@ -390,6 +392,11 @@
                 "@type": "PostalAddress",
                 "addressLocality": "Madison",
                 "addressRegion": "WI"
+            },
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 43.0731,
+                "longitude": -89.4012
             }
         },{% endif %}
         {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
@@ -402,6 +409,7 @@
             "availability": "https://schema.org/InStock"
         },{% else %}"offers": {
             "@type": "Offer",
+            "priceCurrency": "USD",
             "url": "{{ site_url }}/{{ event.detail_url }}",
             "availability": "https://schema.org/InStock",
             "description": "{{ event.price | e }}"

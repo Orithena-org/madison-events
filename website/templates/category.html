@@ -21,6 +21,9 @@
     <meta name="twitter:description" content="{{ category_event_count }} {{ category_name | lower }} events in Madison, WI. Updated daily.">
     <link rel="canonical" href="{{ site_url }}/category/{{ category_slug }}/">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="application/rss+xml" title="{{ category_name }} Events RSS" href="{{ site_url }}/feed/{{ category_slug }}.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
+    <link rel="alternate" type="text/calendar" title="{{ category_name }} Events Calendar" href="{{ site_url }}/calendar/{{ category_slug }}.ics">
     <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
 </head>
@@ -125,9 +128,9 @@
                 <h3>Subscribe to Calendar</h3>
                 <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">Get {{ category_name | lower }} events in your calendar. Auto-updates daily.</p>
                 {% if category_slugs %}
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[category_name] }}.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add {{ category_name }} Events</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/{{ category_slugs[category_name] }}.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add {{ category_name }} Events</a>
                 {% endif %}
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" style="display:block; font-size:13px; text-align:center; color:var(--text-muted);">or subscribe to all events</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" style="display:block; font-size:13px; text-align:center; color:var(--text-muted);">or subscribe to all events</a>
             </div>
             <div class="sidebar-widget">
                 <h3>Categories</h3>

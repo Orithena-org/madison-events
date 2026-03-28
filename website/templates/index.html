@@ -21,6 +21,7 @@
     <meta name="twitter:description" content="{{ site_tagline }}. Updated daily.">
     <link rel="canonical" href="{{ site_url }}/">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
     <link rel="stylesheet" href="static/css/style.css">
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
 </head>
@@ -36,6 +37,7 @@
                 <a href="./today/">Today</a>
                 <a href="./free-events/">Free</a>
                 <a href="./newsletter.html">Newsletter</a>
+                <a href="./highlights/">Highlights</a>
                 <a href="./sponsors.html">Sponsors</a>
             </nav>
         </div>
@@ -168,13 +170,13 @@
             <div class="sidebar-widget">
                 <h3>Subscribe to Calendar</h3>
                 <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">Add Madison events directly to your calendar app. Auto-updates daily.</p>
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add All Events</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add All Events</a>
                 <details style="margin-top:8px;">
                     <summary style="cursor:pointer; font-size:13px; color:var(--text-muted);">Subscribe by category</summary>
                     <div style="margin-top:8px;">
                         {% for cat in categories %}
                         {% if category_slugs %}
-                        <a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[cat] }}.ics"
+                        <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/{{ category_slugs[cat] }}.ics"
                            style="display:block; font-size:13px; padding:4px 0; color:var(--primary);">{{ cat }}</a>
                         {% endif %}
                         {% endfor %}
@@ -210,7 +212,7 @@
             </div>
             <div class="footer-col">
                 <h4>For Venues & Organizers</h4>
-                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
+                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or <a href="./embed.html">embed our widget</a> on your site.</p>
             </div>
             <div class="footer-col">
                 <h4>Feedback</h4>
@@ -220,7 +222,7 @@
         <div class="footer-subscribe">
             <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
             <span class="footer-sep">&middot;</span>
-            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
             <span class="footer-sep">&middot;</span>
             <a href="./newsletter.html" title="Email Newsletter">Newsletter</a>
         </div>
@@ -237,6 +239,14 @@
         "name": "{{ site_title }}",
         "url": "{{ site_url }}/",
         "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "{{ site_url }}/search/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        },
         "publisher": {
             "@type": "Organization",
             "name": "{{ site_title }}",
@@ -253,24 +263,43 @@
         }
     }
     </script>
-    {% for date_group, events in events_by_date.items() %}
-    {% for event in events %}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Event",
-        "name": "{{ event.title | e }}",
-        "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
-        {% if event.description %}"description": "{{ event.description[:200] | e }}",{% endif %}
-        {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
-        {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
-        {% if event.price %}"offers": { "@type": "Offer", "price": "{{ event.price }}", "priceCurrency": "USD", "url": "{{ event.display_url }}" },{% endif %}
-        "url": "{{ event.display_url }}",
-        "eventStatus": "https://schema.org/EventScheduled"
+        "@type": "ItemList",
+        "name": "Upcoming Events in Madison, WI",
+        "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.",
+        "url": "{{ site_url }}/",
+        "numberOfItems": {{ total_events }},
+        "itemListElement": [
+            {% set ns = namespace(pos=0, items=[]) %}
+            {% for date_group, day_events in events_by_date.items() %}
+            {% for event in day_events %}
+            {% if ns.pos < 50 %}
+            {% set ns.pos = ns.pos + 1 %}
+            {% set _ = ns.items.append(event) %}
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+            {% for event in ns.items %}
+            {
+                "@type": "ListItem",
+                "position": {{ loop.index }},
+                "item": {
+                    "@type": "Event",
+                    "name": "{{ event.title | e }}",
+                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
+                    {% if event.description %}"description": "{{ event.description[:200] | e }}",{% endif %}
+                    {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
+                    {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
+                    "url": "{{ site_url }}/{{ event.detail_url }}",
+                    "eventStatus": "https://schema.org/EventScheduled"
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
     }
     </script>
-    {% endfor %}
-    {% endfor %}
     <script src="static/js/app.js"></script>
     {% if goatcounter_site %}
     <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>

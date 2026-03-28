@@ -21,6 +21,7 @@
     <meta name="twitter:description" content="{{ meta_description }}">
     <link rel="canonical" href="{{ site_url }}/{{ page_slug }}/">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
     <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
 </head>
@@ -34,6 +35,7 @@
                 <a href="{{ site_url }}/this-week/">This Week</a>
                 <a href="{{ site_url }}/this-weekend/">This Weekend</a>
                 <a href="{{ site_url }}/newsletter.html">Newsletter</a>
+                <a href="{{ site_url }}/highlights/">Highlights</a>
                 <a href="{{ site_url }}/sponsors.html">Sponsors</a>
             </nav>
         </div>
@@ -139,7 +141,7 @@
             <div class="sidebar-widget">
                 <h3>Subscribe to Calendar</h3>
                 <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">Add all Madison events to your calendar. Auto-updates daily.</p>
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">Add to Calendar</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">Add to Calendar</a>
             </div>
             <div class="sidebar-widget">
                 <h3>Categories</h3>
@@ -159,7 +161,7 @@
         <div class="footer-subscribe">
             <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
             <span class="footer-sep">&middot;</span>
-            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
             <span class="footer-sep">&middot;</span>
             <a href="{{ site_url }}/newsletter.html" title="Email Newsletter">Newsletter</a>
         </div>

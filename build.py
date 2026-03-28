@@ -84,7 +84,10 @@ def _group_events_by_date(events: list[AttrDict]) -> OrderedDict:
 
 
 def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
-                  tagline: str) -> str:
+                  tagline: str, feed_path: str = "feed.xml",
+                  category: str | None = None) -> str:
+    if category:
+        events = [e for e in events if e.get("category") == category]
     rss = Element("rss", version="2.0",
                   attrib={"xmlns:atom": "http://www.w3.org/2005/Atom"})
     channel = SubElement(rss, "channel")
@@ -96,7 +99,7 @@ def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
         "%a, %d %b %Y %H:%M:%S +0000")
 
     atom_link = SubElement(channel, "{http://www.w3.org/2005/Atom}link")
-    atom_link.set("href", f"{site_url}/feed.xml")
+    atom_link.set("href", f"{site_url}/{feed_path}")
     atom_link.set("rel", "self")
     atom_link.set("type", "application/rss+xml")
 
@@ -139,6 +142,8 @@ def _generate_sitemap(events: list[AttrDict], site_url: str,
     urls = [
         (f"{site_url}/", "daily", "1.0"),
         (f"{site_url}/index.html", "daily", "0.9"),
+        (f"{site_url}/search/", "daily", "0.7"),
+        (f"{site_url}/embed.html", "monthly", "0.5"),
     ]
     # Temporal pages get high priority — they target high-intent search queries
     for slug in (temporal_slugs or []):
@@ -341,6 +346,7 @@ def build() -> None:
             "sponsor_tiers": sponsor_tiers,
             "ad_slots": ad_slots,
         }),
+        ("embed.html", "embed.html", {}),
     ]
 
     for tmpl_name, out_name, extra in template_renders:
@@ -352,6 +358,23 @@ def build() -> None:
         html = tmpl.render(**common_context, **extra)
         (SITE_DIR / out_name).write_text(html, encoding="utf-8")
         print(f"  Wrote {out_name}")
+
+    # Search page (in /search/ directory for SearchAction schema)
+    try:
+        search_tmpl = env.get_template("search.html")
+        search_dir = SITE_DIR / "search"
+        search_dir.mkdir(exist_ok=True)
+        html = search_tmpl.render(**common_context)
+        (search_dir / "index.html").write_text(html, encoding="utf-8")
+        print("  Wrote search/index.html")
+    except TemplateNotFound:
+        pass
+
+    # Copy events data for client-side search and embed widget
+    data_dir = SITE_DIR / "data"
+    data_dir.mkdir(exist_ok=True)
+    shutil.copy2(str(DATA_FILE), str(data_dir / "events.json"))
+    print("  Copied events.json to data/")
 
     # Event detail pages
     try:
@@ -519,9 +542,66 @@ def build() -> None:
 
         print(f"  Built {len(temporal_pages)} temporal landing pages")
 
-    # RSS
+    # Weekly highlights page
+    try:
+        highlights_tmpl = env.get_template("highlights.html")
+    except TemplateNotFound:
+        highlights_tmpl = None
+
+    if highlights_tmpl:
+        today = today if 'today' in dir() else date.today()
+        weekday = today.weekday()
+        week_end = today + timedelta(days=(6 - weekday))
+        week_events = [e for e in events
+                       if isinstance(e["date"], date) and today <= e["date"] <= week_end]
+
+        # "More worth checking out": this week's events not in editor's picks
+        pick_slugs = {p.event.url_slug for p in editors_picks}
+        more_events = [e for e in week_events if e.url_slug not in pick_slugs]
+        # Diversify by category — pick up to 10, spread across categories
+        seen_cats: dict[str, int] = {}
+        diverse_more: list[AttrDict] = []
+        for e in sorted(more_events, key=lambda x: str(x["date"])):
+            cat = e.category or "Other"
+            if seen_cats.get(cat, 0) < 2:
+                diverse_more.append(e)
+                seen_cats[cat] = seen_cats.get(cat, 0) + 1
+                if len(diverse_more) >= 10:
+                    break
+
+        highlights_dir = SITE_DIR / "highlights"
+        highlights_dir.mkdir(exist_ok=True)
+        html = highlights_tmpl.render(
+            page_title=f"Madison Event Highlights — {today.strftime('%b %-d')} to {week_end.strftime('%b %-d')}",
+            page_heading="This Week's Highlights",
+            meta_description=f"The best events in Madison, WI this week ({today.strftime('%b %-d')}–{week_end.strftime('%b %-d')}). Editor's picks, live music, food, arts, and more.",
+            date_range_display=f"{today.strftime('%A, %B %-d')} — {week_end.strftime('%A, %B %-d, %Y')}",
+            editors_picks=editors_picks,
+            more_events=diverse_more,
+            total_this_week=len(week_events),
+            **common_context,
+        )
+        (highlights_dir / "index.html").write_text(html, encoding="utf-8")
+        temporal_slugs.append("highlights")
+        print("  Built highlights page")
+
+    # RSS — main feed
     rss_xml = _generate_rss(events, site_title, site_url, tagline)
     (SITE_DIR / "feed.xml").write_text(rss_xml, encoding="utf-8")
+
+    # RSS — per-category feeds
+    feed_dir = SITE_DIR / "feed"
+    feed_dir.mkdir(exist_ok=True)
+    rss_count = 1  # counting main feed
+    for cat_name in categories:
+        cat_slug = re.sub(r'[^a-z0-9]+', '-', cat_name.lower()).strip('-')
+        feed_path = f"feed/{cat_slug}.xml"
+        cat_rss = _generate_rss(events, f"{site_title} — {cat_name}",
+                                site_url, tagline, feed_path=feed_path,
+                                category=cat_name)
+        (SITE_DIR / feed_path).write_text(cat_rss, encoding="utf-8")
+        rss_count += 1
+    print(f"  Built {rss_count} RSS feeds")
 
     # Sitemap (include category + temporal pages)
     category_slugs = [re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-') for c in categories]

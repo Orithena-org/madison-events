@@ -15,6 +15,7 @@
     <meta name="twitter:description" content="Stay connected to Madison events via email, RSS, or calendar.">
     <link rel="canonical" href="{{ site_url }}/newsletter.html">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
     <link rel="stylesheet" href="static/css/style.css">
     <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
     <style>
@@ -69,6 +70,7 @@
             <nav class="main-nav">
                 <a href="./">All Events</a>
                 <a href="./newsletter.html" class="active">Subscribe</a>
+                <a href="./highlights/">Highlights</a>
                 <a href="./sponsors.html">Sponsors</a>
             </nav>
         </div>
@@ -95,13 +97,13 @@
                 <div class="card-icon">&#128197;</div>
                 <h3>Calendar Subscription</h3>
                 <p>Add Madison events directly to Apple Calendar, Google Calendar, or any calendar app. Events update automatically every day.</p>
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="subscribe-btn">Add All Events to Calendar</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" class="subscribe-btn">Add All Events to Calendar</a>
                 <br>
                 <details style="margin-top: 16px;">
                     <summary style="cursor: pointer; font-size: 13px; color: var(--text-muted, #888);">Subscribe by category</summary>
                     <ul class="category-cal-list">
                         {% for cat in categories %}
-                        <li><a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[cat] }}.ics">&#128197; {{ cat }}</a></li>
+                        <li><a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/{{ category_slugs[cat] }}.ics">&#128197; {{ cat }}</a></li>
                         {% endfor %}
                     </ul>
                 </details>
