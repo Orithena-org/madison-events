@@ -21,6 +21,7 @@
     <meta name="twitter:description" content="{% if event.venue %}{{ event.venue }} | {% endif %}{{ event.date_display }}">
     <link rel="canonical" href="{{ site_url }}/{{ event.detail_url }}">
     <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="alternate" type="text/calendar" title="{{ site_title }} Calendar" href="{{ site_url }}/calendar/all.ics">
     <link rel="stylesheet" href="{{ site_url }}/static/css/style.css">
     <style>
         .event-detail-page {
@@ -390,6 +391,11 @@
                 "@type": "PostalAddress",
                 "addressLocality": "Madison",
                 "addressRegion": "WI"
+            },
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 43.0731,
+                "longitude": -89.4012
             }
         },{% endif %}
         {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
@@ -402,6 +408,7 @@
             "availability": "https://schema.org/InStock"
         },{% else %}"offers": {
             "@type": "Offer",
+            "priceCurrency": "USD",
             "url": "{{ site_url }}/{{ event.detail_url }}",
             "availability": "https://schema.org/InStock",
             "description": "{{ event.price | e }}"
