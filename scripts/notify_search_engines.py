@@ -10,8 +10,10 @@ from __future__ import annotations
 
 import json
 import sys
+import urllib.parse
 import urllib.request
 import urllib.error
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 SITE_DIR = Path(__file__).parent.parent / "_site"
@@ -62,10 +64,79 @@ def submit_indexnow() -> int:
     return 0
 
 
+def submit_pingomatic() -> int:
+    """Ping Ping-o-Matic to notify 20+ aggregators about feed updates."""
+    rss_url = f"{SITE_URL}/feed.xml"
+    body = ET.tostring(
+        ET.fromstring(
+            '<?xml version="1.0"?>'
+            "<methodCall>"
+            "<methodName>weblogUpdates.ping</methodName>"
+            "<params>"
+            f"<param><value>Madison Events - Local Event Guide</value></param>"
+            f"<param><value>{SITE_URL}</value></param>"
+            f"<param><value>{SITE_URL}</value></param>"
+            f"<param><value>{rss_url}</value></param>"
+            "</params>"
+            "</methodCall>"
+        ),
+        encoding="unicode",
+    ).encode("utf-8")
+    try:
+        req = urllib.request.Request(
+            "http://rpc.pingomatic.com/RPC2",
+            data=body,
+            headers={"Content-Type": "text/xml"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = resp.read().decode("utf-8", errors="replace")
+            if "flerror" in result and "<boolean>0</boolean>" in result:
+                print("  [pingomatic] Ping successful — notified 20+ aggregators")
+            elif "too awesome" in result.lower():
+                print("  [pingomatic] Rate-limited (already pinged recently)")
+            else:
+                print(f"  [pingomatic] Ping sent, response: {result[:200]}")
+    except Exception as e:
+        print(f"  [pingomatic] Ping failed: {e}")
+        return 1
+    return 0
+
+
+def submit_websub() -> int:
+    """Notify WebSub hub that the RSS feed has been updated."""
+    feed_url = f"{SITE_URL}/feed.xml"
+    data = urllib.parse.urlencode({
+        "hub.mode": "publish",
+        "hub.url": feed_url,
+    }).encode("utf-8")
+    try:
+        req = urllib.request.Request(
+            "https://pubsubhubbub.appspot.com/",
+            data=data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            print(f"  [websub] Published feed update: HTTP {resp.status}")
+    except urllib.error.HTTPError as e:
+        if e.code == 204:
+            print("  [websub] Published feed update: HTTP 204")
+        else:
+            print(f"  [websub] Publish failed: HTTP {e.code}")
+            return 1
+    except Exception as e:
+        print(f"  [websub] Publish failed: {e}")
+        return 1
+    return 0
+
+
 def main() -> int:
     print("Notifying search engines...")
     errors = 0
     errors += submit_indexnow()
+    errors += submit_pingomatic()
+    errors += submit_websub()
     if errors:
         print(f"Done with {errors} error(s)")
     else:

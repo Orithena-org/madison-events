@@ -100,6 +100,11 @@ def _generate_rss(events: list[AttrDict], site_title: str, site_url: str,
     atom_link.set("rel", "self")
     atom_link.set("type", "application/rss+xml")
 
+    # WebSub hub for real-time push notifications to subscribers
+    hub_link = SubElement(channel, "{http://www.w3.org/2005/Atom}link")
+    hub_link.set("href", "https://pubsubhubbub.appspot.com/")
+    hub_link.set("rel", "hub")
+
     sorted_events = sorted(events, key=lambda e: str(e["date"]), reverse=True)[:50]
     for event in sorted_events:
         item = SubElement(channel, "item")

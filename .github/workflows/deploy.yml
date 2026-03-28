@@ -56,3 +56,18 @@ jobs:
             -H "Content-Type: application/json" \
             -d @_site/indexnow-urls.json \
             -o /dev/null -w "IndexNow response: %{http_code}\n" || true
+
+      - name: Ping aggregators via Ping-o-Matic
+        if: success()
+        run: |
+          curl -s -X POST "http://rpc.pingomatic.com/RPC2" \
+            -H "Content-Type: text/xml" \
+            -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.ping</methodName><params><param><value>Madison Events - Local Event Guide</value></param><param><value>https://orithena-org.github.io/madison-events</value></param><param><value>https://orithena-org.github.io/madison-events</value></param><param><value>https://orithena-org.github.io/madison-events/feed.xml</value></param></params></methodCall>' \
+            -o /dev/null -w "Ping-o-Matic response: %{http_code}\n" || true
+
+      - name: Publish WebSub feed update
+        if: success()
+        run: |
+          curl -s -X POST "https://pubsubhubbub.appspot.com/" \
+            -d "hub.mode=publish&hub.url=https://orithena-org.github.io/madison-events/feed.xml" \
+            -o /dev/null -w "WebSub response: %{http_code}\n" || true
