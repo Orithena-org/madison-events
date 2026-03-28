@@ -8,6 +8,7 @@ on:
       - 'build.py'
       - 'website/templates/**'
       - 'website/static/**'
+      - 'scripts/**'
   workflow_dispatch:
 
 permissions:
