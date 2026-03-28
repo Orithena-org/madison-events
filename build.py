@@ -514,6 +514,49 @@ def build() -> None:
 
         print(f"  Built {len(temporal_pages)} temporal landing pages")
 
+    # Weekly highlights page
+    try:
+        highlights_tmpl = env.get_template("highlights.html")
+    except TemplateNotFound:
+        highlights_tmpl = None
+
+    if highlights_tmpl:
+        today = today if 'today' in dir() else date.today()
+        weekday = today.weekday()
+        week_end = today + timedelta(days=(6 - weekday))
+        week_events = [e for e in events
+                       if isinstance(e["date"], date) and today <= e["date"] <= week_end]
+
+        # "More worth checking out": this week's events not in editor's picks
+        pick_slugs = {p.event.url_slug for p in editors_picks}
+        more_events = [e for e in week_events if e.url_slug not in pick_slugs]
+        # Diversify by category — pick up to 10, spread across categories
+        seen_cats: dict[str, int] = {}
+        diverse_more: list[AttrDict] = []
+        for e in sorted(more_events, key=lambda x: str(x["date"])):
+            cat = e.category or "Other"
+            if seen_cats.get(cat, 0) < 2:
+                diverse_more.append(e)
+                seen_cats[cat] = seen_cats.get(cat, 0) + 1
+                if len(diverse_more) >= 10:
+                    break
+
+        highlights_dir = SITE_DIR / "highlights"
+        highlights_dir.mkdir(exist_ok=True)
+        html = highlights_tmpl.render(
+            page_title=f"Madison Event Highlights — {today.strftime('%b %-d')} to {week_end.strftime('%b %-d')}",
+            page_heading="This Week's Highlights",
+            meta_description=f"The best events in Madison, WI this week ({today.strftime('%b %-d')}–{week_end.strftime('%b %-d')}). Editor's picks, live music, food, arts, and more.",
+            date_range_display=f"{today.strftime('%A, %B %-d')} — {week_end.strftime('%A, %B %-d, %Y')}",
+            editors_picks=editors_picks,
+            more_events=diverse_more,
+            total_this_week=len(week_events),
+            **common_context,
+        )
+        (highlights_dir / "index.html").write_text(html, encoding="utf-8")
+        temporal_slugs.append("highlights")
+        print("  Built highlights page")
+
     # RSS
     rss_xml = _generate_rss(events, site_title, site_url, tagline)
     (SITE_DIR / "feed.xml").write_text(rss_xml, encoding="utf-8")
