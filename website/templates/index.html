@@ -169,13 +169,13 @@
             <div class="sidebar-widget">
                 <h3>Subscribe to Calendar</h3>
                 <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;">Add Madison events directly to your calendar app. Auto-updates daily.</p>
-                <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add All Events</a>
+                <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" class="btn-primary" style="display:block; text-align:center; text-decoration:none; margin-bottom:8px;">Add All Events</a>
                 <details style="margin-top:8px;">
                     <summary style="cursor:pointer; font-size:13px; color:var(--text-muted);">Subscribe by category</summary>
                     <div style="margin-top:8px;">
                         {% for cat in categories %}
                         {% if category_slugs %}
-                        <a href="webcal://orithena-org.github.io/madison-events/calendar/{{ category_slugs[cat] }}.ics"
+                        <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/{{ category_slugs[cat] }}.ics"
                            style="display:block; font-size:13px; padding:4px 0; color:var(--primary);">{{ cat }}</a>
                         {% endif %}
                         {% endfor %}
@@ -211,7 +211,7 @@
             </div>
             <div class="footer-col">
                 <h4>For Venues & Organizers</h4>
-                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or contact us to get listed.</p>
+                <p>Want your events featured? <a href="./sponsors.html">Learn about our sponsorship options</a> or <a href="./embed.html">embed our widget</a> on your site.</p>
             </div>
             <div class="footer-col">
                 <h4>Feedback</h4>
@@ -221,7 +221,7 @@
         <div class="footer-subscribe">
             <a href="{{ site_url }}/feed.xml" title="RSS Feed">RSS</a>
             <span class="footer-sep">&middot;</span>
-            <a href="webcal://orithena-org.github.io/madison-events/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
+            <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics" title="Subscribe to Calendar">Calendar</a>
             <span class="footer-sep">&middot;</span>
             <a href="./newsletter.html" title="Email Newsletter">Newsletter</a>
         </div>
@@ -238,6 +238,14 @@
         "name": "{{ site_title }}",
         "url": "{{ site_url }}/",
         "description": "{{ site_tagline }}. Find concerts, shows, festivals, and community events in Madison, Wisconsin.",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "{{ site_url }}/search/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        },
         "publisher": {
             "@type": "Organization",
             "name": "{{ site_title }}",
