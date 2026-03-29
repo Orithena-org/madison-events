@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Embed Madison Events on Your Website | {{ site_title }}</title>
+    <title>Embed msndo on Your Website | {{ site_title }}</title>
     <meta name="description" content="Add a free Madison events widget to your website. Show upcoming events by category or venue with a single line of code.">
-    <meta property="og:title" content="Embed Madison Events Widget">
+    <meta property="og:title" content="Embed msndo Widget">
     <meta property="og:description" content="Add a free events widget to your website. Show upcoming Madison events with a single code snippet.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ site_url }}/embed.html">
@@ -122,7 +122,7 @@
     </header>
 
     <div class="embed-page">
-        <h2>Embed Madison Events on Your Site</h2>
+        <h2>Embed msndo on Your Site</h2>
         <p class="subtitle">Add a free, auto-updating events widget to your website. Great for venues, blogs, community organizations, and local businesses.</p>
 
         <div class="embed-section">
@@ -212,7 +212,7 @@
 
         <div class="embed-section">
             <h3>Other Integration Options</h3>
-            <p>Beyond the widget, you can integrate Madison Events data in other ways:</p>
+            <p>Beyond the widget, you can integrate msndo data in other ways:</p>
             <ul style="margin-top: 12px; padding-left: 20px; line-height: 2;">
                 <li><strong>RSS Feed:</strong> <a href="{{ site_url }}/feed.xml">{{ site_url }}/feed.xml</a> (also available per-category)</li>
                 <li><strong>iCal Calendar:</strong> <a href="{{ site_url | replace('https://', 'webcal://') }}/calendar/all.ics">Subscribe to calendar</a></li>
@@ -268,7 +268,7 @@
             var accent = '#c41e3a';
 
             var html = '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;overflow:hidden;font-family:-apple-system,sans-serif;">';
-            html += '<div style="padding:12px 16px;border-bottom:1px solid ' + border + ';font-weight:700;font-size:15px;"><a href="' + SITE + '/" target="_blank" style="color:' + accent + ';text-decoration:none;">Madison Events</a></div>';
+            html += '<div style="padding:12px 16px;border-bottom:1px solid ' + border + ';font-weight:700;font-size:15px;"><a href="' + SITE + '/" target="_blank" style="color:' + accent + ';text-decoration:none;">msndo</a></div>';
             for (var i = 0; i < events.length; i++) {
                 var e = events[i];
                 html += '<a href="' + SITE + '/' + esc(e.detail_url) + '" target="_blank" style="display:block;padding:12px 16px;border-bottom:1px solid ' + border + ';text-decoration:none;color:' + text + ';">';

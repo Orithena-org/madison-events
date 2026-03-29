@@ -63,12 +63,12 @@ jobs:
         run: |
           curl -s -X POST "http://rpc.pingomatic.com/RPC2" \
             -H "Content-Type: text/xml" \
-            -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.ping</methodName><params><param><value>Madison Events - Local Event Guide</value></param><param><value>https://orithena-org.github.io/madison-events</value></param><param><value>https://orithena-org.github.io/madison-events</value></param><param><value>https://orithena-org.github.io/madison-events/feed.xml</value></param></params></methodCall>' \
+            -d '<?xml version="1.0"?><methodCall><methodName>weblogUpdates.ping</methodName><params><param><value>msndo - Things to do in Madison, WI</value></param><param><value>https://msndo.com</value></param><param><value>https://msndo.com</value></param><param><value>https://msndo.com/feed.xml</value></param></params></methodCall>' \
             -o /dev/null -w "Ping-o-Matic response: %{http_code}\n" || true
 
       - name: Publish WebSub feed update
         if: success()
         run: |
           curl -s -X POST "https://pubsubhubbub.appspot.com/" \
-            -d "hub.mode=publish&hub.url=https://orithena-org.github.io/madison-events/feed.xml" \
+            -d "hub.mode=publish&hub.url=https://msndo.com/feed.xml" \
             -o /dev/null -w "WebSub response: %{http_code}\n" || true

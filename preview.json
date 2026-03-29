@@ -1,5 +1,5 @@
 {
-  "name": "Madison Events",
+  "name": "msndo",
   "type": "static",
   "port": 8001,
   "serve_dir": "output/site"
