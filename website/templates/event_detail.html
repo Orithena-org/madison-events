@@ -381,9 +381,9 @@
         "@context": "https://schema.org",
         "@type": "Event",
         "name": "{{ event.title | e }}",
-        "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{% endif %}",
-        {% if event.time_end and event.time_end|time_to_iso %}"endDate": "{{ event.date.isoformat() }}T{{ event.time_end|time_to_iso }}",
-        {% elif event.time_start and event.time_start|time_to_iso %}{% set start_h = (event.time_start|time_to_iso).split(':')[0]|int %}"endDate": "{{ event.date.isoformat() }}T{{ '%02d' % (start_h + 2) }}:{{ (event.time_start|time_to_iso).split(':')[1] }}",
+        "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{{ event.date|tz_offset }}{% endif %}",
+        {% if event.time_end and event.time_end|time_to_iso %}"endDate": "{{ event.date.isoformat() }}T{{ event.time_end|time_to_iso }}{{ event.date|tz_offset }}",
+        {% elif event.time_start and event.time_start|time_to_iso %}{% set start_h = (event.time_start|time_to_iso).split(':')[0]|int %}"endDate": "{{ event.date.isoformat() }}T{{ '%02d' % (start_h + 2) }}:{{ (event.time_start|time_to_iso).split(':')[1] }}{{ event.date|tz_offset }}",
         {% endif %}{% if event.description %}"description": "{{ event.description | e }}",{% endif %}
         {% if event.venue %}"location": {
             "@type": "Place",

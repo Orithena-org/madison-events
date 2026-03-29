@@ -14,7 +14,8 @@ import re
 import shutil
 import uuid
 from collections import OrderedDict
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -73,6 +74,20 @@ def _time_to_iso(time_str: str) -> str:
     elif ampm == "AM" and hour == 12:
         hour = 0
     return f"{hour:02d}:{minute}"
+
+
+MADISON_TZ = ZoneInfo("America/Chicago")
+
+
+def _tz_offset(event_date: date) -> str:
+    """Return the UTC offset string for Madison, WI on a given date (e.g. '-05:00' or '-06:00')."""
+    dt = datetime(event_date.year, event_date.month, event_date.day, 12, tzinfo=MADISON_TZ)
+    offset = dt.utcoffset()
+    total_seconds = int(offset.total_seconds())
+    sign = "+" if total_seconds >= 0 else "-"
+    hours, remainder = divmod(abs(total_seconds), 3600)
+    minutes = remainder // 60
+    return f"{sign}{hours:02d}:{minutes:02d}"
 
 
 def _group_events_by_date(events: list[AttrDict]) -> OrderedDict:
@@ -204,6 +219,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
         "VERSION:2.0",
         f"PRODID:-//Madison Events//orithena//EN",
         f"X-WR-CALNAME:{_ical_escape(cal_name)}",
+        "X-WR-TIMEZONE:America/Chicago",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
     ]
@@ -216,7 +232,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
         lines.append("BEGIN:VEVENT")
         if start_time:
             dtstart = f"{d.strftime('%Y%m%d')}T{start_time.replace(':', '')}00"
-            lines.append(f"DTSTART:{dtstart}")
+            lines.append(f"DTSTART;TZID=America/Chicago:{dtstart}")
             # Parse end time if available
             end_time = ""
             if event.time_display and " - " in event.time_display:
@@ -228,7 +244,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
                 h, m = start_time.split(":")
                 end_h = int(h) + 2
                 dtend = f"{d.strftime('%Y%m%d')}T{end_h:02d}{m}00"
-            lines.append(f"DTEND:{dtend}")
+            lines.append(f"DTEND;TZID=America/Chicago:{dtend}")
         else:
             # All-day event
             lines.append(f"DTSTART;VALUE=DATE:{d.strftime('%Y%m%d')}")
@@ -271,6 +287,7 @@ def build() -> None:
     # Set up Jinja2
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
     env.filters["time_to_iso"] = _time_to_iso
+    env.filters["tz_offset"] = _tz_offset
 
     site_title = "Madison Events"
     site_url = "https://orithena-org.github.io/madison-events"
