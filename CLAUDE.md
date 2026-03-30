@@ -1,4 +1,4 @@
-# Madison Events — Events Aggregator
+# msndo — Events Aggregator for Madison, WI
 
 Madison WI events aggregator. GitHub Pages shell — templates, static assets, and output live here. Pipeline code lives in `orithena-org/content/`.
 

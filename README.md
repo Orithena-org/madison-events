@@ -1,6 +1,6 @@
-# Madison Events Aggregator
+# msndo — Madison Events Aggregator
 
-A complete events aggregation system for Madison, WI. Scrapes events from local sources, builds a clean website, generates social media content, and creates weekly newsletters.
+A complete events aggregation system for Madison, WI. Scrapes events from local sources, builds a clean website at msndo.com, generates social media content, and creates weekly newsletters.
 
 ## Quick Start
 
@@ -86,7 +86,7 @@ madison-events/
 
 The site is deployed to GitHub Pages automatically via GitHub Actions.
 
-**Live site:** https://orithena-org.github.io/madison-events
+**Live site:** https://msndo.com
 
 ### How it works
 

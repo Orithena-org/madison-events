@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 SITE_DIR = Path(__file__).parent.parent / "_site"
-SITE_URL = "https://orithena-org.github.io/madison-events"
+SITE_URL = "https://msndo.com"
 SITEMAP_URL = f"{SITE_URL}/sitemap.xml"
 
 # Note: Google and Bing deprecated their sitemap ping endpoints (404/410).
@@ -73,7 +73,7 @@ def submit_pingomatic() -> int:
             "<methodCall>"
             "<methodName>weblogUpdates.ping</methodName>"
             "<params>"
-            f"<param><value>Madison Events - Local Event Guide</value></param>"
+            f"<param><value>msndo - Things to do in Madison, WI</value></param>"
             f"<param><value>{SITE_URL}</value></param>"
             f"<param><value>{SITE_URL}</value></param>"
             f"<param><value>{rss_url}</value></param>"

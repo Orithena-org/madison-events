@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone site builder for Madison Events.
+"""Standalone site builder for msndo.
 
 Reads output/data/events.json (written by the orithena-org content pipeline)
 and renders the site using Jinja2 templates. No dependency on orithena-org.
@@ -202,7 +202,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        f"PRODID:-//Madison Events//orithena//EN",
+        f"PRODID:-//msndo//orithena//EN",
         f"X-WR-CALNAME:{_ical_escape(cal_name)}",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
@@ -211,7 +211,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
     for event in sorted(events, key=lambda e: e["date"]):
         d = event["date"]
         start_time = _time_to_iso(event.time_display.split(" - ")[0] if event.time_display else "")
-        uid = f"{event.url_slug}@madison-events.orithena.org"
+        uid = f"{event.url_slug}@msndo.com"
 
         lines.append("BEGIN:VEVENT")
         if start_time:
@@ -255,7 +255,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
 
 
 def build() -> None:
-    """Build the Madison Events static site from JSON data."""
+    """Build the msndo static site from JSON data."""
     data = _load_data()
     events = [_wrap(e) for e in data["events"]]
     editors_picks = [AttrDict({"event": _wrap(p["event"]), "commentary": p["commentary"]})
@@ -272,7 +272,7 @@ def build() -> None:
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
     env.filters["time_to_iso"] = _time_to_iso
 
-    site_title = "Madison Events"
+    site_title = "msndo"
     site_url = "https://orithena-org.github.io/madison-events"
     tagline = "Your guide to everything happening in Madison, WI"
     goatcounter_site = "georgeauto"
@@ -480,7 +480,7 @@ def build() -> None:
             },
             {
                 "slug": "this-week",
-                "page_title": f"Madison Events This Week — {today.strftime('%b %-d')} to {week_end.strftime('%b %-d')}",
+                "page_title": f"msndo — This Week — {today.strftime('%b %-d')} to {week_end.strftime('%b %-d')}",
                 "page_heading": "Things to Do in Madison This Week",
                 "meta_description": f"Discover {today.strftime('%b %-d')}–{week_end.strftime('%b %-d')} events in Madison, WI. Concerts, festivals, food events, free activities, and more from {len(sources)} local sources.",
                 "date_range_display": f"{today.strftime('%A, %B %-d')} — {week_end.strftime('%A, %B %-d, %Y')}",
@@ -488,7 +488,7 @@ def build() -> None:
             },
             {
                 "slug": "this-weekend",
-                "page_title": f"Madison Events This Weekend — {saturday.strftime('%b %-d')}–{sunday.strftime('%-d')}",
+                "page_title": f"msndo — This Weekend — {saturday.strftime('%b %-d')}–{sunday.strftime('%-d')}",
                 "page_heading": "Things to Do in Madison This Weekend",
                 "meta_description": f"Weekend events in Madison, WI ({saturday.strftime('%b %-d')}–{sunday.strftime('%-d')}). Find live music, food, art, comedy, and free activities happening this Saturday and Sunday.",
                 "date_range_display": f"{saturday.strftime('%A, %B %-d')} — {sunday.strftime('%A, %B %-d, %Y')}",
@@ -618,14 +618,14 @@ def build() -> None:
     cal_dir.mkdir(exist_ok=True)
 
     # Main feed — all upcoming events
-    main_ical = _generate_ical(events, "Madison Events", site_url)
+    main_ical = _generate_ical(events, "msndo", site_url)
     (cal_dir / "all.ics").write_text(main_ical, encoding="utf-8")
 
     # Per-category feeds
     ical_count = 1  # counting main feed
     for cat_name in categories:
         cat_slug = re.sub(r'[^a-z0-9]+', '-', cat_name.lower()).strip('-')
-        cat_ical = _generate_ical(events, f"Madison Events — {cat_name}", site_url,
+        cat_ical = _generate_ical(events, f"msndo — {cat_name}", site_url,
                                   category=cat_name)
         (cal_dir / f"{cat_slug}.ics").write_text(cat_ical, encoding="utf-8")
         ical_count += 1
