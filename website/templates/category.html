@@ -151,6 +151,39 @@
         <p><a href="{{ site_url }}/feed.xml">RSS Feed</a></p>
     </footer>
 
+    <!-- JSON-LD: ItemList for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "{{ category_name }} Events in Madison, WI",
+        "description": "{% if category_seo_description %}{{ category_seo_description }}{% else %}Find {{ category_name | lower }} events in Madison, Wisconsin.{% endif %}",
+        "url": "{{ site_url }}/category/{{ category_slug }}/",
+        "numberOfItems": {{ category_event_count }},
+        "itemListElement": [
+            {% set ns = namespace(items=[]) %}
+            {% for date_group, day_events in events_by_date.items() %}
+            {% for event in day_events %}
+            {% set _ = ns.items.append(event) %}
+            {% endfor %}
+            {% endfor %}
+            {% for event in ns.items %}
+            {
+                "@type": "ListItem",
+                "position": {{ loop.index }},
+                "item": {
+                    "@type": "Event",
+                    "name": "{{ event.title | e }}",
+                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{{ event.date|tz_offset }}{% endif %}",
+                    {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
+                    "url": "{{ site_url }}/{{ event.detail_url }}"
+                }
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+
     {% if goatcounter_site %}
     <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     {% endif %}
