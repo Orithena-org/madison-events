@@ -190,7 +190,7 @@
                 "item": {
                     "@type": "Event",
                     "name": "{{ event.title | e }}",
-                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
+                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{{ event.date|tz_offset }}{% endif %}",
                     {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
                     "url": "{{ site_url }}/{{ event.detail_url }}"
                 }

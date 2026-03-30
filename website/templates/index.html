@@ -288,7 +288,7 @@
                 "item": {
                     "@type": "Event",
                     "name": "{{ event.title | e }}",
-                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start %}T{{ event.time_start }}{% endif %}",
+                    "startDate": "{{ event.date.isoformat() }}{% if event.time_start and event.time_start|time_to_iso %}T{{ event.time_start|time_to_iso }}{{ event.date|tz_offset }}{% endif %}",
                     {% if event.description %}"description": "{{ event.description[:200] | e }}",{% endif %}
                     {% if event.venue %}"location": { "@type": "Place", "name": "{{ event.venue | e }}", "address": { "@type": "PostalAddress", "addressLocality": "Madison", "addressRegion": "WI" } },{% endif %}
                     {% if event.image_url %}"image": "{{ event.image_url }}",{% endif %}
