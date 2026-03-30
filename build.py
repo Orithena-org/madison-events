@@ -290,7 +290,7 @@ def build() -> None:
     env.filters["tz_offset"] = _tz_offset
 
     site_title = "msndo"
-    site_url = "https://orithena-org.github.io/madison-events"
+    site_url = "https://msndo.com"
     tagline = "Your guide to everything happening in Madison, WI"
     goatcounter_site = "georgeauto"
 
