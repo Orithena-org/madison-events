@@ -669,8 +669,9 @@ def build() -> None:
     for event in events:
         if isinstance(event["date"], date) and event["date"] >= today_date:
             indexnow_urls.append(f"{site_url}/{event.detail_url}")
+    from urllib.parse import urlparse
     indexnow_data = {
-        "host": "orithena-org.github.io",
+        "host": urlparse(site_url).hostname,
         "key": indexnow_key,
         "keyLocation": f"{site_url}/{indexnow_key}.txt",
         "urlList": indexnow_urls,
