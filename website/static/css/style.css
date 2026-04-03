@@ -485,6 +485,70 @@ a:hover { color: var(--primary-dark); }
 .beehiiv-fallback a { font-weight: 600; }
 .sidebar-widget .beehiiv-wrapper { max-width: 100%; }
 
+/* Find Your People section */
+.find-your-people {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: #f0f4ff;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+}
+.fyp-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+.fyp-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+.fyp-see-all {
+    font-size: 14px;
+    color: var(--primary);
+    font-weight: 600;
+}
+.fyp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+.fyp-card {
+    background: white;
+    border-radius: 8px;
+    padding: 14px 16px;
+    border: 1px solid #e8ecf0;
+}
+.fyp-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.fyp-card-link:hover h3 { color: var(--primary); }
+.fyp-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    line-height: 1.4;
+}
+.fyp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.fyp-meta span::after { content: " ·"; }
+.fyp-meta span:last-child::after { content: ""; }
+.fyp-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .page-layout {
