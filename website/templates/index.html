@@ -34,9 +34,9 @@
                 <a href="#all" class="nav-tab active" data-tab="all">All Events</a>
                 <a href="#this-week" class="nav-tab" data-tab="this-week">This Week</a>
                 <a href="#weekend" class="nav-tab" data-tab="weekend">Weekend</a>
+                <a href="#find-your-people">Find Your People</a>
                 <a href="./today/">Today</a>
                 <a href="./free-events/">Free</a>
-                <a href="./category/community/">Community</a>
                 <a href="./newsletter.html">Newsletter</a>
                 <a href="./highlights/">Highlights</a>
                 <a href="./sponsors.html">Sponsors</a>
@@ -79,6 +79,33 @@
                 <span>from {{ sources|length }} sources</span>
                 <span>Updated: {{ last_updated }}</span>
             </div>
+
+            {% if community_events %}
+            <!-- Find Your People section -->
+            <section class="find-your-people" id="find-your-people">
+                <div class="fyp-header">
+                    <h2>Find Your People</h2>
+                    <a href="./category/community/" class="fyp-see-all">See all community &rarr;</a>
+                </div>
+                <div class="fyp-grid">
+                    {% for event in community_events[:6] %}
+                    <article class="fyp-card">
+                        <a href="{{ event.detail_url }}" class="fyp-card-link">
+                            <h3>{{ event.title }}</h3>
+                            <div class="fyp-meta">
+                                <span>{{ event.date_display }}</span>
+                                {% if event.time_start %}<span>{{ event.time_start }}</span>{% endif %}
+                                {% if event.venue %}<span>{{ event.venue }}</span>{% endif %}
+                            </div>
+                            {% if event.description %}
+                            <p class="fyp-desc">{{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}</p>
+                            {% endif %}
+                        </a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
 
             <!-- Events List View -->
             <div id="events-list" class="events-list">
