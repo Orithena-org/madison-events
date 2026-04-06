@@ -20,6 +20,14 @@ ORG_ROOT="$(cd "$MADISON_ROOT/../orithena-org" && pwd)"
 cd "$ORG_ROOT"
 python3 -u -m content.pipeline --domain madison_events
 
+# --- Generate curated picks page ---
+AGENT_ROOT="$(cd "$MADISON_ROOT/../agent-01" && pwd)"
+if [[ -f "$AGENT_ROOT/tools/generate_picks_page.py" ]]; then
+    echo "[picks] Generating curated picks page..."
+    python3 "$AGENT_ROOT/tools/generate_picks_page.py" \
+        --output "$MADISON_ROOT/output/site/picks" || true
+fi
+
 # --- Deploy: commit and push site output if changed ---
 cd "$MADISON_ROOT"
 
