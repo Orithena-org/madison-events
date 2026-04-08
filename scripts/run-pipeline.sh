@@ -28,6 +28,13 @@ if [[ -f "$AGENT_ROOT/tools/generate_picks_page.py" ]]; then
         --output "$MADISON_ROOT/output/site/picks" || true
 fi
 
+# --- Generate iCal subscription feed ---
+if [[ -f "$AGENT_ROOT/tools/generate_ical_feed.py" ]]; then
+    echo "[ical] Generating iCal subscription feed..."
+    python3 "$AGENT_ROOT/tools/generate_ical_feed.py" \
+        --output "$MADISON_ROOT/output/site/feeds" || true
+fi
+
 # --- Deploy: commit and push site output if changed ---
 cd "$MADISON_ROOT"
 
