@@ -47,8 +47,8 @@ if [[ "$current_branch" != "main" ]]; then
     git pull origin main
 fi
 
-if ! git diff --quiet output/site/ 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard output/site/)" ]; then
-    git add output/site/
+if ! git diff --quiet output/ 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard output/)" ]; then
+    git add output/data/ output/site/
     git commit -m "chore(site): update generated site output $(date +%Y-%m-%d)"
     git push origin main
     echo "[deploy] Site output committed and pushed."
