@@ -81,6 +81,13 @@ a:hover { color: var(--primary-dark); }
 .pk-price { color: var(--primary); font-weight: 500; }
 .pk-day { font-weight: 600; color: var(--primary); margin-right: 4px; }
 .pk-desc { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.pk-cal {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 6px; margin-left: 8px;
+  white-space: nowrap; vertical-align: middle;
+}
+.pk-cal:hover { color: var(--primary); border-color: var(--primary); background: #fff5f7; }
 
 .pk-day-group { margin-bottom: 20px; }
 .pk-day-group h3 {
@@ -101,6 +108,20 @@ a:hover { color: var(--primary-dark); }
   font-weight: 600; font-size: 14px;
 }
 .pk-share:hover { background: var(--primary-dark); color: white; }
+.pk-subscribe { margin: 16px 0 12px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.pk-sub-btn {
+  display: inline-block; padding: 10px 20px;
+  background: var(--secondary); color: white;
+  border-radius: var(--radius); font-weight: 600; font-size: 14px;
+}
+.pk-sub-btn:hover { background: #2a2a4e; color: white; }
+.pk-sub-link {
+  display: inline-flex; align-items: center;
+  padding: 10px 20px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-weight: 600; font-size: 14px;
+  color: var(--text);
+}
+.pk-sub-link:hover { border-color: var(--primary); color: var(--primary); }
 </style>
 </head>
 <body>
@@ -118,7 +139,7 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-pick-body">
     <div class="pk-emoji">🍽️</div>
     <div class="pk-info">
-      <div class="pk-title"><span class="pk-day">Sunday</span> <a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260412/e095ecc7-b30c-4da8-8f82-4a614663111d/beer-bubbles-ballet" target="_blank" rel="noopener">Beer, Bubbles, BALLET!</a></div>
+      <div class="pk-title"><span class="pk-day">Sunday</span> <a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260412/e095ecc7-b30c-4da8-8f82-4a614663111d/beer-bubbles-ballet" target="_blank" rel="noopener">Beer, Bubbles, BALLET!</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Beer%2C%20Bubbles%2C%20BALLET%21&amp;dates=20260412T180000/20260412T200000&amp;ctz=America/Chicago&amp;location=Central%20Midwest%20Ballet%20Academy%2C%20Madison%2C%20WI&amp;details=https%3A//patch.com/wisconsin/madison-wi/calendar/event/20260412/e095ecc7-b30c-4da8-8f82-4a614663111d/beer-bubbles-ballet" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
       <div class="pk-meta"><span class="pk-time">6:00 PM</span><span class="pk-venue">@ Central Midwest Ballet Academy</span><span class="pk-price">Free</span></div>
     </div>
   </div>
@@ -127,7 +148,7 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-pick-body">
     <div class="pk-emoji">🎭</div>
     <div class="pk-info">
-      <div class="pk-title"><span class="pk-day">Saturday</span> <a href="https://www.eventbrite.com/e/night-walk-sky-dance-registration-1981453427541" target="_blank" rel="noopener">Night Walk: Sky Dance</a></div>
+      <div class="pk-title"><span class="pk-day">Saturday</span> <a href="https://www.eventbrite.com/e/night-walk-sky-dance-registration-1981453427541" target="_blank" rel="noopener">Night Walk: Sky Dance</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Night%20Walk%3A%20Sky%20Dance&amp;dates=20260411T190000/20260411T210000&amp;ctz=America/Chicago&amp;location=University%20of%20Wisconsin-Madison%20Arboretum%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/night-walk-sky-dance-registration-1981453427541" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
       <div class="pk-meta"><span class="pk-time">7:00 PM</span><span class="pk-venue">@ University of Wisconsin-Madison Arboretum</span></div>
     </div>
   </div>
@@ -136,7 +157,7 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-pick-body">
     <div class="pk-emoji">⚽</div>
     <div class="pk-info">
-      <div class="pk-title"><span class="pk-day">Saturday</span> <a href="https://www.eventbrite.com/e/isthmus-city-fc-card-show-tickets-1986624124234" target="_blank" rel="noopener">ISTHMUS CITY FC CARD SHOW</a></div>
+      <div class="pk-title"><span class="pk-day">Saturday</span> <a href="https://www.eventbrite.com/e/isthmus-city-fc-card-show-tickets-1986624124234" target="_blank" rel="noopener">ISTHMUS CITY FC CARD SHOW</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=ISTHMUS%20CITY%20FC%20CARD%20SHOW&amp;dates=20260411T100000/20260411T120000&amp;ctz=America/Chicago&amp;location=Madison%20East%20High%20School%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/isthmus-city-fc-card-show-tickets-1986624124234" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
       <div class="pk-meta"><span class="pk-time">10:00 AM</span><span class="pk-venue">@ Madison East High School</span></div>
     </div>
   </div>
@@ -145,104 +166,52 @@ a:hover { color: var(--primary-dark); }
 <section class="pk-section">
   <h2>Tonight</h2>
   <div class="pk-list"><div class="pk-card">
-  <div class="pk-emoji">🎵</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://isthmus.com/events/open-mic-locker-room/?occ_dtstart=2026-04-07T18:30" target="_blank" rel="noopener">Open Mic with Sam Sturtevant</a></div>
-    <div class="pk-meta"><span class="pk-time">6:30 PM</span><span class="pk-venue">@ Locker Room Sports Bar</span></div>
-    <p class="pk-desc">6:30 pm Tuesdays, Locker Room. Free.</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🤝</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/wisconsin-book-festival-presents-nnedi-okorafor-death-author-63761" target="_blank" rel="noopener">Wisconsin Book Festival Presents Nnedi Okorafor for Death Of The Author</a></div>
-    <div class="pk-meta"><span class="pk-time">7:00 PM</span><span class="pk-venue">@ Central Library</span><span class="pk-price">Free</span></div>
-    <p class="pk-desc">Disabled, disinclined to marry, and more interested in writing than a lucrative career in medicine or law, Zelu has always felt like the outcast of...</p>
-  </div>
-</div><div class="pk-card">
   <div class="pk-emoji">🍽️</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://isthmus.com/events/childrens-african-story-hour-university-apartments/?occ_dtstart=2026-04-07T17:30" target="_blank" rel="noopener">Children&#x27;s African Story Hour</a></div>
-    <div class="pk-meta"><span class="pk-time">5:30 PM</span><span class="pk-venue">@ Eagle Heights Community Center</span></div>
-    <p class="pk-desc">UW African Studies Program storybook reading, activities and food, 5:30 pm Tuesdays, through 5/12. Free.</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🍽️</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://www.visitmadison.com/event/april-in-paris-with-chef-evan-dannells/76319/" target="_blank" rel="noopener">April in Paris with Chef Evan Dannells</a></div>
-    <div class="pk-meta"><span class="pk-time">6:15 PM</span><span class="pk-venue">@ The Deliciouser</span><span class="pk-price">$135</span></div>
-    <p class="pk-desc">It’s April, and we’re returning to Paris.   This year’s April in Paris dinner brings together The Deliciouser and Chef Evan Dannells of Cadre for a...</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🎭</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://isthmus.com/events/madison-west-coast-swing-club-dancesport/?occ_dtstart=2026-04-07T18:15" target="_blank" rel="noopener">Madison West Coast Swing Club</a></div>
-    <div class="pk-meta"><span class="pk-time">6:15 PM</span><span class="pk-venue">@ Dancesport</span></div>
-    <p class="pk-desc">Lesson 6:15 pm, open dance, 7-9 pm Tuesdays. $10.</p>
-  </div>
-</div></div>
-</section>
-<section class="pk-section">
-  <h2>Next 7 Days</h2>
-  <div class="pk-day-group">
-  <h3>Tuesday</h3>
-  <div class="pk-list"><div class="pk-card">
-  <div class="pk-emoji">🎵</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://isthmus.com/events/open-mic-locker-room/?occ_dtstart=2026-04-07T18:30" target="_blank" rel="noopener">Open Mic with Sam Sturtevant</a></div>
-    <div class="pk-meta"><span class="pk-time">6:30 PM</span><span class="pk-venue">@ Locker Room Sports Bar</span></div>
-    <p class="pk-desc">6:30 pm Tuesdays, Locker Room. Free.</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🤝</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/meadowridge-anime-club-77481" target="_blank" rel="noopener">Meadowridge Anime Club</a></div>
-    <div class="pk-meta"><span class="pk-time">4:30 PM</span><span class="pk-venue">@ Meadowridge Library</span><span class="pk-price">Free</span></div>
-    <p class="pk-desc">Love anime or want to get into it? Watch an anime (title TBD), participate in an Asian snack tasting, play a game, or create a craft project. Check...</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🤝</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/wisconsin-book-festival-presents-nnedi-okorafor-death-author-63761" target="_blank" rel="noopener">Wisconsin Book Festival Presents Nnedi Okorafor for Death Of The Author</a></div>
-    <div class="pk-meta"><span class="pk-time">7:00 PM</span><span class="pk-venue">@ Central Library</span><span class="pk-price">Free</span></div>
-    <p class="pk-desc">Disabled, disinclined to marry, and more interested in writing than a lucrative career in medicine or law, Zelu has always felt like the outcast of...</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🎭</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://isthmus.com/events/fatemeh-fani/?occ_dtstart=2026-04-07T00:00" target="_blank" rel="noopener">Fatemeh Fani</a></div>
-    <div class="pk-meta"><span class="pk-time">12:00 AM</span><span class="pk-venue">@ UW Art Lofts</span></div>
-    <p class="pk-desc">&quot;رخ لى يروا (Dance of Defiance),&quot; master of fine arts degree qualifier exhibition, 4/7-12, Backspace Gallery (reception 5-8 pm, 4/10).</p>
-  </div>
-</div></div>
-</div><div class="pk-day-group">
-  <h3>Wednesday</h3>
-  <div class="pk-list"><div class="pk-card">
-  <div class="pk-emoji">🍽️</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/trivia-night-at-the-lone-girl-brewing-company-tickets-1979395829209" target="_blank" rel="noopener">Trivia Night at The Lone Girl Brewing Company</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/trivia-night-at-the-lone-girl-brewing-company-tickets-1979395829209" target="_blank" rel="noopener">Trivia Night at The Lone Girl Brewing Company</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Trivia%20Night%20at%20The%20Lone%20Girl%20Brewing%20Company&amp;dates=20260408T183000/20260408T203000&amp;ctz=America/Chicago&amp;location=The%20Lone%20Girl%20Brewing%20Company%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/trivia-night-at-the-lone-girl-brewing-company-tickets-1979395829209" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">6:30 PM</span><span class="pk-venue">@ The Lone Girl Brewing Company</span></div>
     <p class="pk-desc">Your Weekly Bar Trivia Challenge! Drink a beer, munch some food, and compete for glory &amp; prizes! FREE to play!</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">📚</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260408/9630e8a6-24e4-408c-9a73-4aff7c77b71f/public-talk-a-look-at-our-local-watersheds-on-madison-s-west-side" target="_blank" rel="noopener">Public Talk: A Look at Our Local Watersheds on Madison’s West Side</a></div>
+    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260408/9630e8a6-24e4-408c-9a73-4aff7c77b71f/public-talk-a-look-at-our-local-watersheds-on-madison-s-west-side" target="_blank" rel="noopener">Public Talk: A Look at Our Local Watersheds on Madison’s West Side</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Public%20Talk%3A%20A%20Look%20at%20Our%20Local%20Watersheds%20on%20Madison%E2%80%99s%20West%20Side&amp;dates=20260408T230000/20260409T010000&amp;ctz=America/Chicago&amp;location=Pope%20Farm%20Elementary%20School%2C%20Madison%2C%20WI&amp;details=https%3A//patch.com/wisconsin/madison-wi/calendar/event/20260408/9630e8a6-24e4-408c-9a73-4aff7c77b71f/public-talk-a-look-at-our-local-watersheds-on-madison-s-west-side" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">11:00 PM</span><span class="pk-venue">@ Pope Farm Elementary School</span><span class="pk-price">Free</span></div>
+    <p class="pk-desc">Most of us walk the trails at Pope Farm Conservancy without realizing we are standing on a major hydrological divide of three...</p>
+  </div>
+</div></div>
+</section>
+<section class="pk-section">
+  <h2>Next 7 Days</h2>
+  <div class="pk-day-group">
+  <h3>Wednesday</h3>
+  <div class="pk-list"><div class="pk-card">
+  <div class="pk-emoji">🍽️</div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/trivia-night-at-the-lone-girl-brewing-company-tickets-1979395829209" target="_blank" rel="noopener">Trivia Night at The Lone Girl Brewing Company</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Trivia%20Night%20at%20The%20Lone%20Girl%20Brewing%20Company&amp;dates=20260408T183000/20260408T203000&amp;ctz=America/Chicago&amp;location=The%20Lone%20Girl%20Brewing%20Company%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/trivia-night-at-the-lone-girl-brewing-company-tickets-1979395829209" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">6:30 PM</span><span class="pk-venue">@ The Lone Girl Brewing Company</span></div>
+    <p class="pk-desc">Your Weekly Bar Trivia Challenge! Drink a beer, munch some food, and compete for glory &amp; prizes! FREE to play!</p>
+  </div>
+</div><div class="pk-card">
+  <div class="pk-emoji">📚</div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260408/9630e8a6-24e4-408c-9a73-4aff7c77b71f/public-talk-a-look-at-our-local-watersheds-on-madison-s-west-side" target="_blank" rel="noopener">Public Talk: A Look at Our Local Watersheds on Madison’s West Side</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Public%20Talk%3A%20A%20Look%20at%20Our%20Local%20Watersheds%20on%20Madison%E2%80%99s%20West%20Side&amp;dates=20260408T230000/20260409T010000&amp;ctz=America/Chicago&amp;location=Pope%20Farm%20Elementary%20School%2C%20Madison%2C%20WI&amp;details=https%3A//patch.com/wisconsin/madison-wi/calendar/event/20260408/9630e8a6-24e4-408c-9a73-4aff7c77b71f/public-talk-a-look-at-our-local-watersheds-on-madison-s-west-side" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">11:00 PM</span><span class="pk-venue">@ Pope Farm Elementary School</span><span class="pk-price">Free</span></div>
     <p class="pk-desc">Most of us walk the trails at Pope Farm Conservancy without realizing we are standing on a major hydrological divide of three...</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🤝</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/learn-together-play-together-play-group-children-ages-0-3-who-are-dhh-54271" target="_blank" rel="noopener">Learn Together, Play Together, Play group for Children ages 0-3 who are DHH</a></div>
-    <div class="pk-meta"><span class="pk-time">10:00 AM</span><span class="pk-venue">@ Pinney Library</span><span class="pk-price">Free</span></div>
-    <p class="pk-desc">Wisconsin Sound Beginnings welcomes children ages 0-3 years old who are deaf or hard of hearing (DHH) and their parents/caregivers to join a story/...</p>
+    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/scrabble-library-51286" target="_blank" rel="noopener">Scrabble at the Library</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Scrabble%20at%20the%20Library&amp;dates=20260408T100000/20260408T120000&amp;ctz=America/Chicago&amp;location=Lakeview%20Library%2C%20Madison%2C%20WI&amp;details=https%3A//www.madisonpubliclibrary.org/spaces/events/scrabble-library-51286" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">10:00 AM</span><span class="pk-venue">@ Lakeview Library</span><span class="pk-price">Free</span></div>
+    <p class="pk-desc">Attention word lovers: exercise your brain by playing Scrabble with other adults!</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🤝</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/scrabble-library-51286" target="_blank" rel="noopener">Scrabble at the Library</a></div>
-    <div class="pk-meta"><span class="pk-time">10:00 AM</span><span class="pk-venue">@ Lakeview Library</span><span class="pk-price">Free</span></div>
-    <p class="pk-desc">Attention word lovers: exercise your brain by playing Scrabble with other adults!</p>
+    <div class="pk-title"><a href="https://www.madisonpubliclibrary.org/spaces/events/dream-bus-east-madison-community-center-77691" target="_blank" rel="noopener">Dream Bus at East Madison Community Center</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Dream%20Bus%20at%20East%20Madison%20Community%20Center&amp;dates=20260408T144500/20260408T164500&amp;ctz=America/Chicago&amp;location=Dream%20Bus%2C%20Madison%2C%20WI&amp;details=https%3A//www.madisonpubliclibrary.org/spaces/events/dream-bus-east-madison-community-center-77691" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">2:45 PM</span><span class="pk-venue">@ Dream Bus</span><span class="pk-price">Free</span></div>
+    <p class="pk-desc">Visit the Dream Bus to browse books and other library materials, place or pick up holds, and sign up for a library card.…</p>
   </div>
 </div></div>
 </div><div class="pk-day-group">
@@ -250,28 +219,28 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-list"><div class="pk-card">
   <div class="pk-emoji">🎵</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/jazz-cocktails-with-mr-chair-tickets-1982692771452" target="_blank" rel="noopener">Jazz &amp; Cocktails with Mr. Chair</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/jazz-cocktails-with-mr-chair-tickets-1982692771452" target="_blank" rel="noopener">Jazz &amp; Cocktails with Mr. Chair</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Jazz%20%26%20Cocktails%20with%20Mr.%20Chair&amp;dates=20260409T183000/20260409T203000&amp;ctz=America/Chicago&amp;location=Mansion%20Hill%20Inn%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/jazz-cocktails-with-mr-chair-tickets-1982692771452" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">6:30 PM</span><span class="pk-venue">@ Mansion Hill Inn</span></div>
     <p class="pk-desc">Join us for an evening of jazz with Mr. Chair</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🍽️</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/trivia-night-at-one-social-food-hall-tickets-1782594270449" target="_blank" rel="noopener">Trivia Night at One Social Food Hall</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/trivia-night-at-one-social-food-hall-tickets-1782594270449" target="_blank" rel="noopener">Trivia Night at One Social Food Hall</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Trivia%20Night%20at%20One%20Social%20Food%20Hall&amp;dates=20260409T183000/20260409T203000&amp;ctz=America/Chicago&amp;location=One%20Social%20Food%20Hall%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/trivia-night-at-one-social-food-hall-tickets-1782594270449" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">6:30 PM</span><span class="pk-venue">@ One Social Food Hall</span></div>
     <p class="pk-desc">Your Weekly Bar Trivia Challenge! Drink a beer, munch some food, and compete for glory &amp; prizes! FREE to play!</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">📚</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/science-literature-the-science-of-hope-tickets-1981596698067" target="_blank" rel="noopener">Science + Literature: The Science of Hope</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/science-literature-the-science-of-hope-tickets-1981596698067" target="_blank" rel="noopener">Science + Literature: The Science of Hope</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Science%20%2B%20Literature%3A%20The%20Science%20of%20Hope&amp;dates=20260409T190000/20260409T210000&amp;ctz=America/Chicago&amp;location=Madison%20Public%20Library%20-%20Central%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/science-literature-the-science-of-hope-tickets-1981596698067" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">7:00 PM</span><span class="pk-venue">@ Madison Public Library - Central</span></div>
     <p class="pk-desc">Featuring Science + Literature–honored author Kimberly Blaeser in conversation with Sean Hill</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🤝</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260409/3bd344d0-5e50-407e-a74b-fcf64dedf26d/protest-songs-w-dennis-leise" target="_blank" rel="noopener">Protest Songs w/ Dennis Leise</a></div>
+    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260409/3bd344d0-5e50-407e-a74b-fcf64dedf26d/protest-songs-w-dennis-leise" target="_blank" rel="noopener">Protest Songs w/ Dennis Leise</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Protest%20Songs%20w/%20Dennis%20Leise&amp;dates=20260409T230000/20260410T010000&amp;ctz=America/Chicago&amp;location=Minocqua%20Brewing%20Company%C2%A02927%20East%20Washington%20Avenue%C2%A0Madison%2C%20WI%2053704%2C%20Madison%2C%20WI&amp;details=https%3A//patch.com/wisconsin/madison-wi/calendar/event/20260409/3bd344d0-5e50-407e-a74b-fcf64dedf26d/protest-songs-w-dennis-leise" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">11:00 PM</span><span class="pk-venue">@ Minocqua Brewing Company 2927 East Washington Avenue Madison, WI 53704</span><span class="pk-price">Free</span></div>
     <p class="pk-desc">Dennis hails originally from Western PA, but for the last 25 years has called the Chicago area his home. He carries the baggage...</p>
   </div>
@@ -281,31 +250,30 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-list"><div class="pk-card">
   <div class="pk-emoji">🎵</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/rsvp-for-friday-fish-fry-tickets-1962565700842" target="_blank" rel="noopener">RSVP for Friday Fish Fry</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/rsvp-for-friday-fish-fry-tickets-1962565700842" target="_blank" rel="noopener">RSVP for Friday Fish Fry</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=RSVP%20for%20Friday%20Fish%20Fry&amp;dates=20260410T150000/20260410T170000&amp;ctz=America/Chicago&amp;location=The%20Rigby%20Pub%2C%20Grill%2C%20and%20Event%20Space%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/rsvp-for-friday-fish-fry-tickets-1962565700842" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">3:00 PM</span><span class="pk-venue">@ The Rigby Pub, Grill, and Event Space</span></div>
     <p class="pk-desc">Join us Friday&#x27;s for drink specials, live music, and of course our fish fry and regular menu available until 10pm!</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🎭</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260410/20a8f0bb-c887-438e-ab90-f1ab2c87490b/adult-swim-green-vibes-only" target="_blank" rel="noopener">Adult Swim: Green Vibes Only</a></div>
-    <div class="pk-meta"><span class="pk-time">9:30 PM</span><span class="pk-venue">@ Madison Children&#x27;s Museum, 100 N Hamilton St, Madison, WI 53703-2116</span><span class="pk-price">Free</span></div>
-    <p class="pk-desc">Can you dig it? Groove out at Adult Swim: Green Vibes Only!
- Get down (to earth) with a far-out night of eco-friendly fun! Get...</p>
-  </div>
-</div><div class="pk-card">
-  <div class="pk-emoji">🎭</div>
-  <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/line-breaks-festival-performance-showcases-tickets-1983568426560" target="_blank" rel="noopener">Line Breaks Festival Performance Showcases</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/line-breaks-festival-performance-showcases-tickets-1983568426560" target="_blank" rel="noopener">Line Breaks Festival Performance Showcases</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Line%20Breaks%20Festival%20Performance%20Showcases&amp;dates=20260410/20260411&amp;location=Overture%20Center%20for%20the%20Arts%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/line-breaks-festival-performance-showcases-tickets-1983568426560" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-venue">@ Overture Center for the Arts</span></div>
     <p class="pk-desc">Join us for a two nights of back-to-back performance showcases presented by the Office of Multicultural Arts Initiatives (OMAI)</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🎭</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/shifting-ground-opening-reception-tickets-1984417851212" target="_blank" rel="noopener">Shifting Ground opening reception</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/shifting-ground-opening-reception-tickets-1984417851212" target="_blank" rel="noopener">Shifting Ground opening reception</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Shifting%20Ground%20opening%20reception&amp;dates=20260410T170000/20260410T190000&amp;ctz=America/Chicago&amp;location=221%20King%20St%20suite%20102%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/shifting-ground-opening-reception-tickets-1984417851212" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">5:00 PM</span><span class="pk-venue">@ 221 King St suite 102</span></div>
     <p class="pk-desc">This exhibition features works by Madison artist Peg Orcutt.</p>
+  </div>
+</div><div class="pk-card">
+  <div class="pk-emoji"></div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/blade-rave-madison-tickets-1984517338782" target="_blank" rel="noopener">Blade Rave - MADISON</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Blade%20Rave%20-%20MADISON&amp;dates=20260410T203000/20260410T223000&amp;ctz=America/Chicago&amp;location=The%20Annex%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/blade-rave-madison-tickets-1984517338782" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">8:30 PM</span><span class="pk-venue">@ The Annex</span></div>
+    <p class="pk-desc">Blade Rave at The Annex!</p>
   </div>
 </div></div>
 </div><div class="pk-day-group">
@@ -313,28 +281,28 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-list"><div class="pk-card">
   <div class="pk-emoji">🍽️</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/heated-rivalry-drag-brunch-tickets-1981937944745" target="_blank" rel="noopener">Heated Rivalry Drag Brunch</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/heated-rivalry-drag-brunch-tickets-1981937944745" target="_blank" rel="noopener">Heated Rivalry Drag Brunch</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Heated%20Rivalry%20Drag%20Brunch&amp;dates=20260411T110000/20260411T130000&amp;ctz=America/Chicago&amp;location=Graduate%20by%20Hilton%20Madison%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/heated-rivalry-drag-brunch-tickets-1981937944745" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">11:00 AM</span><span class="pk-venue">@ Graduate by Hilton Madison</span></div>
     <p class="pk-desc">Lace up, line up, and sashay! Heated Rivalry drag performances, bingo battles, and a power-play brunch buffet at Graduate by Hilton Madison.</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">⚽</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/isthmus-city-fc-card-show-tickets-1986624124234" target="_blank" rel="noopener">ISTHMUS CITY FC CARD SHOW</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/isthmus-city-fc-card-show-tickets-1986624124234" target="_blank" rel="noopener">ISTHMUS CITY FC CARD SHOW</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=ISTHMUS%20CITY%20FC%20CARD%20SHOW&amp;dates=20260411T100000/20260411T120000&amp;ctz=America/Chicago&amp;location=Madison%20East%20High%20School%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/isthmus-city-fc-card-show-tickets-1986624124234" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">10:00 AM</span><span class="pk-venue">@ Madison East High School</span></div>
     <p class="pk-desc">Open to all TCG Card Vendors &amp; TCG Adjacent Vendors | Food Trucks &amp; Raffles | Soccer Related Activities</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🎭</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/night-walk-sky-dance-registration-1981453427541" target="_blank" rel="noopener">Night Walk: Sky Dance</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/night-walk-sky-dance-registration-1981453427541" target="_blank" rel="noopener">Night Walk: Sky Dance</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Night%20Walk%3A%20Sky%20Dance&amp;dates=20260411T190000/20260411T210000&amp;ctz=America/Chicago&amp;location=University%20of%20Wisconsin-Madison%20Arboretum%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/night-walk-sky-dance-registration-1981453427541" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">7:00 PM</span><span class="pk-venue">@ University of Wisconsin-Madison Arboretum</span></div>
     <p class="pk-desc">Listen for frogs and other night animals, like woodcocks. We may even see the woodcock’s mating ritual known as “sky dance.”</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🤝</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260411/fe3b08c2-bd0e-4e4d-81d2-be4781673968/tartan-day-cilidh-2026" target="_blank" rel="noopener">Tartan Day Cèilidh! 2026</a></div>
+    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260411/fe3b08c2-bd0e-4e4d-81d2-be4781673968/tartan-day-cilidh-2026" target="_blank" rel="noopener">Tartan Day Cèilidh! 2026</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Tartan%20Day%20C%C3%A8ilidh%21%202026&amp;dates=20260411T230000/20260412T010000&amp;ctz=America/Chicago&amp;location=Four%20Winds%20Farm%2C%20Madison%2C%20WI&amp;details=https%3A//patch.com/wisconsin/madison-wi/calendar/event/20260411/fe3b08c2-bd0e-4e4d-81d2-be4781673968/tartan-day-cilidh-2026" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">11:00 PM</span><span class="pk-venue">@ Four Winds Farm</span><span class="pk-price">Free</span></div>
     <p class="pk-desc">A Cèilidh (pronounced KAY-lee) is a traditional Scottish social gathering full of lively music, dancing, and fun—think of it...</p>
   </div>
@@ -344,7 +312,7 @@ a:hover { color: var(--primary-dark); }
   <div class="pk-list"><div class="pk-card">
   <div class="pk-emoji">🍽️</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260412/e095ecc7-b30c-4da8-8f82-4a614663111d/beer-bubbles-ballet" target="_blank" rel="noopener">Beer, Bubbles, BALLET!</a></div>
+    <div class="pk-title"><a href="https://patch.com/wisconsin/madison-wi/calendar/event/20260412/e095ecc7-b30c-4da8-8f82-4a614663111d/beer-bubbles-ballet" target="_blank" rel="noopener">Beer, Bubbles, BALLET!</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Beer%2C%20Bubbles%2C%20BALLET%21&amp;dates=20260412T180000/20260412T200000&amp;ctz=America/Chicago&amp;location=Central%20Midwest%20Ballet%20Academy%2C%20Madison%2C%20WI&amp;details=https%3A//patch.com/wisconsin/madison-wi/calendar/event/20260412/e095ecc7-b30c-4da8-8f82-4a614663111d/beer-bubbles-ballet" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">6:00 PM</span><span class="pk-venue">@ Central Midwest Ballet Academy</span><span class="pk-price">Free</span></div>
     <p class="pk-desc">Have you ever wanted to try ballet? Do it the fun way!
 A short ballet class complete with Karben4 beer, wine, and prosecco for...</p>
@@ -352,16 +320,49 @@ A short ballet class complete with Karben4 beer, wine, and prosecco for...</p>
 </div><div class="pk-card">
   <div class="pk-emoji">🤣</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/over-under-quintet-tickets-1984579393389" target="_blank" rel="noopener">Over Under Quintet</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/over-under-quintet-tickets-1984579393389" target="_blank" rel="noopener">Over Under Quintet</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Over%20Under%20Quintet&amp;dates=20260412T150000/20260412T170000&amp;ctz=America/Chicago&amp;location=The%20North%20Street%20Cabaret%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/over-under-quintet-tickets-1984579393389" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">3:00 PM</span><span class="pk-venue">@ The North Street Cabaret</span></div>
     <p class="pk-desc">Originally from Detroit, Michael Hudson-Casanova is a multi-instrumentalist, composer, improviser, and educator</p>
   </div>
 </div><div class="pk-card">
   <div class="pk-emoji">🎭</div>
   <div class="pk-info">
-    <div class="pk-title"><a href="https://www.eventbrite.com/e/play-date-at-jump-around-gymnastics-tickets-1985560005426" target="_blank" rel="noopener">Play Date at Jump Around Gymnastics</a></div>
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/play-date-at-jump-around-gymnastics-tickets-1985560005426" target="_blank" rel="noopener">Play Date at Jump Around Gymnastics</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Play%20Date%20at%20Jump%20Around%20Gymnastics&amp;dates=20260412T090000/20260412T110000&amp;ctz=America/Chicago&amp;location=Jump%20Around%20Gymnastics%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/play-date-at-jump-around-gymnastics-tickets-1985560005426" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
     <div class="pk-meta"><span class="pk-time">9:00 AM</span><span class="pk-venue">@ Jump Around Gymnastics</span></div>
     <p class="pk-desc">Join us for a fun Sunday playdate for moms &amp; littles! ☀️</p>
+  </div>
+</div></div>
+</div><div class="pk-day-group">
+  <h3>Tuesday</h3>
+  <div class="pk-list"><div class="pk-card">
+  <div class="pk-emoji">🎵</div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/lone-pinon-sugar-maple-concert-series-tickets-1979658367468" target="_blank" rel="noopener">Lone Piñon - Sugar Maple Concert Series</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Lone%20Pi%C3%B1on%20-%20Sugar%20Maple%20Concert%20Series&amp;dates=20260414T190000/20260414T210000&amp;ctz=America/Chicago&amp;location=The%20North%20Street%20Cabaret%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/lone-pinon-sugar-maple-concert-series-tickets-1979658367468" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">7:00 PM</span><span class="pk-venue">@ The North Street Cabaret</span></div>
+    <p class="pk-desc">Lone Piñon comes to North Street Cabaret</p>
+  </div>
+</div><div class="pk-card">
+  <div class="pk-emoji"></div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/2026-madison-spring-tech-kickoff-registration-1984650313513" target="_blank" rel="noopener">2026 Madison Spring Tech Kickoff</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=2026%20Madison%20Spring%20Tech%20Kickoff&amp;dates=20260414T170000/20260414T190000&amp;ctz=America/Chicago&amp;location=Recovery.com%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/2026-madison-spring-tech-kickoff-registration-1984650313513" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">5:00 PM</span><span class="pk-venue">@ Recovery.com</span></div>
+    <p class="pk-desc">Madison&#x27;s Spring Tech Kickoff
+Tuesday, April 14th, 5:00 p.m. - 7:00 p.m.
+Recovery.com Office</p>
+  </div>
+</div><div class="pk-card">
+  <div class="pk-emoji"></div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/data-centers-a-sustainable-future-tickets-1984577479665" target="_blank" rel="noopener">Data Centers &amp; a Sustainable Future</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=Data%20Centers%20%26%20a%20Sustainable%20Future&amp;dates=20260414T080000/20260414T100000&amp;ctz=America/Chicago&amp;location=821%20E%20Washington%20Ave%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/data-centers-a-sustainable-future-tickets-1984577479665" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">8:00 AM</span><span class="pk-venue">@ 821 E Washington Ave</span></div>
+    <p class="pk-desc">Join us for our April Sustainable Breakfast Series as we explore data centers.</p>
+  </div>
+</div><div class="pk-card">
+  <div class="pk-emoji">📚</div>
+  <div class="pk-info">
+    <div class="pk-title"><a href="https://www.eventbrite.com/e/2026-wisconsin-collaborative-clinical-research-professionals-conference-tickets-1977313906121" target="_blank" rel="noopener">2026 Wisconsin Collaborative Clinical Research Professionals Conference</a><a class="pk-cal" href="https://www.google.com/calendar/render?action=TEMPLATE&amp;text=2026%20Wisconsin%20Collaborative%20Clinical%20Research%20Professionals%20Conference&amp;dates=20260414T090000/20260414T110000&amp;ctz=America/Chicago&amp;location=Madison%20Public%20Library%20-%20Central%2C%20Madison%2C%20WI&amp;details=https%3A//www.eventbrite.com/e/2026-wisconsin-collaborative-clinical-research-professionals-conference-tickets-1977313906121" target="_blank" rel="noopener" title="Add to Google Calendar">+cal</a></div>
+    <div class="pk-meta"><span class="pk-time">9:00 AM</span><span class="pk-venue">@ Madison Public Library - Central</span></div>
+    <p class="pk-desc">Voices of Clinical Research: The Participants, Researchers, and Partners who Move Medicine Forward.</p>
   </div>
 </div></div>
 </div>
@@ -369,8 +370,12 @@ A short ballet class complete with Karben4 beer, wine, and prosecco for...</p>
 </div>
 
 <footer class="pk-footer">
-  <p>Updated April 7 at 8:34 AM</p>
+  <p>Updated April 8 at 3:03 AM</p>
   <p><a href="https://msndo.com">Browse all events</a></p>
+  <div class="pk-subscribe">
+    <a class="pk-sub-btn" href="webcal://msndo.com/feeds/events.ics">Subscribe to Calendar</a>
+    <a class="pk-sub-link" href="https://www.google.com/calendar/render?cid=webcal%3A%2F%2Fmsndo.com%2Ffeeds%2Fevents.ics">Add to Google Calendar</a>
+  </div>
   <a class="pk-share" href="https://msndo.com/picks/">Share this page</a>
 </footer>
 </body>
