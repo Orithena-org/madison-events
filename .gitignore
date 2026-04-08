@@ -1,3 +1,6 @@
+output/site/
+!output/site/feeds/
+!output/site/picks/
 output/logs/
 data/events.json
 data/discord_posted.json

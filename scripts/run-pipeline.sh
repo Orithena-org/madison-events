@@ -18,6 +18,16 @@ fi
 
 AGENT_ROOT="$(cd "$MADISON_ROOT/../agent-01" && pwd)"
 ORG_ROOT="$(cd "$MADISON_ROOT/../orithena-org" && pwd)"
+
+# --- Branch guard: must be on main before any writes ---
+cd "$MADISON_ROOT"
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$current_branch" != "main" ]]; then
+    echo "[deploy] WARNING: was on branch '$current_branch', switching to main"
+    git checkout main
+    git pull origin main
+fi
+
 cd "$ORG_ROOT"
 python3 -u -m content.pipeline --domain madison_events
 
@@ -37,15 +47,6 @@ fi
 
 # --- Deploy: commit and push site output if changed ---
 cd "$MADISON_ROOT"
-
-# Ensure we're on main — if a Scout branch was left checked out, commits
-# would go to the wrong branch and the push would silently push stale data.
-current_branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ "$current_branch" != "main" ]]; then
-    echo "[deploy] WARNING: was on branch '$current_branch', switching to main"
-    git checkout main
-    git pull origin main
-fi
 
 if ! git diff --quiet output/ 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard output/)" ]; then
     git add output/data/ output/site/
