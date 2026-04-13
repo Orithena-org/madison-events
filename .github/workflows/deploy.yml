@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'output/data/events.json'
+      - 'output/site/feeds/**'
+      - 'output/site/picks/**'
       - 'build.py'
       - 'website/templates/**'
       - 'website/static/**'
