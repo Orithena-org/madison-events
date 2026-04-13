@@ -211,7 +211,7 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
         events = [e for e in events if e.category == category]
 
     # Only include future/today events
-    today = date.today()
+    today = datetime.now(MADISON_TZ).date()
     events = [e for e in events if isinstance(e["date"], date) and e["date"] >= today]
 
     lines = [
@@ -464,7 +464,7 @@ def build() -> None:
 
     temporal_slugs: list[str] = []
     if temporal_tmpl:
-        today = date.today()
+        today = datetime.now(MADISON_TZ).date()
         # Calculate date ranges
         weekday = today.weekday()  # Monday=0 ... Sunday=6
         week_end = today + timedelta(days=(6 - weekday))  # end of this week (Sunday)
@@ -566,7 +566,7 @@ def build() -> None:
         highlights_tmpl = None
 
     if highlights_tmpl:
-        today = today if 'today' in dir() else date.today()
+        today = today if 'today' in dir() else datetime.now(MADISON_TZ).date()
         weekday = today.weekday()
         week_end = today + timedelta(days=(6 - weekday))
         week_events = [e for e in events
@@ -665,7 +665,7 @@ def build() -> None:
     for slug in category_slugs:
         indexnow_urls.append(f"{site_url}/category/{slug}/")
     # Include upcoming event detail pages
-    today_date = date.today()
+    today_date = datetime.now(MADISON_TZ).date()
     for event in events:
         if isinstance(event["date"], date) and event["date"] >= today_date:
             indexnow_urls.append(f"{site_url}/{event.detail_url}")
