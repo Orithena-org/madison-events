@@ -273,11 +273,17 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
 def build() -> None:
     """Build the msndo static site from JSON data."""
     data = _load_data()
-    events = [_wrap(e) for e in data["events"]]
+    all_events = [_wrap(e) for e in data["events"]]
     editors_picks = [AttrDict({"event": _wrap(p["event"]), "commentary": p["commentary"]})
                      for p in data.get("editors_picks", [])]
 
-    print(f"Building site from {len(events)} events...")
+    # Split into upcoming (today or future) and all events.
+    # Listings/feeds show only upcoming; detail pages exist for all (preserving URLs).
+    today = date.today()
+    events = [e for e in all_events
+              if isinstance(e["date"], date) and e["date"] >= today]
+    past_count = len(all_events) - len(events)
+    print(f"Building site from {len(events)} upcoming events ({past_count} past events excluded from listings)...")
 
     # Prepare output directory
     if SITE_DIR.exists():
@@ -402,7 +408,7 @@ def build() -> None:
     if detail_tmpl:
         events_dir = SITE_DIR / "events"
         events_dir.mkdir(exist_ok=True)
-        for event in events:
+        for event in all_events:
             same_day = [e for e in events
                         if e["date"] == event["date"] and e.title != event.title][:4]
             event_dir = events_dir / event.url_slug
@@ -410,7 +416,7 @@ def build() -> None:
             html = detail_tmpl.render(event=event, related_events=same_day,
                                       **common_context)
             (event_dir / "index.html").write_text(html, encoding="utf-8")
-        print(f"  Built {len(events)} event detail pages")
+        print(f"  Built {len(all_events)} event detail pages ({past_count} past)")
 
     # Category landing pages
     try:
@@ -620,9 +626,9 @@ def build() -> None:
         rss_count += 1
     print(f"  Built {rss_count} RSS feeds")
 
-    # Sitemap (include category + temporal pages)
+    # Sitemap (include category + temporal pages; all events for detail page URLs)
     category_slugs = [re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-') for c in categories]
-    sitemap_xml = _generate_sitemap(events, site_url, category_slugs, temporal_slugs)
+    sitemap_xml = _generate_sitemap(all_events, site_url, category_slugs, temporal_slugs)
     (SITE_DIR / "sitemap.xml").write_text(sitemap_xml, encoding="utf-8")
 
     # robots.txt
