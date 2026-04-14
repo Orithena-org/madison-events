@@ -340,7 +340,7 @@
             <div class="related-grid">
                 {% for rel in related_events %}
                 <div class="related-card">
-                    <h4><a href="../{{ rel.slug }}/">{{ rel.title }}</a></h4>
+                    <h4><a href="../{{ rel.url_slug }}/">{{ rel.title }}</a></h4>
                     <div class="related-meta">
                         {{ rel.time_display }}{% if rel.venue %} | {{ rel.venue }}{% endif %}
                     </div>
