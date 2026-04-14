@@ -301,6 +301,7 @@ def build() -> None:
     goatcounter_site = "georgeauto"
 
     events_by_date = _group_events_by_date(events)
+    community_events = [e for e in events if e.category == "Community"]
     categories = sorted(set(e.category for e in events if e.category))
     sources = {e.source: e.source_display for e in events if e.source}
 
@@ -363,7 +364,7 @@ def build() -> None:
     # Render main templates
     template_renders = [
         ("landing.html", "landing.html", {"editors_picks": editors_picks}),
-        ("index.html", "index.html", {"events_by_date": events_by_date}),
+        ("index.html", "index.html", {"events_by_date": events_by_date, "community_events": community_events}),
         ("newsletter_page.html", "newsletter.html", {"newsletter_preview": ""}),
         ("sponsors.html", "sponsors.html", {
             "sponsor_tiers": sponsor_tiers,
