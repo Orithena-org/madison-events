@@ -25,8 +25,9 @@ current_branch=$(git rev-parse --abbrev-ref HEAD)
 if [[ "$current_branch" != "main" ]]; then
     echo "[deploy] WARNING: was on branch '$current_branch', switching to main"
     git checkout main
-    git pull origin main
 fi
+# Pull latest — tolerate network failures so the pipeline still runs with local state
+git pull origin main 2>/dev/null || echo "[deploy] WARNING: git pull failed (network?), continuing with local main"
 
 cd "$ORG_ROOT"
 python3 -u -m content.pipeline --domain madison_events
@@ -51,11 +52,13 @@ cd "$MADISON_ROOT"
 if ! git diff --quiet output/ 2>/dev/null || [ -n "$(git ls-files --others --exclude-standard output/)" ]; then
     git add output/data/ output/site/
     git commit -m "chore(site): update generated site output $(date +%Y-%m-%d)"
-    git push origin main
-    echo "[deploy] Site output committed and pushed."
-
-    # Notify search engines about the update
-    python3 "$MADISON_ROOT/scripts/notify_search_engines.py" || true
+    if git push origin main; then
+        echo "[deploy] Site output committed and pushed."
+        # Notify search engines about the update
+        python3 "$MADISON_ROOT/scripts/notify_search_engines.py" || true
+    else
+        echo "[deploy] WARNING: git push failed (network?), commit is local — will push on next run"
+    fi
 else
     echo "[deploy] No site changes to commit."
 fi
