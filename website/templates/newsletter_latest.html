@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This Week's Newsletter - {{ site_title }}</title>
+    <meta name="description" content="This week's curated guide to the best events in Madison, WI. Editor's picks, weekend spotlight, and more.">
+    <meta property="og:title" content="{{ site_title }} Weekly Newsletter">
+    <meta property="og:description" content="This week's curated guide to the best events happening in Madison, WI.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ site_url }}/newsletter/latest/">
+    <meta property="og:site_name" content="{{ site_title }}">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="{{ site_url }}/newsletter/latest/">
+    <link rel="alternate" type="application/rss+xml" title="{{ site_title }} RSS" href="{{ site_url }}/feed.xml">
+    <link rel="stylesheet" href="../../static/css/style.css">
+    <style>
+        .newsletter-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border, #333);
+        }
+        .newsletter-cta {
+            text-align: center;
+            padding: 32px 24px;
+            background: var(--surface, #1a1a2e);
+            border: 1px solid var(--border, #333);
+            border-radius: 12px;
+            margin-top: 32px;
+        }
+        .newsletter-cta h3 { margin: 0 0 8px; font-size: 1.2em; }
+        .newsletter-cta p { color: var(--text-muted, #888); margin: 0 0 16px; font-size: 14px; }
+        .newsletter-cta .cta-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: var(--accent, #4a9eff);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .newsletter-cta .cta-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1><a href="../../">{{ site_title }}</a></h1>
+            <p class="tagline">This Week's Newsletter</p>
+            <nav class="main-nav">
+                <a href="../../">All Events</a>
+                <a href="../../newsletter.html">Subscribe</a>
+                <a href="../../highlights/">Highlights</a>
+                <a href="../../sponsors.html">Sponsors</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-content">
+        {% if newsletter_html %}
+        <div class="newsletter-container">
+            {{ newsletter_html }}
+        </div>
+
+        <div class="newsletter-cta">
+            <h3>Get this in your inbox every week</h3>
+            <p>Subscribe free and never miss the best events in Madison.</p>
+            <a href="../../newsletter.html" class="cta-btn">Subscribe Now</a>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted, #888); padding: 48px 0;">
+            No newsletter available yet. Check back soon!
+        </p>
+        {% endif %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_title }}. Built by Orithena.</p>
+        </div>
+    </footer>
+    {% if goatcounter_site %}
+    <script data-goatcounter="https://{{ goatcounter_site }}.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    {% endif %}
+</body>
+</html>
