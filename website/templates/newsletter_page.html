@@ -60,6 +60,14 @@
         .newsletter-hero { text-align: center; margin-bottom: 32px; }
         .newsletter-hero h2 { font-size: 1.8em; margin-bottom: 8px; }
         .newsletter-hero p { color: var(--text-muted, #888); font-size: 1.1em; max-width: 600px; margin: 0 auto; }
+        .newsletter-preview-frame {
+            max-width: 640px;
+            margin: 0 auto;
+            border: 1px solid var(--border, #333);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
     </style>
 </head>
 <body>
@@ -118,6 +126,16 @@
                 <a href="https://feedly.com/i/subscription/feed/{{ site_url }}/feed.xml" target="_blank" rel="noopener" class="subscribe-btn-outline">Add to Feedly</a>
             </div>
         </div>
+
+        {% if newsletter_preview %}
+        <section style="margin-top: 48px;">
+            <h2 style="text-align: center; font-size: 1.4em; margin-bottom: 8px;">This Week's Newsletter</h2>
+            <p style="text-align: center; color: var(--text-muted, #888); font-size: 14px; margin-bottom: 24px;">Here's what subscribers get every week.</p>
+            <div class="newsletter-preview-frame">
+                {{ newsletter_preview }}
+            </div>
+        </section>
+        {% endif %}
     </main>
 
     <footer class="site-footer">

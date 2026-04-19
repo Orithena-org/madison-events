@@ -158,6 +158,7 @@ def _generate_sitemap(events: list[AttrDict], site_url: str,
         (f"{site_url}/", "daily", "1.0"),
         (f"{site_url}/index.html", "daily", "0.9"),
         (f"{site_url}/search/", "daily", "0.7"),
+        (f"{site_url}/newsletter/latest/", "weekly", "0.8"),
         (f"{site_url}/embed.html", "monthly", "0.5"),
     ]
     # Temporal pages get high priority — they target high-intent search queries
@@ -364,7 +365,7 @@ def build() -> None:
     template_renders = [
         ("landing.html", "landing.html", {"editors_picks": editors_picks}),
         ("index.html", "index.html", {"events_by_date": events_by_date}),
-        ("newsletter_page.html", "newsletter.html", {"newsletter_preview": ""}),
+        ("newsletter_page.html", "newsletter.html", {"newsletter_preview": data.get("newsletter_html", "")}),
         ("sponsors.html", "sponsors.html", {
             "sponsor_tiers": sponsor_tiers,
             "ad_slots": ad_slots,
@@ -390,6 +391,18 @@ def build() -> None:
         html = search_tmpl.render(**common_context)
         (search_dir / "index.html").write_text(html, encoding="utf-8")
         print("  Wrote search/index.html")
+    except TemplateNotFound:
+        pass
+
+    # Newsletter latest page (/newsletter/latest/)
+    newsletter_html = data.get("newsletter_html", "")
+    try:
+        nl_tmpl = env.get_template("newsletter_latest.html")
+        nl_dir = SITE_DIR / "newsletter" / "latest"
+        nl_dir.mkdir(parents=True, exist_ok=True)
+        html = nl_tmpl.render(newsletter_html=newsletter_html, **common_context)
+        (nl_dir / "index.html").write_text(html, encoding="utf-8")
+        print("  Wrote newsletter/latest/index.html")
     except TemplateNotFound:
         pass
 
