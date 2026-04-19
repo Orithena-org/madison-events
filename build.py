@@ -688,6 +688,7 @@ def build() -> None:
     for event in events:
         if isinstance(event["date"], date) and event["date"] >= today_date:
             indexnow_urls.append(f"{site_url}/{event.detail_url}")
+    indexnow_urls.append(f"{site_url}/newsletter/latest/")
     from urllib.parse import urlparse
     indexnow_data = {
         "host": urlparse(site_url).hostname,
