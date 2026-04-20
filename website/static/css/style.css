@@ -485,6 +485,110 @@ a:hover { color: var(--primary-dark); }
 .beehiiv-fallback a { font-weight: 600; }
 .sidebar-widget .beehiiv-wrapper { max-width: 100%; }
 
+/* Week Picks hero */
+.week-picks {
+    margin-bottom: 32px;
+}
+.wp-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+.wp-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+.wp-see-all {
+    font-size: 14px;
+    color: var(--primary);
+    font-weight: 600;
+}
+.wp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+.wp-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.wp-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+.wp-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.wp-image {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+}
+.wp-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.wp-image-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.wp-fallback-icon {
+    font-size: 48px;
+    line-height: 1;
+}
+.wp-info {
+    padding: 14px 16px;
+}
+.wp-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
+.wp-info h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    line-height: 1.3;
+}
+.wp-card-link:hover h3 {
+    color: var(--primary);
+}
+.wp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.wp-meta span::after { content: " \00b7"; }
+.wp-meta span:last-child::after { content: ""; }
+.wp-commentary {
+    font-size: 13px;
+    color: var(--primary-dark);
+    font-style: italic;
+    margin: 0;
+    line-height: 1.4;
+}
+.wp-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
 /* Find Your People section */
 .find-your-people {
     margin-bottom: 32px;
@@ -550,6 +654,9 @@ a:hover { color: var(--primary-dark); }
 }
 
 /* Responsive */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .wp-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 768px) {
     .page-layout {
         grid-template-columns: 1fr;
@@ -558,6 +665,8 @@ a:hover { color: var(--primary-dark); }
         flex-direction: column;
         align-items: flex-start;
     }
+    .wp-grid { grid-template-columns: 1fr; }
+    .wp-image { height: 180px; }
     .event-content { flex-direction: column; }
     .event-image { width: 100%; height: 160px; }
     .calendar-grid { grid-template-columns: repeat(2, 1fr); }

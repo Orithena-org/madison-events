@@ -80,6 +80,50 @@
                 <span>Updated: {{ last_updated }}</span>
             </div>
 
+            {% if week_picks %}
+            <!-- Week Picks Hero -->
+            <section class="week-picks">
+                <div class="wp-header">
+                    <h2>This Week's Picks</h2>
+                    <a href="./highlights/" class="wp-see-all">All highlights &rarr;</a>
+                </div>
+                <div class="wp-grid">
+                    {% for pick in week_picks %}
+                    <article class="wp-card">
+                        <a href="{{ pick.event.detail_url }}" class="wp-card-link">
+                            {% if pick.event.image_url %}
+                            <div class="wp-image">
+                                <img src="{{ pick.event.image_url }}" alt="{{ pick.event.title }}" loading="lazy">
+                            </div>
+                            {% else %}
+                            {% set cat_icon = category_icons.get(pick.event.category, default_category_icon) %}
+                            <div class="wp-image wp-image-fallback" style="background: linear-gradient(135deg, {{ cat_icon.color }}20, {{ cat_icon.color }}40);">
+                                <span class="wp-fallback-icon" style="color: {{ cat_icon.color }};">{{ cat_icon.icon }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="wp-info">
+                                {% if pick.event.category %}
+                                {% set cat_icon = category_icons.get(pick.event.category, default_category_icon) %}
+                                <span class="wp-category" style="background: {{ cat_icon.color }}15; color: {{ cat_icon.color }};">{{ pick.event.category }}</span>
+                                {% endif %}
+                                <h3>{{ pick.event.title }}</h3>
+                                <div class="wp-meta">
+                                    <span>{{ pick.event.date_display }}</span>
+                                    {% if pick.event.venue %}<span>{{ pick.event.venue }}</span>{% endif %}
+                                </div>
+                                {% if pick.commentary %}
+                                <p class="wp-commentary">{{ pick.commentary }}</p>
+                                {% elif pick.event.description %}
+                                <p class="wp-desc">{{ pick.event.description[:100] }}{% if pick.event.description|length > 100 %}...{% endif %}</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
             {% if community_events %}
             <!-- Find Your People section -->
             <section class="find-your-people" id="find-your-people">

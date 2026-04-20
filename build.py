@@ -270,6 +270,51 @@ def _generate_ical(events: list[AttrDict], cal_name: str, site_url: str,
     return "\r\n".join(lines)
 
 
+def _select_week_picks(events: list[AttrDict],
+                       editors_picks: list[AttrDict]) -> list[AttrDict]:
+    """Select up to 6 featured events for the hero section.
+
+    Prioritizes editors picks (which have commentary), then fills with
+    upcoming events that have images, diversifying by category.
+    """
+    today = date.today()
+    window_end = today + timedelta(days=7)
+    upcoming = [e for e in events
+                if isinstance(e["date"], date) and today <= e["date"] <= window_end]
+
+    picks: list[AttrDict] = []
+    seen_titles: set[str] = set()
+
+    for pick in editors_picks:
+        if len(picks) >= 6:
+            break
+        ev = pick.event
+        if ev.title and ev.title not in seen_titles:
+            seen_titles.add(ev.title)
+            picks.append(AttrDict({"event": ev, "commentary": pick.commentary}))
+
+    used_cats: set[str] = {p.event.category for p in picks if p.event.category}
+    for e in upcoming:
+        if len(picks) >= 6:
+            break
+        if e.title in seen_titles or not e.get("image_url"):
+            continue
+        if e.category not in used_cats:
+            picks.append(AttrDict({"event": e, "commentary": ""}))
+            seen_titles.add(e.title)
+            used_cats.add(e.category)
+
+    for e in upcoming:
+        if len(picks) >= 6:
+            break
+        if e.title in seen_titles or not e.get("image_url"):
+            continue
+        picks.append(AttrDict({"event": e, "commentary": ""}))
+        seen_titles.add(e.title)
+
+    return picks
+
+
 def build() -> None:
     """Build the msndo static site from JSON data."""
     data = _load_data()
@@ -283,7 +328,8 @@ def build() -> None:
     events = [e for e in all_events
               if isinstance(e["date"], date) and e["date"] >= today]
     past_count = len(all_events) - len(events)
-    print(f"Building site from {len(events)} upcoming events ({past_count} past events excluded from listings)...")
+    week_picks = _select_week_picks(events, editors_picks)
+    print(f"Building site from {len(events)} upcoming events ({past_count} past, {len(week_picks)} picks)...")
 
     # Prepare output directory
     if SITE_DIR.exists():
@@ -310,12 +356,31 @@ def build() -> None:
         for cat in categories
     }
 
+    category_icons = {
+        "Music": {"icon": "\u266b", "color": "#7c3aed"},
+        "Arts": {"icon": "\U0001f3a8", "color": "#ec4899"},
+        "Arts & Entertainment": {"icon": "\U0001f3ad", "color": "#ec4899"},
+        "Comedy": {"icon": "\U0001f923", "color": "#f59e0b"},
+        "Community": {"icon": "\U0001f91d", "color": "#10b981"},
+        "Education": {"icon": "\U0001f393", "color": "#3b82f6"},
+        "Family": {"icon": "\U0001f468\u200d\U0001f469\u200d\U0001f467\u200d\U0001f466", "color": "#f472b6"},
+        "Food & Drink": {"icon": "\U0001f37d\ufe0f", "color": "#ef4444"},
+        "Sports": {"icon": "\u26bd", "color": "#06b6d4"},
+        "Outdoors": {"icon": "\U0001f332", "color": "#22c55e"},
+        "Wellness": {"icon": "\U0001f9d8", "color": "#8b5cf6"},
+        "Parks & Recreation": {"icon": "\U0001f33f", "color": "#16a34a"},
+        "Festival": {"icon": "\U0001f389", "color": "#f97316"},
+    }
+    default_category_icon = {"icon": "\U0001f4c5", "color": "#6b7280"}
+
     common_context = {
         "site_title": site_title,
         "site_tagline": tagline,
         "site_url": site_url,
         "categories": categories,
         "category_slugs": category_slugs_map,
+        "category_icons": category_icons,
+        "default_category_icon": default_category_icon,
         "sources": sources,
         "total_events": len(events),
         "current_year": datetime.now().year,
@@ -363,7 +428,7 @@ def build() -> None:
     # Render main templates
     template_renders = [
         ("landing.html", "landing.html", {"editors_picks": editors_picks}),
-        ("index.html", "index.html", {"events_by_date": events_by_date}),
+        ("index.html", "index.html", {"events_by_date": events_by_date, "week_picks": week_picks}),
         ("newsletter_page.html", "newsletter.html", {"newsletter_preview": ""}),
         ("sponsors.html", "sponsors.html", {
             "sponsor_tiers": sponsor_tiers,
