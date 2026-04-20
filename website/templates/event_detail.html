@@ -51,6 +51,16 @@
             object-fit: cover;
             display: block;
         }
+        .event-detail-hero-fallback {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fallback-icon-hero {
+            font-size: 64px;
+            line-height: 1;
+        }
         .event-detail-body {
             padding: 30px;
         }
@@ -258,6 +268,11 @@
             {% if event.image_url %}
             <div class="event-detail-hero">
                 <img src="{{ event.image_url }}" alt="{{ event.title }}" loading="lazy">
+            </div>
+            {% else %}
+            {% set cat_icon = category_icons.get(event.category, default_category_icon) %}
+            <div class="event-detail-hero event-detail-hero-fallback" style="background: linear-gradient(135deg, {{ cat_icon.color }}15, {{ cat_icon.color }}30);">
+                <span class="fallback-icon-hero" style="color: {{ cat_icon.color }};">{{ cat_icon.icon }}</span>
             </div>
             {% endif %}
 
