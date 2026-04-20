@@ -28,6 +28,18 @@ document.addEventListener("DOMContentLoaded", function () {
             card.style.display = (sourceMatch && categoryMatch) ? "" : "none";
         });
 
+        var pickCards = document.querySelectorAll(".pick-card");
+        pickCards.forEach(function (card) {
+            var categoryMatch = activeCategory === "all" || card.dataset.category === activeCategory;
+            card.style.display = categoryMatch ? "" : "none";
+        });
+
+        var fypCards = document.querySelectorAll(".fyp-card");
+        fypCards.forEach(function (card) {
+            var categoryMatch = activeCategory === "all" || card.dataset.category === activeCategory;
+            card.style.display = categoryMatch ? "" : "none";
+        });
+
         // Update visible event count
         var statsBar = document.querySelector(".stats-bar span");
         if (statsBar) {
@@ -175,6 +187,8 @@ document.addEventListener("DOMContentLoaded", function () {
         var calendarDays = document.querySelectorAll(".calendar-day[data-date]");
         var inlineCTA = document.querySelector(".newsletter-inline-cta");
         var recurringSection = document.querySelector(".recurring-section");
+        var picksSection = document.querySelector(".picks-section");
+        var fypSection = document.querySelector(".find-your-people");
         var today = getTodayISO();
 
         if (activeTab === "all") {
@@ -195,11 +209,15 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             if (inlineCTA) inlineCTA.style.display = "";
             if (recurringSection) recurringSection.style.display = "";
+            if (picksSection) picksSection.style.display = "";
+            if (fypSection) fypSection.style.display = "";
             return;
         }
 
         if (inlineCTA) inlineCTA.style.display = "none";
         if (recurringSection) recurringSection.style.display = "none";
+        if (picksSection) picksSection.style.display = "none";
+        if (fypSection) fypSection.style.display = "none";
 
         var allowed;
         if (activeTab === "this-week") {

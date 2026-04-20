@@ -348,14 +348,16 @@ def build() -> None:
     """Build the msndo static site from JSON data."""
     data = _load_data()
     all_events = [_wrap(e) for e in data["events"]]
-    editors_picks = [AttrDict({"event": _wrap(p["event"]), "commentary": p["commentary"]})
-                     for p in data.get("editors_picks", [])]
+    editors_picks_raw = [AttrDict({"event": _wrap(p["event"]), "commentary": p["commentary"]})
+                         for p in data.get("editors_picks", [])]
 
     # Split into upcoming (today or future) and all events.
     # Listings/feeds show only upcoming; detail pages exist for all (preserving URLs).
     today = date.today()
     events = [e for e in all_events
               if isinstance(e["date"], date) and e["date"] >= today]
+    editors_picks = [p for p in editors_picks_raw
+                     if isinstance(p.event.get("date"), date) and p.event["date"] >= today]
     past_count = len(all_events) - len(events)
     print(f"Building site from {len(events)} upcoming events ({past_count} past events excluded from listings)...")
 

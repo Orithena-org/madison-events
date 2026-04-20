@@ -92,7 +92,7 @@
                     {% for pick in editors_picks[:5] %}
                     {% set event = pick.event %}
                     {% set cat_icon = category_icons.get(event.category, default_category_icon) %}
-                    <article class="pick-card">
+                    <article class="pick-card" data-category="{{ event.category or '' }}">
                         <a href="{{ event.detail_url }}" class="pick-card-link">
                             <div class="pick-number" style="background-color: {{ cat_icon.color }};">{{ loop.index }}</div>
                             <div class="pick-info">
@@ -121,7 +121,7 @@
                 </div>
                 <div class="fyp-grid">
                     {% for event in community_events[:6] %}
-                    <article class="fyp-card">
+                    <article class="fyp-card" data-category="{{ event.category or '' }}">
                         <a href="{{ event.detail_url }}" class="fyp-card-link">
                             <h3>{{ event.title }}</h3>
                             <div class="fyp-meta">
