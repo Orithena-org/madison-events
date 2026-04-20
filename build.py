@@ -458,7 +458,12 @@ def build() -> None:
     # Render main templates
     template_renders = [
         ("landing.html", "landing.html", {"editors_picks": editors_picks}),
-        ("index.html", "index.html", {"events_by_date": events_by_date, "recurring_events": recurring_summaries}),
+        ("index.html", "index.html", {
+            "events_by_date": events_by_date,
+            "recurring_events": recurring_summaries,
+            "editors_picks": editors_picks,
+            "community_events": [e for e in consolidated_events if e.category == "Community"],
+        }),
         ("newsletter_page.html", "newsletter.html", {"newsletter_preview": ""}),
         ("sponsors.html", "sponsors.html", {
             "sponsor_tiers": sponsor_tiers,

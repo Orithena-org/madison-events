@@ -80,6 +80,37 @@
                 <span>Updated: {{ last_updated }}</span>
             </div>
 
+            {% if editors_picks %}
+            <!-- Editor's Picks -->
+            <section class="picks-section" id="picks">
+                <div class="picks-header">
+                    <h2>This Week's Picks</h2>
+                    <a href="./highlights/" class="picks-see-all">See all picks &rarr;</a>
+                </div>
+                <div class="picks-grid">
+                    {% for pick in editors_picks[:5] %}
+                    {% set event = pick.event %}
+                    {% set cat_icon = category_icons.get(event.category, default_category_icon) %}
+                    <article class="pick-card">
+                        <a href="{{ event.detail_url }}" class="pick-card-link">
+                            <div class="pick-number" style="background-color: {{ cat_icon.color }};">{{ loop.index }}</div>
+                            <div class="pick-info">
+                                <h3>{{ event.title }}</h3>
+                                <div class="pick-meta">
+                                    <span>{{ event.date_display }}</span>
+                                    {% if event.venue %}<span>{{ event.venue }}</span>{% endif %}
+                                </div>
+                                {% if pick.commentary %}
+                                <p class="pick-commentary">{{ pick.commentary }}</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
             {% if community_events %}
             <!-- Find Your People section -->
             <section class="find-your-people" id="find-your-people">
