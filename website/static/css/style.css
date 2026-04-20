@@ -230,6 +230,82 @@ a:hover { color: var(--primary-dark); }
     border-radius: 0 var(--radius) 0 var(--radius);
 }
 
+/* Recurring badge */
+.recurring-badge {
+    display: inline-block;
+    background: #e8f0fe;
+    color: #1a56db;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin: 8px 16px 0;
+}
+
+/* Recurring events section */
+.recurring-section {
+    margin: 24px 0;
+}
+.recurring-section-header {
+    cursor: pointer;
+    padding: 12px 0;
+}
+.recurring-section-header h2 {
+    display: inline;
+    font-size: 18px;
+    color: var(--secondary);
+}
+.recurring-count {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 8px;
+}
+.recurring-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+.recurring-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+}
+.recurring-card h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+.recurring-card h3 a {
+    color: var(--text);
+    text-decoration: none;
+}
+.recurring-card h3 a:hover {
+    color: var(--primary);
+}
+.recurring-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.recurring-schedule-badge {
+    background: #e8f0fe;
+    color: #1a56db;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+.recurring-next {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
 /* Calendar view */
 .calendar-grid {
     display: grid;
