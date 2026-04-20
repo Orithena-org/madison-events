@@ -289,6 +289,8 @@ def _select_week_picks(events: list[AttrDict],
         if len(picks) >= 6:
             break
         ev = pick.event
+        if not (isinstance(ev["date"], date) and today <= ev["date"] <= window_end):
+            continue
         if ev.title and ev.title not in seen_titles:
             seen_titles.add(ev.title)
             picks.append(AttrDict({"event": ev, "commentary": pick.commentary}))
