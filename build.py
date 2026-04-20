@@ -310,12 +310,31 @@ def build() -> None:
         for cat in categories
     }
 
+    category_icons = {
+        "Music": {"icon": "♫", "color": "#7c3aed"},
+        "Arts": {"icon": "🎨", "color": "#ec4899"},
+        "Arts & Entertainment": {"icon": "🎭", "color": "#ec4899"},
+        "Comedy": {"icon": "🤣", "color": "#f59e0b"},
+        "Community": {"icon": "🤝", "color": "#10b981"},
+        "Education": {"icon": "🎓", "color": "#3b82f6"},
+        "Family": {"icon": "👨\u200d👩\u200d👧\u200d👦", "color": "#f472b6"},
+        "Food & Drink": {"icon": "🍽️", "color": "#ef4444"},
+        "Sports": {"icon": "⚽", "color": "#06b6d4"},
+        "Outdoors": {"icon": "🌲", "color": "#22c55e"},
+        "Wellness": {"icon": "🧘", "color": "#8b5cf6"},
+        "Parks & Recreation": {"icon": "🌿", "color": "#16a34a"},
+        "Festival": {"icon": "🎉", "color": "#f97316"},
+    }
+    default_category_icon = {"icon": "📅", "color": "#6b7280"}
+
     common_context = {
         "site_title": site_title,
         "site_tagline": tagline,
         "site_url": site_url,
         "categories": categories,
         "category_slugs": category_slugs_map,
+        "category_icons": category_icons,
+        "default_category_icon": default_category_icon,
         "sources": sources,
         "total_events": len(events),
         "current_year": datetime.now().year,
