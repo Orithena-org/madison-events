@@ -118,6 +118,9 @@
                         {% if event.is_featured %}
                         <div class="featured-badge">Featured</div>
                         {% endif %}
+                        {% if event.recurring_schedule %}
+                        <div class="recurring-badge">{{ event.recurring_schedule }}</div>
+                        {% endif %}
                         <div class="event-content">
                             <div class="event-info">
                                 <h3 class="event-title">
@@ -159,6 +162,30 @@
                 {% endif %}
                 {% endfor %}
             </div>
+
+            {% if recurring_events %}
+            <!-- Recurring Events Section -->
+            <div class="recurring-section">
+                <details>
+                    <summary class="recurring-section-header">
+                        <h2>Recurring Events <span class="recurring-count">{{ recurring_events|length }} series</span></h2>
+                    </summary>
+                    <div class="recurring-grid">
+                        {% for re in recurring_events %}
+                        <div class="recurring-card" data-source="{{ re.source }}" data-category="{{ re.category or '' }}">
+                            <h3><a href="{{ re.detail_url }}">{{ re.title }}</a></h3>
+                            <div class="recurring-meta">
+                                <span class="recurring-schedule-badge">{{ re.schedule }}</span>
+                                {% if re.time_display %}<span>{{ re.time_display }}</span>{% endif %}
+                                {% if re.venue %}<span>@ {{ re.venue }}</span>{% endif %}
+                            </div>
+                            <div class="recurring-next">Next: {{ re.next_date_display }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+            {% endif %}
 
             <!-- Calendar View (hidden by default) -->
             <div id="events-calendar" class="events-calendar" style="display:none;">
