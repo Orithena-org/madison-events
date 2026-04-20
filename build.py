@@ -386,12 +386,31 @@ def build() -> None:
         for cat in categories
     }
 
+    category_icons = {
+        "Music": {"icon": "\u266b", "color": "#7c3aed"},
+        "Arts": {"icon": "\U0001f3a8", "color": "#ec4899"},
+        "Arts & Entertainment": {"icon": "\U0001f3ad", "color": "#ec4899"},
+        "Comedy": {"icon": "\U0001f923", "color": "#f59e0b"},
+        "Community": {"icon": "\U0001f91d", "color": "#10b981"},
+        "Education": {"icon": "\U0001f393", "color": "#3b82f6"},
+        "Family": {"icon": "\U0001f46a", "color": "#f472b6"},
+        "Food & Drink": {"icon": "\U0001f37d\ufe0f", "color": "#ef4444"},
+        "Sports": {"icon": "\u26bd", "color": "#06b6d4"},
+        "Outdoors": {"icon": "\U0001f332", "color": "#22c55e"},
+        "Wellness": {"icon": "\U0001f9d8", "color": "#8b5cf6"},
+        "Parks & Recreation": {"icon": "\U0001f33f", "color": "#16a34a"},
+        "Festival": {"icon": "\U0001f389", "color": "#f97316"},
+    }
+    default_category_icon = {"icon": "\U0001f4c5", "color": "#6b7280"}
+
     common_context = {
         "site_title": site_title,
         "site_tagline": tagline,
         "site_url": site_url,
         "categories": categories,
         "category_slugs": category_slugs_map,
+        "category_icons": category_icons,
+        "default_category_icon": default_category_icon,
         "sources": sources,
         "total_events": len(events),
         "current_year": datetime.now().year,

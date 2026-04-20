@@ -147,6 +147,11 @@
                             <div class="event-image">
                                 <img src="{{ event.image_url }}" alt="{{ event.title }}" loading="lazy">
                             </div>
+                            {% else %}
+                            {% set cat_icon = category_icons.get(event.category, default_category_icon) %}
+                            <div class="event-image event-image-fallback" style="background-color: {{ cat_icon.color }}15;">
+                                <span class="fallback-icon" style="color: {{ cat_icon.color }};">{{ cat_icon.icon }}</span>
+                            </div>
                             {% endif %}
                         </div>
                     </article>
