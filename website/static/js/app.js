@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var activeSource = "all";
     var activeCategory = "all";
 
+    var recurringCards = document.querySelectorAll(".recurring-card");
+
     function applyFilters() {
         eventCards.forEach(function (card) {
             var sourceMatch = activeSource === "all" || card.dataset.source === activeSource;
@@ -18,6 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
         calendarEvents.forEach(function (ev) {
             var sourceMatch = activeSource === "all" || ev.dataset.source === activeSource;
             ev.style.display = sourceMatch ? "" : "none";
+        });
+
+        recurringCards.forEach(function (card) {
+            var sourceMatch = activeSource === "all" || card.dataset.source === activeSource;
+            var categoryMatch = activeCategory === "all" || !card.dataset.category || card.dataset.category === activeCategory;
+            card.style.display = (sourceMatch && categoryMatch) ? "" : "none";
         });
 
         // Update visible event count
@@ -166,6 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var dateSections = document.querySelectorAll(".date-section[data-date]");
         var calendarDays = document.querySelectorAll(".calendar-day[data-date]");
         var inlineCTA = document.querySelector(".newsletter-inline-cta");
+        var recurringSection = document.querySelector(".recurring-section");
         var today = getTodayISO();
 
         if (activeTab === "all") {
@@ -185,10 +194,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
             if (inlineCTA) inlineCTA.style.display = "";
+            if (recurringSection) recurringSection.style.display = "";
             return;
         }
 
         if (inlineCTA) inlineCTA.style.display = "none";
+        if (recurringSection) recurringSection.style.display = "none";
 
         var allowed;
         if (activeTab === "this-week") {
