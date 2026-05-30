@@ -90,6 +90,80 @@ def _tz_offset(event_date: date) -> str:
     return f"{sign}{hours:02d}:{minutes:02d}"
 
 
+def _identify_recurring(events: list[AttrDict], min_occurrences: int = 3) -> dict:
+    """Find events that recur (same title on 3+ dates). Returns {title: [dates]}."""
+    from collections import Counter
+    title_dates: dict[str, list[date]] = {}
+    for e in events:
+        d = e["date"]
+        if isinstance(d, date):
+            title_dates.setdefault(e.title, []).append(d)
+    return {
+        title: sorted(set(dates))
+        for title, dates in title_dates.items()
+        if len(set(dates)) >= min_occurrences
+    }
+
+
+def _consolidate_recurring(events: list[AttrDict]) -> tuple[list[AttrDict], list[AttrDict]]:
+    """Split events into one-time and recurring.
+
+    Returns (consolidated_events, recurring_summaries).
+    consolidated_events: all one-time events + first occurrence of each recurring event.
+    recurring_summaries: one entry per recurring title with schedule info.
+    """
+    recurring_titles = _identify_recurring(events)
+    if not recurring_titles:
+        return events, []
+
+    seen_recurring: set[str] = set()
+    consolidated: list[AttrDict] = []
+    recurring_summaries: list[AttrDict] = []
+
+    for event in sorted(events, key=lambda e: (e["date"], e.title)):
+        if event.title not in recurring_titles:
+            consolidated.append(event)
+            continue
+        if event.title in seen_recurring:
+            continue
+        seen_recurring.add(event.title)
+        dates = recurring_titles[event.title]
+        schedule = _format_schedule(dates)
+        event["recurring_schedule"] = schedule
+        event["recurring_count"] = len(dates)
+        consolidated.append(event)
+        recurring_summaries.append(AttrDict({
+            "title": event.title,
+            "venue": event.venue,
+            "category": event.category,
+            "source": event.source,
+            "source_display": event.source_display,
+            "detail_url": event.detail_url,
+            "url": event.url,
+            "time_display": event.time_display,
+            "schedule": schedule,
+            "count": len(dates),
+            "next_date": dates[0],
+            "next_date_display": dates[0].strftime("%a, %b %-d"),
+        }))
+
+    recurring_summaries.sort(key=lambda r: r["count"], reverse=True)
+    return consolidated, recurring_summaries
+
+
+def _format_schedule(dates: list[date]) -> str:
+    """Format a list of dates into a human-readable schedule string."""
+    if len(dates) <= 4:
+        return ", ".join(d.strftime("%a %b %-d") for d in dates)
+    day_names = [d.strftime("%A") for d in dates]
+    from collections import Counter
+    day_counts = Counter(day_names)
+    common_days = [d for d, c in day_counts.most_common() if c >= 2]
+    if common_days:
+        return f"Every {', '.join(d[:3] for d in common_days)}"
+    return f"{len(dates)} upcoming dates"
+
+
 def _group_events_by_date(events: list[AttrDict]) -> OrderedDict:
     grouped: dict[str, list[AttrDict]] = {}
     for event in sorted(events, key=lambda e: e["date"]):
@@ -300,7 +374,9 @@ def build() -> None:
     tagline = "Your guide to everything happening in Madison, WI"
     goatcounter_site = "georgeauto"
 
-    events_by_date = _group_events_by_date(events)
+    consolidated_events, recurring_summaries = _consolidate_recurring(events)
+    events_by_date = _group_events_by_date(consolidated_events)
+    print(f"  Consolidated {len(events) - len(consolidated_events)} recurring event duplicates ({len(recurring_summaries)} recurring series)")
     categories = sorted(set(e.category for e in events if e.category))
     sources = {e.source: e.source_display for e in events if e.source}
 
@@ -363,7 +439,7 @@ def build() -> None:
     # Render main templates
     template_renders = [
         ("landing.html", "landing.html", {"editors_picks": editors_picks}),
-        ("index.html", "index.html", {"events_by_date": events_by_date}),
+        ("index.html", "index.html", {"events_by_date": events_by_date, "recurring_events": recurring_summaries}),
         ("newsletter_page.html", "newsletter.html", {"newsletter_preview": ""}),
         ("sponsors.html", "sponsors.html", {
             "sponsor_tiers": sponsor_tiers,
